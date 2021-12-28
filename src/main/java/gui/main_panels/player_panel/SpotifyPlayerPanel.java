@@ -22,54 +22,21 @@ public class SpotifyPlayerPanel extends JPanel {
     private SpotifyWebHandler spotifyWebHandler;
     private SongPlayerPanel songPlayerPanel;
 
+    private JLabel connectedLabel;
+
     public SpotifyPlayerPanel() {
-        super(new BorderLayout());
+        super(null);
         this.spotifyWebHandler = new SpotifyWebHandler();
         this.songPlayerPanel = new SongPlayerPanel(this);
 
         this.setOpaque(true);
         this.setBackground(new Color(24, 24, 24));
 
-        JLabel connectedLabel = new JLabel();
-        JPanel northPanel = new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {
-                //super.paintComponent(g);
-                if(spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
-                    GetCurrentUsersProfileRequest currentUsersProfileRequest = spotifyWebHandler.getSpotifyApi().getCurrentUsersProfile().build();
-                    try {
-                        User currentUser = currentUsersProfileRequest.execute();
-                        connectedLabel.setText("Connected to " + currentUser.getDisplayName() + "'s Spotify");
-                    } catch (IOException | SpotifyWebApiException | ParseException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        northPanel.setPreferredSize(new Dimension(500, 100));
-        JPanel southPanel = new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {}
-        };
-        southPanel.setPreferredSize(new Dimension(500, 50));
-        JPanel eastPanel = new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {}
-        };
-        eastPanel.setPreferredSize(new Dimension(400, 500));
-        JPanel westPanel = new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {}
-        };
-        westPanel.setPreferredSize(new Dimension(400, 500));
+        this.connectedLabel = new JLabel();
+        this.connectedLabel.setBounds(0, 0, 50, 10);
+        this.add(this.songPlayerPanel);
+        this.songPlayerPanel.setBounds(100, 100, 300, 300);
 
-        this.add(songPlayerPanel, BorderLayout.CENTER);
-        this.add(northPanel, BorderLayout.NORTH);
-        this.add(southPanel, BorderLayout.SOUTH);
-        this.add(eastPanel, BorderLayout.EAST);
-        this.add(westPanel, BorderLayout.WEST);
-
-        northPanel.add(connectedLabel);
         JButton connectToSpotifyButton = new JButton("Connect to your Spotify");
         connectToSpotifyButton.addActionListener(new ActionListener() {
             @Override
@@ -79,7 +46,7 @@ public class SpotifyPlayerPanel extends JPanel {
                 repaint();
             }
         });
-        northPanel.add(connectToSpotifyButton);
+        connectToSpotifyButton.setBounds(20, 20, 40, 10);
 
         JButton clickMeButton = new JButton("Click Me!");
         clickMeButton.addActionListener(new ActionListener() {
@@ -97,7 +64,25 @@ public class SpotifyPlayerPanel extends JPanel {
                 }
             }
         });
-        northPanel.add(clickMeButton);
+        clickMeButton.setBounds(10, 10, 40, 10);
+
+        this.add(this.connectedLabel);
+        this.add(connectToSpotifyButton);
+        this.add(clickMeButton);
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
+            GetCurrentUsersProfileRequest currentUsersProfileRequest = this.spotifyWebHandler.getSpotifyApi().getCurrentUsersProfile().build();
+            try {
+                User currentUser = currentUsersProfileRequest.execute();
+                this.connectedLabel.setText("Connected to " + currentUser.getDisplayName() + "'s Spotify");
+            } catch (IOException | SpotifyWebApiException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public CurrentlyPlayingContext onGetCurrentPlayingTrack() {
