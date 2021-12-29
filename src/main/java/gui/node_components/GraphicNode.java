@@ -1,6 +1,6 @@
 package gui.node_components;
 
-import control.NodeControl;
+import control.node.NodeControl;
 import control.exceptions.CannotDeleteNodeException;
 import gui.main_panels.ParentNodePanel;
 

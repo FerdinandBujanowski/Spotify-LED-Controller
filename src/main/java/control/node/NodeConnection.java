@@ -1,6 +1,5 @@
-package control;
+package control.node;
 
-import java.awt.*;
 import java.io.Serializable;
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package control;
+package control.node;
 
 import java.io.Serializable;
 import java.util.Objects;

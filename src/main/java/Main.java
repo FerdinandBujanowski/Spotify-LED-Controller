@@ -1,18 +1,9 @@
-import com.wrapper.spotify.exceptions.SpotifyWebApiException;
-import com.wrapper.spotify.model_objects.IPlaylistItem;
-import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
-import com.wrapper.spotify.model_objects.specification.Track;
-import com.wrapper.spotify.requests.data.player.GetInformationAboutUsersCurrentPlaybackRequest;
-import control.NodeControl;
-import control.event.EventControl;
-import control.spotify.SpotifyWebHandler;
+import control.node.NodeControl;
+import control.song.SongControl;
 import gui.MainWindow;
-
-import org.apache.hc.core5.http.ParseException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
@@ -23,14 +14,14 @@ public class Main {
             e.printStackTrace();
         }
         NodeControl nodeControl = new NodeControl();
-        EventControl eventControl = new EventControl();
+        SongControl songControl = new SongControl();
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         MainWindow mainWindow = new MainWindow(
                 new Dimension((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.75)),
                 "LED Node Control",
                 nodeControl,
-                eventControl
+                songControl
         );
         mainWindow.setVisible(true);
 

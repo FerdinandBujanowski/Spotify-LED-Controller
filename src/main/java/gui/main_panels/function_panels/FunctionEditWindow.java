@@ -1,12 +1,12 @@
 package gui.main_panels.function_panels;
 
-import control.*;
+import control.node.NodeConnection;
+import control.node.NodeControl;
 import control.type_enums.JointType;
 import control.type_enums.NodeType;
 import gui.main_panels.ParentNodePanel;
 
 import java.awt.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class FunctionEditWindow extends ParentNodePanel {

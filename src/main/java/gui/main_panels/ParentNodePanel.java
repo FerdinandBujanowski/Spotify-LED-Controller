@@ -1,9 +1,9 @@
 package gui.main_panels;
 
-import control.ThreeCoordinatePoint;
+import control.node.ThreeCoordinatePoint;
 import control.exceptions.CannotDeleteNodeException;
-import control.NodeConnection;
-import control.NodeControl;
+import control.node.NodeConnection;
+import control.node.NodeControl;
 import control.type_enums.NodeType;
 import control.math_functions.MathFunctions;
 import gui.node_components.GraphicJoint;
@@ -16,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public abstract class ParentNodePanel extends JPanel implements Serializable {

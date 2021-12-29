@@ -1,10 +1,7 @@
 package control.save;
 
-import control.NodeControl;
-import gui.main_panels.function_panels.FunctionEditWindow;
-import gui.main_panels.function_panels.FunctionTabbedPane;
-import gui.main_panels.node_panel.NodeEditWindow;
-import gui.node_components.GraphicNode;
+import control.node.NodeControl;
+import control.song.SongControl;
 
 import java.awt.*;
 import java.io.*;
@@ -13,12 +10,14 @@ public class DataStorer implements Serializable {
 
     private String selectedSongID;
     private NodeControl nodeControl;
+    private SongControl songControl;
     private Point[] nodeEditGraphicNodePositions;
     private Point[][] functionEditGraphicNodePositions;
 
-    public DataStorer(String selectedSongID, NodeControl nodeControl, Point[] nodeEditGraphicNodePositions, Point[][] functionEditGraphicNodePositions) {
+    public DataStorer(String selectedSongID, NodeControl nodeControl, SongControl songControl, Point[] nodeEditGraphicNodePositions, Point[][] functionEditGraphicNodePositions) {
         this.selectedSongID = selectedSongID;
         this.nodeControl = nodeControl;
+        this.songControl = songControl;
         this.nodeEditGraphicNodePositions = nodeEditGraphicNodePositions;
         this.functionEditGraphicNodePositions = functionEditGraphicNodePositions;
     }
@@ -28,6 +27,9 @@ public class DataStorer implements Serializable {
     }
     public NodeControl getNodeControl() {
         return this.nodeControl;
+    }
+    public SongControl getSongControl() {
+        return this.songControl;
     }
     public Point[] getNodeEditGraphicNodePositions() {
         return this.nodeEditGraphicNodePositions;

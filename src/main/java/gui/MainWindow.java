@@ -1,10 +1,10 @@
 package gui;
 
-import control.event.EventControl;
+import control.song.SongControl;
 import control.save.DataStorer;
-import control.spotify.SpotifyWebHandler;
 import control.type_enums.*;
-import control.NodeControl;
+import control.node.NodeControl;
+import gui.main_panels.event_panel.EventEditWindow;
 import gui.main_panels.function_panels.FunctionTabbedPane;
 import gui.main_panels.node_panel.NodeEditWindow;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
@@ -16,13 +16,13 @@ import java.awt.event.*;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainWindow extends JFrame {
 
     private SpotifyPlayerPanel spotifyPlayerPanel;
 
     private NodeEditWindow nodeEditWindow;
+    private EventEditWindow eventEditWindow;
     private FunctionTabbedPane functionTabbedPane;
 
     private JMenuBar jMenuBar;
@@ -34,7 +34,7 @@ public class MainWindow extends JFrame {
 
     private boolean bProjectOpen;
 
-    public MainWindow(Dimension dimension, String title, NodeControl nodeControl, EventControl eventControl) {
+    public MainWindow(Dimension dimension, String title, NodeControl nodeControl, SongControl songControl) {
         super(title);
 
         this.setIconImage(new ImageIcon("images\\icon\\icon.png").getImage());
@@ -274,7 +274,7 @@ public class MainWindow extends JFrame {
                 if(bProjectOpen) {
                     //TODO: Abfangen, dass im Zweifelsfall das geöffnete Programm nicht gespeichert wird
                 }
-                newProject(nodeControl, dimension);
+                newProject(nodeControl, songControl, dimension);
                 pack();
                 setCorrectLocation();
                 repaint();
@@ -293,7 +293,7 @@ public class MainWindow extends JFrame {
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     DataStorer data = DataStorer.readFromFile(fileOpenChooser.getSelectedFile().getPath());
                     if(data != null) {
-                        newProject(data.getNodeControl(), dimension);
+                        newProject(data.getNodeControl(), data.getSongControl(), dimension);
 
                         nodeEditWindow.updateGraphicNodes(data.getNodeEditGraphicNodePositions());
                         functionTabbedPane.updateFunctions(data.getFunctionEditGraphicNodePositions());
@@ -320,7 +320,8 @@ public class MainWindow extends JFrame {
                 }
                 DataStorer dataStorer = new DataStorer(
                         null,
-                        nodeEditWindow.getNodeControl(),
+                        nodeControl,
+                        songControl,
                         nodeEditGraphicNodePositions,
                         functionEditGraphicNodePositions
                 );
@@ -338,11 +339,12 @@ public class MainWindow extends JFrame {
         });
     }
 
-    private void newProject(NodeControl nodeControl, Dimension dimension) {
+    private void newProject(NodeControl nodeControl, SongControl songControl, Dimension dimension) {
 
-        this.spotifyPlayerPanel = new SpotifyPlayerPanel();
+        this.spotifyPlayerPanel = new SpotifyPlayerPanel(songControl, dimension);
         this.nodeEditWindow = new NodeEditWindow(nodeControl);
         this.functionTabbedPane = new FunctionTabbedPane(nodeControl);
+        this.eventEditWindow = new EventEditWindow(songControl);
 
         this.nodeEditWindow.setPreferredSize(dimension);
 
@@ -351,7 +353,7 @@ public class MainWindow extends JFrame {
 
     private void enableTabs() {
         this.tabbedPane.setComponentAt(0, this.spotifyPlayerPanel);
-        this.tabbedPane.setComponentAt(1, new JPanel());
+        this.tabbedPane.setComponentAt(1, this.eventEditWindow);
         this.tabbedPane.setComponentAt(2, this.nodeEditWindow);
         this.tabbedPane.setComponentAt(3, this.functionTabbedPane);
         this.tabbedPane.setComponentAt(4, new JPanel());

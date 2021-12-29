@@ -7,6 +7,7 @@ import com.wrapper.spotify.model_objects.specification.User;
 import com.wrapper.spotify.requests.data.player.GetInformationAboutUsersCurrentPlaybackRequest;
 import com.wrapper.spotify.requests.data.player.*;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
+import control.song.SongControl;
 import control.spotify.SpotifyWebHandler;
 import gui.main_panels.node_panel.SongPlayerPanel;
 import org.apache.hc.core5.http.ParseException;
@@ -22,12 +23,16 @@ public class SpotifyPlayerPanel extends JPanel {
     private SpotifyWebHandler spotifyWebHandler;
     private SongPlayerPanel songPlayerPanel;
 
+    private SongControl songControl;
+
     private JLabel connectedLabel;
 
-    public SpotifyPlayerPanel() {
+    public SpotifyPlayerPanel(SongControl songControl, Dimension windowDimension) {
         super(null);
         this.spotifyWebHandler = new SpotifyWebHandler();
         this.songPlayerPanel = new SongPlayerPanel(this);
+
+        this.songControl = songControl;
 
         this.setOpaque(true);
         this.setBackground(new Color(24, 24, 24));

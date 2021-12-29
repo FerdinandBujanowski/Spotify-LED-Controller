@@ -1,4 +1,4 @@
-package control;
+package control.node;
 
 import control.exceptions.CannotDeleteNodeException;
 import control.exceptions.JointConnectionFailedException;

@@ -1,8 +1,7 @@
 package gui.main_panels.function_panels;
 
 import control.type_enums.JointType;
-import control.NodeControl;
-import gui.node_components.GraphicNode;
+import control.node.NodeControl;
 
 import javax.swing.*;
 import java.awt.*;

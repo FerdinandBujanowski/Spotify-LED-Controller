@@ -1,14 +1,13 @@
 package logic.function;
 
-import control.NodeConnection;
-import control.NodeControl;
+import control.node.NodeConnection;
+import control.node.NodeControl;
 import control.exceptions.JointConnectionFailedException;
 import logic.LogicComponent;
 import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.JointDataType;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 public class LogicFunction extends LogicComponent {

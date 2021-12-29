@@ -1,12 +1,11 @@
 package gui.node_components;
 
-import control.NodeControl;
+import control.node.NodeControl;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 
 public class GraphicJoint extends JPanel {
 
