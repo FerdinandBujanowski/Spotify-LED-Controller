@@ -353,7 +353,11 @@ public class MainWindow extends JFrame {
 
     private void enableTabs() {
         this.tabbedPane.setComponentAt(0, this.spotifyPlayerPanel);
-        this.tabbedPane.setComponentAt(1, this.eventEditWindow);
+        this.tabbedPane.setComponentAt(1, new JScrollPane(
+                this.eventEditWindow,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        ));
         this.tabbedPane.setComponentAt(2, this.nodeEditWindow);
         this.tabbedPane.setComponentAt(3, this.functionTabbedPane);
         this.tabbedPane.setComponentAt(4, new JPanel());

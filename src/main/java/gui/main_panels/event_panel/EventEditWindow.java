@@ -14,6 +14,6 @@ public class EventEditWindow extends JPanel {
 
         this.songControl = songControl;
         this.setOpaque(true);
-        this.setBackground(new Color(182, 182, 36));
+        this.setBackground(new Color(111, 159, 152));
     }
 }
