@@ -42,7 +42,7 @@ public class SongPlayerPanel extends JPanel {
         this.add(playButtonsPanel);
         //this.add(Box.createVerticalGlue());
     }
-
+/*
     public void updatePlayImage() {
         CurrentlyPlayingContext currentlyPlayingContext = this.spotifyPlayerPanel.onGetCurrentPlayingTrack();
         BufferedImage songImage = null;
@@ -53,7 +53,7 @@ public class SongPlayerPanel extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.imageLabel .setIcon(new ImageIcon(getScaledImage(songImage, 300, 300)));
+        this.imageLabel.setIcon(new ImageIcon(getScaledImage(songImage, 300, 300)));
     }
     @Override
     public void paintComponent(Graphics g) {
@@ -70,6 +70,8 @@ public class SongPlayerPanel extends JPanel {
 
         return resizedImg;
     }
+
+ */
 }
 
 class PlayButtonsPanel extends JPanel {
@@ -141,6 +143,7 @@ class PlayButtonsPanel extends JPanel {
         Icon finalPlayIconHover = playIconHover;
         Icon finalPauseIcon = pauseIcon;
         Icon finalPauseIconHover = pauseIconHover;
+        /*
         playPauseButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -170,6 +173,8 @@ class PlayButtonsPanel extends JPanel {
                 }
             }
         });
+
+         */
     }
 
     @Override
