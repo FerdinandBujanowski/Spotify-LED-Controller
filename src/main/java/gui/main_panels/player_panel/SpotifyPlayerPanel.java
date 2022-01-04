@@ -20,8 +20,12 @@ public class SpotifyPlayerPanel extends JPanel {
 
     private final JTextField searchSongField;
     private final JButton searchSongButton;
+
     private final JComboBox<String> selectSongBox;
     private final JButton selectSongButton;
+
+    private JLabel currentDevicesText;
+    private JButton refreshDevicesButton;
 
     private JLabel songImageLabel;
 
@@ -137,6 +141,9 @@ public class SpotifyPlayerPanel extends JPanel {
         this.songImageLabel.setBounds((windowDimension.width - 300) / 2, 100, 300, 300);
 
         this.add(this.songImageLabel);
+
+        //Current Devices Text
+        this.currentDevicesText = new JLabel();
     }
 
     @Override

@@ -2,6 +2,7 @@ package control.song;
 
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
+import com.wrapper.spotify.model_objects.miscellaneous.Device;
 import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.model_objects.specification.User;
 import com.wrapper.spotify.requests.data.player.GetInformationAboutUsersCurrentPlaybackRequest;
@@ -10,9 +11,11 @@ import com.wrapper.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
 import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import control.spotify.SpotifyWebHandler;
+import logic.node.nodes.debug.DebugNode;
 import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class SongControl {
@@ -26,6 +29,7 @@ public class SongControl {
     private Track[] lastSearchedSongList;
     private Track selectedSong;
 
+    private Device[] currentAvailableDevices;
 
     public SongControl() {
         this.spotifyWebHandler = new SpotifyWebHandler();
@@ -35,6 +39,8 @@ public class SongControl {
 
         this.lastSearchedSongList = new Track[] {};
         this.selectedSong = null;
+
+        this.currentAvailableDevices = new Device[] {};
     }
 
 
@@ -44,6 +50,10 @@ public class SongControl {
             GetCurrentUsersProfileRequest currentUsersProfileRequest = this.spotifyWebHandler.getSpotifyApi().getCurrentUsersProfile().build();
             try {
                 this.lastConnectedUser = currentUsersProfileRequest.execute();
+
+                this.currentAvailableDevices = this.spotifyWebHandler.getSpotifyApi().getUsersAvailableDevices().build()
+                        .execute();
+
                 return true;
             } catch (IOException | SpotifyWebApiException | ParseException e) {
                 e.printStackTrace();
@@ -83,8 +93,20 @@ public class SongControl {
         }
     }
 
+    public String[] getDeviceNameList() {
+        if(this.currentAvailableDevices.length == 0) {
+            return null;
+        }
+        return Arrays.copyOf(
+                Arrays.stream(this.currentAvailableDevices).map(Device::getName).toArray(),
+                this.currentAvailableDevices.length,
+                String[].class
+        );
+    }
+
     public CurrentlyPlayingContext onGetCurrentPlayingTrack() {
-        GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
+        GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
+                this.spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
         CurrentlyPlayingContext currentlyPlayingContext = null;
         try {
             currentlyPlayingContext = currentPlaybackRequest.execute();
