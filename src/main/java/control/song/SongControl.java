@@ -1,6 +1,8 @@
 package control.song;
 
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
+import com.wrapper.spotify.model_objects.miscellaneous.AudioAnalysis;
+import com.wrapper.spotify.model_objects.miscellaneous.AudioAnalysisMeasure;
 import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
 import com.wrapper.spotify.model_objects.miscellaneous.Device;
 import com.wrapper.spotify.model_objects.specification.Track;
@@ -9,13 +11,16 @@ import com.wrapper.spotify.requests.data.player.GetInformationAboutUsersCurrentP
 import com.wrapper.spotify.requests.data.player.PauseUsersPlaybackRequest;
 import com.wrapper.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
 import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
+import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import control.spotify.SpotifyWebHandler;
+import logic.event.LogicTrack;
 import logic.node.nodes.debug.DebugNode;
 import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SongControl {
@@ -29,10 +34,15 @@ public class SongControl {
     private Track[] lastSearchedSongList;
     private Track selectedSong;
 
+    private AudioAnalysis selectedSongAnalysis;
+
     private Device[] currentAvailableDevices;
+
+    private ArrayList<LogicTrack> logicTracks;
 
     public SongControl() {
         this.spotifyWebHandler = new SpotifyWebHandler();
+        this.logicTracks = new ArrayList<>();
 
         this.songId = "";
         this.songSelected = false;
@@ -79,9 +89,37 @@ public class SongControl {
     }
 
     public void selectSongBySearchedList(int selectedListIndex) {
-        this.selectedSong = this.lastSearchedSongList[selectedListIndex];
+        this.selectSong(this.lastSearchedSongList[selectedListIndex]);
+    }
+
+    public void selectSong(Track track) {
+        this.selectedSong = track;
         this.songId = this.selectedSong.getId();
         this.songSelected = true;
+
+        GetAudioAnalysisForTrackRequest getAudioAnalysisForTrackRequest =
+                this.spotifyWebHandler.getSpotifyApi().getAudioAnalysisForTrack(this.songId).build();
+        try {
+            this.selectedSongAnalysis = getAudioAnalysisForTrackRequest.execute();
+
+            this.logicTracks.add(new LogicTrack("Bars (generated)"));
+            for(AudioAnalysisMeasure bar : this.selectedSongAnalysis.getBars()) {
+                this.logicTracks.get(0).addEventToTrack(
+                        (int)(bar.getStart() * 1000),
+                        (int)((bar.getStart() + bar.getDuration()) * 1000)
+                );
+            }
+
+            this.logicTracks.add(new LogicTrack("Beats (generated"));
+            for(AudioAnalysisMeasure beat : this.selectedSongAnalysis.getBeats()) {
+                this.logicTracks.get(1).addEventToTrack(
+                        (int)(beat.getStart() * 1000),
+                        (int)((beat.getStart() + beat.getDuration()) * 1000)
+                );
+            }
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getImageURL() {

@@ -10,4 +10,19 @@ public abstract class MathFunctions {
         }
     }
 
+    public static double getBezier(double value) {
+        return 0;
+    }
+    public static double getConstant(double value) {
+        return 1;
+    }
+    public static double getExponential(double value) {
+        return 0;
+    }
+    public static double getLogarithmic(double value) {
+        return value;
+    }
+
+
+
 }
