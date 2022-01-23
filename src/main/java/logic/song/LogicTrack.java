@@ -1,4 +1,4 @@
-package logic.event;
+package logic.song;
 
 import control.exceptions.EventTimeNegativeException;
 

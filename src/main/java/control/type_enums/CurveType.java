@@ -8,6 +8,7 @@ public enum CurveType {
 
     BEZIER(MathFunctions::getBezier),
     CONSTANT(MathFunctions::getConstant),
+    LINEAR(MathFunctions::getLinear),
     EXPONENTIAL(MathFunctions::getExponential),
     LOGARITHMIC(MathFunctions::getLogarithmic);
 

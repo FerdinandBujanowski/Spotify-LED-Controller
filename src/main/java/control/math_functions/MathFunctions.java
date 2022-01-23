@@ -16,6 +16,9 @@ public abstract class MathFunctions {
     public static double getConstant(double value) {
         return 1;
     }
+    public static double getLinear(double value) {
+        return value;
+    }
     public static double getExponential(double value) {
         return 0;
     }

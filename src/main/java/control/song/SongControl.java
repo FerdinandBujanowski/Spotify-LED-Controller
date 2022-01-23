@@ -5,6 +5,7 @@ import com.wrapper.spotify.model_objects.miscellaneous.AudioAnalysis;
 import com.wrapper.spotify.model_objects.miscellaneous.AudioAnalysisMeasure;
 import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlayingContext;
 import com.wrapper.spotify.model_objects.miscellaneous.Device;
+import com.wrapper.spotify.model_objects.specification.AudioFeatures;
 import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.model_objects.specification.User;
 import com.wrapper.spotify.requests.data.player.GetInformationAboutUsersCurrentPlaybackRequest;
@@ -12,14 +13,13 @@ import com.wrapper.spotify.requests.data.player.PauseUsersPlaybackRequest;
 import com.wrapper.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
 import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
+import com.wrapper.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import control.spotify.SpotifyWebHandler;
-import logic.event.LogicTrack;
-import logic.node.nodes.debug.DebugNode;
+import logic.song.LogicTrack;
 import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,6 +35,8 @@ public class SongControl {
     private Track selectedSong;
 
     private AudioAnalysis selectedSongAnalysis;
+    private AudioFeatures selectedSongFeatures;
+    private ArrayList<TimeMeasure> timeMeasures;
 
     private Device[] currentAvailableDevices;
 
@@ -42,7 +44,6 @@ public class SongControl {
 
     public SongControl() {
         this.spotifyWebHandler = new SpotifyWebHandler();
-        this.logicTracks = new ArrayList<>();
 
         this.songId = "";
         this.songSelected = false;
@@ -50,7 +51,13 @@ public class SongControl {
         this.lastSearchedSongList = new Track[] {};
         this.selectedSong = null;
 
+        this.selectedSongAnalysis = null;
+        this.selectedSongFeatures = null;
+        this.timeMeasures = new ArrayList<>();
+
         this.currentAvailableDevices = new Device[] {};
+
+        this.logicTracks = new ArrayList<>();
     }
 
 
@@ -110,13 +117,29 @@ public class SongControl {
                 );
             }
 
+            float beatDurationSum = 0;
             this.logicTracks.add(new LogicTrack("Beats (generated"));
             for(AudioAnalysisMeasure beat : this.selectedSongAnalysis.getBeats()) {
+                beatDurationSum += beat.getDuration();
                 this.logicTracks.get(1).addEventToTrack(
                         (int)(beat.getStart() * 1000),
                         (int)((beat.getStart() + beat.getDuration()) * 1000)
                 );
             }
+            int averageBeatDuration = (int)((beatDurationSum / (float)this.selectedSongAnalysis.getBeats().length) * 1000);
+
+            GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest =
+                    this.spotifyWebHandler.getSpotifyApi().getAudioFeaturesForTrack(this.songId).build();
+            this.selectedSongFeatures = getAudioFeaturesForTrackRequest.execute();
+
+            this.timeMeasures.add(new TimeMeasure(
+                    this.selectedSongFeatures.getTimeSignature(),
+                    this.selectedSongFeatures.getTempo(),
+                    (int)(this.selectedSongAnalysis.getBeats()[0].getStart() * 1000),
+                    this.selectedSongAnalysis.getBeats().length
+            ));
+
+
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
@@ -170,5 +193,9 @@ public class SongControl {
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<TimeMeasure> getTimeMeasures() {
+        return this.timeMeasures;
     }
 }
