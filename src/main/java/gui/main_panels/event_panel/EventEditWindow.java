@@ -23,11 +23,14 @@ public class EventEditWindow extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        this.setPreferredSize(new Dimension(5000, this.getHeight()));
+        System.out.println("Test");
+
         ArrayList<TimeMeasure> timeMeasures = this.songControl.getTimeMeasures();
+        int totalWidth = 0;
         if(timeMeasures != null) {
             for(TimeMeasure timeMeasure : timeMeasures) {
                 int msSingleBeat = (int)Math.round(1000.0 / (timeMeasure.getBeatsPerMinute() / 60.0));
+                totalWidth += msSingleBeat * timeMeasure.getBeatsDuration();
                 for(int i = 0; i < timeMeasure.getBeatsDuration(); i++) {
 
                     if(i % timeMeasure.getBeatsPerBar() == 0) {
@@ -35,10 +38,11 @@ public class EventEditWindow extends JPanel {
                     } else {
                         g.setColor(Color.GRAY);
                     }
-                    int x = i * ((timeMeasure.getMsStart() + msSingleBeat) / 10);
+                    int x = i * ((timeMeasure.getMsStart() + msSingleBeat) / 20);
                     g.drawLine(x, 0, x, this.getHeight());
                 }
             }
+            this.setPreferredSize(new Dimension(totalWidth / 20, this.getHeight()));
         }
     }
 }
