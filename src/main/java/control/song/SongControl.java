@@ -16,6 +16,7 @@ import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import control.spotify.SpotifyWebHandler;
+import logic.song.LogicEvent;
 import logic.song.LogicTrack;
 import org.apache.hc.core5.http.ParseException;
 
@@ -94,7 +95,11 @@ public class SongControl {
         try {
             Track[] tracks = searchTracksRequest.execute().getItems();
             this.lastSearchedSongList = tracks;
-            return Arrays.copyOf(Arrays.stream(tracks).map(e -> e.getName() + " by " + e.getArtists()[0].getName()).toArray(), tracks.length, String[].class);
+            return Arrays.copyOf(
+                    Arrays.stream(tracks).map(e -> e.getName() + " by " + e.getArtists()[0].getName()).toArray(),
+                    tracks.length,
+                    String[].class
+            );
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
@@ -203,5 +208,15 @@ public class SongControl {
 
     public ArrayList<TimeMeasure> getTimeMeasures() {
         return this.timeMeasures;
+    }
+
+    public TrackTime[] getTrackTimes() {
+
+        TrackTime[] trackTimes = new TrackTime[this.logicTracks.size()];
+
+        for(int i = 0; i < trackTimes.length; i++) {
+            trackTimes[i] = new TrackTime(this.logicTracks.get(i).getEvents());
+        }
+        return trackTimes;
     }
 }

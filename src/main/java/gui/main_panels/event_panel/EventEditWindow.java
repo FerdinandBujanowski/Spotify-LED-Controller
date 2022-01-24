@@ -2,6 +2,7 @@ package gui.main_panels.event_panel;
 
 import control.song.SongControl;
 import control.song.TimeMeasure;
+import control.song.TrackTime;
 import control.song.Updatable;
 
 import javax.swing.*;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 public class EventEditWindow extends JPanel implements Updatable {
 
     private SongControl songControl;
+
+    private int EVENT_WIDTH_DIVISION = 20;
 
     public EventEditWindow(SongControl songControl) {
         super(null);
@@ -26,8 +29,6 @@ public class EventEditWindow extends JPanel implements Updatable {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        System.out.println("Test");
-
         ArrayList<TimeMeasure> timeMeasures = this.songControl.getTimeMeasures();
         if(timeMeasures != null) {
             for(TimeMeasure timeMeasure : timeMeasures) {
@@ -39,8 +40,31 @@ public class EventEditWindow extends JPanel implements Updatable {
                     } else {
                         g.setColor(Color.GRAY);
                     }
-                    int x = i * ((timeMeasure.getMsStart() + msSingleBeat) / 20);
+                    int x = i * ((timeMeasure.getMsStart() + msSingleBeat) / this.EVENT_WIDTH_DIVISION);
                     g.drawLine(x, 0, x, this.getHeight());
+                }
+            }
+        }
+
+        TrackTime[] trackTimes = this.songControl.getTrackTimes();
+        if(trackTimes != null) {
+            for(int i = 0; i < trackTimes.length; i++) {
+                Point[] points = trackTimes[i].getPoints();
+                for(int j = 0; j < points.length; j++) {
+                    g.setColor(Color.BLUE);
+                    g.fillRect(
+                            points[j].x / this.EVENT_WIDTH_DIVISION,
+                            20 + (i * 50),
+                            points[j].y / this.EVENT_WIDTH_DIVISION,
+                            30
+                    );
+                    g.setColor(Color.BLACK);
+                    g.drawRect(
+                            points[j].x / this.EVENT_WIDTH_DIVISION,
+                            20 + (i * 50),
+                            points[j].y / this.EVENT_WIDTH_DIVISION,
+                            30
+                    );
                 }
             }
         }
@@ -53,7 +77,7 @@ public class EventEditWindow extends JPanel implements Updatable {
             int msSingleBeat = (int)Math.round(1000.0 / (timeMeasure.getBeatsPerMinute() / 60.0));
             totalWidth += msSingleBeat * timeMeasure.getBeatsDuration();
         }
-        this.setPreferredSize(new Dimension(totalWidth / 20, this.getHeight()));
+        this.setPreferredSize(new Dimension(totalWidth / this.EVENT_WIDTH_DIVISION, this.getPreferredSize().height));
         this.repaint();
     }
 }

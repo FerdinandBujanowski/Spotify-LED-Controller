@@ -45,4 +45,12 @@ public class LogicTrack {
     public boolean eventOverlap(LogicEvent eventA, LogicEvent eventE) {
         return eventA.getMsStart() < eventE.getMsStart() && eventA.getMsEnd() > eventE.getMsStart();
     }
+
+    public LogicEvent[] getEvents() {
+        LogicEvent[] eventCopy = new LogicEvent[this.eventArrayList.size()];
+        for(int i = 0; i < eventCopy.length; i++) {
+            eventCopy[i] = this.eventArrayList.get(i);
+        }
+        return eventCopy;
+    }
 }
