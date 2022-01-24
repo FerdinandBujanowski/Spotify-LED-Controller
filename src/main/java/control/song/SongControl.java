@@ -26,6 +26,7 @@ import java.util.Arrays;
 public class SongControl {
 
     private SpotifyWebHandler spotifyWebHandler;
+    private Updatable eventWindow;
 
     private User lastConnectedUser;
     private String songId;
@@ -44,6 +45,7 @@ public class SongControl {
 
     public SongControl() {
         this.spotifyWebHandler = new SpotifyWebHandler();
+        this.eventWindow = null;
 
         this.songId = "";
         this.songSelected = false;
@@ -77,6 +79,10 @@ public class SongControl {
             }
         }
         return false;
+    }
+
+    public void setUpdatable(Updatable updatable) {
+        this.eventWindow = updatable;
     }
 
     public String getLastConnectedUserName() {
@@ -126,8 +132,6 @@ public class SongControl {
                         (int)((beat.getStart() + beat.getDuration()) * 1000)
                 );
             }
-            int averageBeatDuration = (int)((beatDurationSum / (float)this.selectedSongAnalysis.getBeats().length) * 1000);
-
             GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest =
                     this.spotifyWebHandler.getSpotifyApi().getAudioFeaturesForTrack(this.songId).build();
             this.selectedSongFeatures = getAudioFeaturesForTrackRequest.execute();
@@ -138,7 +142,9 @@ public class SongControl {
                     (int)(this.selectedSongAnalysis.getBeats()[0].getStart() * 1000),
                     this.selectedSongAnalysis.getBeats().length
             ));
-
+            if(this.eventWindow != null) {
+                this.eventWindow.update();
+            }
 
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
