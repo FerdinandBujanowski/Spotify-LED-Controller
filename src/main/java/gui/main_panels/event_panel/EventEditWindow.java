@@ -13,6 +13,8 @@ public class EventEditWindow extends JPanel implements Updatable {
 
     private SongControl songControl;
 
+    private ArrayList<TrackLabel> trackLabels;
+
     private double EVENT_WIDTH_DIVISION = 20;
 
     public EventEditWindow(SongControl songControl) {
@@ -21,8 +23,10 @@ public class EventEditWindow extends JPanel implements Updatable {
         this.songControl = songControl;
         this.songControl.setUpdatable(this);
 
+        this.trackLabels = new ArrayList<>();
+
         this.setOpaque(true);
-        this.setBackground(new Color(111, 159, 152));
+        this.setBackground(new Color(218, 218, 218));
     }
 
     @Override
