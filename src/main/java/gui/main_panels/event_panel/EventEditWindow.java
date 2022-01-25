@@ -13,7 +13,7 @@ public class EventEditWindow extends JPanel implements Updatable {
 
     private SongControl songControl;
 
-    private int EVENT_WIDTH_DIVISION = 20;
+    private double EVENT_WIDTH_DIVISION = 20;
 
     public EventEditWindow(SongControl songControl) {
         super(null);
@@ -32,7 +32,7 @@ public class EventEditWindow extends JPanel implements Updatable {
         ArrayList<TimeMeasure> timeMeasures = this.songControl.getTimeMeasures();
         if(timeMeasures != null) {
             for(TimeMeasure timeMeasure : timeMeasures) {
-                int msSingleBeat = (int)Math.round(1000.0 / (timeMeasure.getBeatsPerMinute() / 60.0));
+                double msSingleBeat = 1000.0 / (timeMeasure.getBeatsPerMinute() / 60.0);
                 for(int i = 0; i < timeMeasure.getBeatsDuration(); i++) {
 
                     if(i % timeMeasure.getBeatsPerBar() == 0) {
@@ -40,7 +40,8 @@ public class EventEditWindow extends JPanel implements Updatable {
                     } else {
                         g.setColor(Color.GRAY);
                     }
-                    int x = i * ((timeMeasure.getMsStart() + msSingleBeat) / this.EVENT_WIDTH_DIVISION);
+                    int x = (int)Math.round((timeMeasure.getMsStart() / this.EVENT_WIDTH_DIVISION)
+                        + (i * (msSingleBeat / this.EVENT_WIDTH_DIVISION)));
                     g.drawLine(x, 0, x, this.getHeight());
                 }
             }
@@ -53,16 +54,16 @@ public class EventEditWindow extends JPanel implements Updatable {
                 for(int j = 0; j < points.length; j++) {
                     g.setColor(Color.BLUE);
                     g.fillRect(
-                            points[j].x / this.EVENT_WIDTH_DIVISION,
+                            points[j].x / (int)this.EVENT_WIDTH_DIVISION,
                             20 + (i * 50),
-                            points[j].y / this.EVENT_WIDTH_DIVISION,
+                            points[j].y / (int)this.EVENT_WIDTH_DIVISION,
                             30
                     );
                     g.setColor(Color.BLACK);
                     g.drawRect(
-                            points[j].x / this.EVENT_WIDTH_DIVISION,
+                            points[j].x / (int)this.EVENT_WIDTH_DIVISION,
                             20 + (i * 50),
-                            points[j].y / this.EVENT_WIDTH_DIVISION,
+                            points[j].y / (int)this.EVENT_WIDTH_DIVISION,
                             30
                     );
                 }
@@ -77,7 +78,7 @@ public class EventEditWindow extends JPanel implements Updatable {
             int msSingleBeat = (int)Math.round(1000.0 / (timeMeasure.getBeatsPerMinute() / 60.0));
             totalWidth += msSingleBeat * timeMeasure.getBeatsDuration();
         }
-        this.setPreferredSize(new Dimension(totalWidth / this.EVENT_WIDTH_DIVISION, this.getPreferredSize().height));
+        this.setPreferredSize(new Dimension(totalWidth / (int)this.EVENT_WIDTH_DIVISION, this.getPreferredSize().height));
         this.repaint();
     }
 }
