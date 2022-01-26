@@ -16,7 +16,6 @@ import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import control.spotify.SpotifyWebHandler;
-import logic.song.LogicEvent;
 import logic.song.LogicTrack;
 import org.apache.hc.core5.http.ParseException;
 
@@ -24,10 +23,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SongControl {
+public class SongControl implements TrackRequestAcceptor {
 
     private SpotifyWebHandler spotifyWebHandler;
-    private Updatable eventWindow;
+    private EventGraphicUnit eventWindow;
 
     private User lastConnectedUser;
     private String songId;
@@ -80,10 +79,6 @@ public class SongControl {
             }
         }
         return false;
-    }
-
-    public void setUpdatable(Updatable updatable) {
-        this.eventWindow = updatable;
     }
 
     public String getLastConnectedUserName() {
@@ -148,7 +143,7 @@ public class SongControl {
                     this.selectedSongAnalysis.getBeats().length
             ));
             if(this.eventWindow != null) {
-                this.eventWindow.update();
+                this.eventWindow.syncTracks(this.getTrackTimes());
             }
 
         } catch (IOException | SpotifyWebApiException | ParseException e) {
@@ -206,17 +201,34 @@ public class SongControl {
         }
     }
 
+    @Override
+    public void setEventGraphicUnit(EventGraphicUnit eventGraphicUnit) {
+        this.eventWindow = eventGraphicUnit;
+    }
+
+    @Override
     public ArrayList<TimeMeasure> getTimeMeasures() {
         return this.timeMeasures;
     }
 
+    @Override
     public TrackTime[] getTrackTimes() {
 
         TrackTime[] trackTimes = new TrackTime[this.logicTracks.size()];
 
-        for(int i = 0; i < trackTimes.length; i++) {
-            trackTimes[i] = new TrackTime(this.logicTracks.get(i).getEvents());
+        for(int i = 0; i < this.logicTracks.size(); i++) {
+            trackTimes[i] = new TrackTime(this.logicTracks.get(i).getEvents(), this.logicTracks.get(i).getCurveTypes());
         }
         return trackTimes;
+    }
+
+    @Override
+    public void onUpdateTrackRequest(String trackName, boolean deleted) {
+
+    }
+
+    @Override
+    public void onUpdateEventRequest(String trackName, int msStartOld, boolean deleted, int msStartNew, int msDurationNew) {
+
     }
 }

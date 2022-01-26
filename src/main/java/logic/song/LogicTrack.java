@@ -1,6 +1,7 @@
 package logic.song;
 
 import control.exceptions.EventTimeNegativeException;
+import control.type_enums.CurveType;
 
 import java.util.ArrayList;
 
@@ -52,5 +53,13 @@ public class LogicTrack {
             eventCopy[i] = this.eventArrayList.get(i);
         }
         return eventCopy;
+    }
+
+    public CurveType[] getCurveTypes() {
+        CurveType[] curveTypeCopy = new CurveType[this.eventArrayList.size()];
+        for(int i = 0; i < curveTypeCopy.length; i++) {
+            curveTypeCopy[i] = this.eventArrayList.get(i).getCurveType();
+        }
+        return curveTypeCopy;
     }
 }

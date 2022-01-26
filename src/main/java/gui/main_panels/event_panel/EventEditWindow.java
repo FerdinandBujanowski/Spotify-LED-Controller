@@ -1,29 +1,30 @@
 package gui.main_panels.event_panel;
 
-import control.song.SongControl;
-import control.song.TimeMeasure;
-import control.song.TrackTime;
-import control.song.Updatable;
+import control.song.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class EventEditWindow extends JPanel implements Updatable {
+public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
-    private SongControl songControl;
+    private TrackRequestAcceptor songControl;
 
-    private ArrayList<TrackLabel> trackLabels;
+    private ArrayList<JLabel> trackLabels;
+    private ArrayList<ArrayList<JLabel>> eventLabels;
 
     private double EVENT_WIDTH_DIVISION = 20;
 
-    public EventEditWindow(SongControl songControl) {
+    public EventEditWindow(TrackRequestAcceptor songControl) {
         super(null);
 
         this.songControl = songControl;
-        this.songControl.setUpdatable(this);
+        this.songControl.setEventGraphicUnit(this);
 
         this.trackLabels = new ArrayList<>();
+        this.eventLabels = new ArrayList<>();
 
         this.setOpaque(true);
         this.setBackground(new Color(218, 218, 218));
@@ -56,7 +57,7 @@ public class EventEditWindow extends JPanel implements Updatable {
             for(int i = 0; i < trackTimes.length; i++) {
                 Point[] points = trackTimes[i].getPoints();
                 for(int j = 0; j < points.length; j++) {
-                    g.setColor(Color.BLUE);
+                    g.setColor(Color.WHITE);
                     g.fillRect(
                             points[j].x / (int)this.EVENT_WIDTH_DIVISION,
                             20 + (i * 50),
@@ -76,13 +77,83 @@ public class EventEditWindow extends JPanel implements Updatable {
     }
 
     @Override
-    public void update() {
+    public void syncTracks(TrackTime[] trackTimes) {
+
         int totalWidth = 0;
         for(TimeMeasure timeMeasure : this.songControl.getTimeMeasures()) {
             int msSingleBeat = (int)Math.round(1000.0 / (timeMeasure.getBeatsPerMinute() / 60.0));
             totalWidth += msSingleBeat * timeMeasure.getBeatsDuration();
         }
         this.setPreferredSize(new Dimension(totalWidth / (int)this.EVENT_WIDTH_DIVISION, this.getPreferredSize().height));
+
+        for(int i = 0; i < trackTimes.length; i++) {
+            this.addTrack();
+            for(Point point : trackTimes[i].getPoints()) {
+                this.addEventToTrack(i, point.x, point.y);
+            }
+        }
+
         this.repaint();
+    }
+
+    @Override
+    public void addTrack() {
+
+       JLabel trackLabel = new JLabel();
+       trackLabel.setOpaque(true);
+       trackLabel.setBackground(new Color(154, 154, 154));
+
+       trackLabel.setBounds(
+               0,
+               20 + (this.trackLabels.size() * 50),
+               this.getPreferredSize().width,
+               30
+       );
+
+       trackLabel.addMouseListener(new MouseAdapter() {
+           @Override
+           public void mouseClicked(MouseEvent e) {
+               //TODO: user input triggers requests to SongControl
+               super.mouseClicked(e);
+           }
+       });
+
+       this.trackLabels.add(trackLabel);
+       //this.add(trackLabel);
+
+       this.eventLabels.add(new ArrayList<>());
+    }
+
+    @Override
+    public void removeTrack(int trackNumber) {
+        this.trackLabels.remove(trackNumber);
+    }
+
+    @Override
+    public void addEventToTrack(int trackNumber, int msStart, int msDuration) {
+        JLabel eventLabel = new JLabel();
+        eventLabel.setOpaque(true);
+        eventLabel.setBackground(Color.BLUE);
+
+        eventLabel.setBounds(
+                msStart / (int)this.EVENT_WIDTH_DIVISION + 2,
+                20 + (trackNumber * 50),
+                msDuration / (int)this.EVENT_WIDTH_DIVISION - 2,
+                30
+        );
+
+        eventLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //TODO: user input triggers request to SongControl
+                super.mouseClicked(e);
+
+                System.out.println("Event clicked [track "
+                        + trackNumber + " - milliseconds " + msStart + " to " + (msStart + msDuration) + "]");
+            }
+        });
+
+        this.eventLabels.get(trackNumber).add(eventLabel);
+        this.add(eventLabel);
     }
 }
