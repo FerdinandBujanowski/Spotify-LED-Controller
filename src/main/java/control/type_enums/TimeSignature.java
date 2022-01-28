@@ -39,4 +39,14 @@ public enum TimeSignature {
         }
         return -1;
     }
+
+    public static String[] getNameArray() {
+        TimeSignature[] timeSignatures = TimeSignature.values();
+        String[] displayNames = new String[timeSignatures.length];
+
+        for(int i = 0; i < timeSignatures.length; i++) {
+            displayNames[i] = timeSignatures[i].getDisplayText();
+        }
+        return displayNames;
+    }
 }

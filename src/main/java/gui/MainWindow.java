@@ -111,7 +111,7 @@ public class MainWindow extends JFrame {
         editInputRhythmMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JComboBox notationTypeComboBox = new JComboBox(TimeSignature.values());
+                JComboBox notationTypeComboBox = new JComboBox(TimeSignature.getNameArray());
                 notationTypeComboBox.setSelectedIndex(TimeSignature.indexOf(eventEditWindow.getBarRoster()));
                 JOptionPane.showOptionDialog(null, notationTypeComboBox, "Edit Input Notation", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
                 TimeSignature newTimeSignature = TimeSignature.values()[notationTypeComboBox.getSelectedIndex()];
