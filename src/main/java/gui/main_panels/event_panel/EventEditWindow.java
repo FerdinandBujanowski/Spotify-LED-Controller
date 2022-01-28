@@ -68,31 +68,6 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 }
             }
         }
-
-        /*
-        TrackTime[] trackTimes = this.songControl.getTrackTimes();
-        if(trackTimes != null) {
-            for(int i = 0; i < trackTimes.length; i++) {
-                Point[] points = trackTimes[i].getPoints();
-                for(int j = 0; j < points.length; j++) {
-                    g.setColor(Color.WHITE);
-                    g.fillRect(
-                            points[j].x / (int)this.EVENT_WIDTH_DIVISION,
-                            20 + (i * 50),
-                            points[j].y / (int)this.EVENT_WIDTH_DIVISION,
-                            30
-                    );
-                    g.setColor(Color.BLACK);
-                    g.drawRect(
-                            points[j].x / (int)this.EVENT_WIDTH_DIVISION,
-                            20 + (i * 50),
-                            points[j].y / (int)this.EVENT_WIDTH_DIVISION,
-                            30
-                    );
-                }
-            }
-        }
-        */
     }
 
     @Override
@@ -100,10 +75,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
         int totalWidth = 0;
         for(TimeMeasure timeMeasure : this.songControl.getTimeMeasures()) {
-            int msSingleBeat = (int)Math.round(1000.0 / (timeMeasure.getBeatsPerMinute() / 60.0));
-            totalWidth += msSingleBeat * timeMeasure.getBeatsDuration();
+            int msSingleBeat = timeMeasure.getLengthOneBeat();
+            totalWidth += (msSingleBeat * timeMeasure.getBeatsDuration());
         }
-        this.setPreferredSize(new Dimension(totalWidth / (int)this.EVENT_WIDTH_DIVISION, this.getPreferredSize().height));
+        this.setPreferredSize(new Dimension(
+                totalWidth / (int)this.EVENT_WIDTH_DIVISION,
+                this.getPreferredSize().height));
 
         for(int i = 0; i < trackTimes.length; i++) {
             this.addTrack();
@@ -129,12 +106,25 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                30
        );
 
+       int currentIndex = this.trackLabels.size();
+
        trackLabel.addMouseListener(new MouseAdapter() {
            @Override
            public void mouseClicked(MouseEvent e) {
                //TODO: user input triggers requests to SongControl
                if(e.getClickCount() == 2) {
                    Point clickLocation = e.getPoint();
+
+                   int msInSong = clickLocation.x * (int)EVENT_WIDTH_DIVISION;
+                   TimeMeasure timeMeasure = songControl.getCorrespondingTimeMeasure(msInSong);
+                   double msOneSection = timeMeasure.getLengthOneBar() * barRoster.getRatio();
+                   int msInTimeMeasure = msInSong - timeMeasure.getMsStart();
+
+                   songControl.onAddEventToTrackRequest(
+                           currentIndex,
+                           (msInSong) - (int)Math.round(msInTimeMeasure % msOneSection),
+                           (int)Math.round(msOneSection)
+                   );
 
                }
            }
@@ -154,22 +144,28 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
     @Override
     public void addEventToTrack(int trackNumber, int msStart, int msDuration) {
-        JLabel eventLabel = new JLabel();
+        JLabel eventLabel = new JLabel() {
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(Color.BLACK);
+                g.drawRect(0, 0, this.getSize().width, this.getSize().height);
+            }
+        };
         eventLabel.setOpaque(true);
         eventLabel.setBackground(new Color(0, 11, 147));
 
         eventLabel.setBounds(
-                msStart / (int)this.EVENT_WIDTH_DIVISION + 1,
-                20 + (trackNumber * 50) + 2,
-                msDuration / (int)this.EVENT_WIDTH_DIVISION - 2,
-                30 - 4
+                msStart / (int)this.EVENT_WIDTH_DIVISION,
+                20 + (trackNumber * 50),
+                msDuration / (int)this.EVENT_WIDTH_DIVISION,
+                30
         );
 
         eventLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 //TODO: user input triggers request to SongControl
-                super.mouseClicked(e);
 
                 System.out.println("Event clicked [track "
                         + trackNumber + " - milliseconds " + msStart + " to " + (msStart + msDuration) + "]");
@@ -179,5 +175,6 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         this.eventLabels.get(trackNumber).add(eventLabel);
         this.add(eventLabel);
         eventLabel.getParent().setComponentZOrder(eventLabel, 0);
+        this.repaint();
     }
 }

@@ -82,14 +82,14 @@ public class SpotifyPlayerPanel extends JPanel {
 
         //Search Song Field
         this.searchSongField = new JTextField();
-        this.searchSongField.setBounds((windowDimension.width / 4) - 150, 30, 200, 20);
+        this.searchSongField.setBounds((windowDimension.width / 2) - 150, 60, 200, 20);
         this.searchSongField.setEnabled(false);
 
         this.add(this.searchSongField);
 
         //Search Song Button
         this.searchSongButton = new JButton("Search");
-        this.searchSongButton.setBounds((windowDimension.width / 4) + 51, 30, 100, 20);
+        this.searchSongButton.setBounds((windowDimension.width / 2) + 51, 60, 100, 20);
         this.searchSongButton.setEnabled(false);
 
         this.searchSongButton.addActionListener(new ActionListener() {
@@ -105,14 +105,14 @@ public class SpotifyPlayerPanel extends JPanel {
 
         //Select Song Box
         this.selectSongBox = new JComboBox<>();
-        this.selectSongBox.setBounds((windowDimension.width / 4) - 150, 55, 200, 20);
+        this.selectSongBox.setBounds((windowDimension.width / 2) - 150, 85, 200, 20);
         this.selectSongBox.setEnabled(false);
 
         this.add(selectSongBox);
 
         //Select Song Button
         this.selectSongButton = new JButton("Select");
-        this.selectSongButton.setBounds((windowDimension.width / 4) + 51, 55, 100, 20);
+        this.selectSongButton.setBounds((windowDimension.width / 2) + 51, 85, 100, 20);
         this.selectSongButton.setEnabled(false);
 
         this.selectSongButton.addActionListener(new ActionListener() {
@@ -138,7 +138,7 @@ public class SpotifyPlayerPanel extends JPanel {
 
         //Song Image Label
         this.songImageLabel = new JLabel();
-        this.songImageLabel.setBounds((windowDimension.width - 300) / 2, 100, 300, 300);
+        this.songImageLabel.setBounds((windowDimension.width - 300) / 2, 120, 300, 300);
 
         this.add(this.songImageLabel);
 

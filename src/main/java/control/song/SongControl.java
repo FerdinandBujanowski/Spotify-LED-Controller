@@ -16,6 +16,7 @@ import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import control.spotify.SpotifyWebHandler;
+import logic.song.LogicEvent;
 import logic.song.LogicTrack;
 import org.apache.hc.core5.http.ParseException;
 
@@ -212,6 +213,17 @@ public class SongControl implements TrackRequestAcceptor {
     }
 
     @Override
+    public TimeMeasure getCorrespondingTimeMeasure(int ms) {
+        for(TimeMeasure timeMeasure : this.timeMeasures) {
+            int msEnd = timeMeasure.getMsStart() + (timeMeasure.getLengthOneBeat() * timeMeasure.getBeatsDuration());
+            if(ms >= timeMeasure.getMsStart() && ms < msEnd) {
+                return timeMeasure;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public TrackTime[] getTrackTimes() {
 
         TrackTime[] trackTimes = new TrackTime[this.logicTracks.size()];
@@ -233,6 +245,21 @@ public class SongControl implements TrackRequestAcceptor {
     @Override
     public void onUpdateTrackRequest(int trackNumber, boolean deleted) {
 
+    }
+
+    @Override
+    public void onAddEventToTrackRequest(int trackNumber, int msStart, int msDuration) {
+        if(this.logicTracks.get(trackNumber) != null) {
+            int oldLength = this.logicTracks.get(trackNumber).getEvents().length;
+            this.logicTracks.get(trackNumber).addEventToTrack(msStart, msStart + msDuration);
+
+            //TODO: Prüfen nach Overlaps klappt anscheinend noch nicht
+            LogicEvent[] events = this.logicTracks.get(trackNumber).getEvents();
+            if(events.length > oldLength) {
+                LogicEvent newEvent = events[oldLength];
+                this.eventWindow.addEventToTrack(trackNumber, newEvent.getMsStart(), newEvent.getMsDuration());
+            }
+        }
     }
 
     @Override
