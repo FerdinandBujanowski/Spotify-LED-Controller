@@ -9,7 +9,9 @@ public interface TrackRequestAcceptor {
     ArrayList<TimeMeasure> getTimeMeasures();
     TrackTime[] getTrackTimes();
 
-    void onUpdateTrackRequest(String trackName, boolean deleted);
+    void onAddTrackRequest();
+    void onUpdateTrackRequest(int trackNumber, boolean deleted);
 
-    void onUpdateEventRequest(String trackName, int msStartOld, boolean deleted, int msStartNew, int msDurationNew);
+    void onUpdateEventRequest(int trackNumber, int msStartOld, boolean deleted, int msStartNew, int msDurationNew);
+
 }

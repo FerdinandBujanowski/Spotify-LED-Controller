@@ -115,7 +115,7 @@ public class SongControl implements TrackRequestAcceptor {
         try {
             this.selectedSongAnalysis = getAudioAnalysisForTrackRequest.execute();
 
-            this.logicTracks.add(new LogicTrack("Bars (generated)"));
+            this.logicTracks.add(new LogicTrack());
             for(AudioAnalysisMeasure bar : this.selectedSongAnalysis.getBars()) {
                 this.logicTracks.get(0).addEventToTrack(
                         (int)(bar.getStart() * 1000),
@@ -124,7 +124,7 @@ public class SongControl implements TrackRequestAcceptor {
             }
 
             float beatDurationSum = 0;
-            this.logicTracks.add(new LogicTrack("Beats (generated"));
+            this.logicTracks.add(new LogicTrack());
             for(AudioAnalysisMeasure beat : this.selectedSongAnalysis.getBeats()) {
                 beatDurationSum += beat.getDuration();
                 this.logicTracks.get(1).addEventToTrack(
@@ -223,12 +223,20 @@ public class SongControl implements TrackRequestAcceptor {
     }
 
     @Override
-    public void onUpdateTrackRequest(String trackName, boolean deleted) {
+    public void onAddTrackRequest() {
+        if(this.songSelected) {
+            //TODO: hier alle möglichen Fehler abfangen
+            this.logicTracks.add(new LogicTrack());
+            this.eventWindow.addTrack();
+        }
+    }
+    @Override
+    public void onUpdateTrackRequest(int trackNumber, boolean deleted) {
 
     }
 
     @Override
-    public void onUpdateEventRequest(String trackName, int msStartOld, boolean deleted, int msStartNew, int msDurationNew) {
+    public void onUpdateEventRequest(int trackNumber, int msStartOld, boolean deleted, int msStartNew, int msDurationNew) {
 
     }
 }

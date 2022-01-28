@@ -30,7 +30,7 @@ public class MainWindow extends JFrame {
 
     JSplitPane splitPane;
 
-    private JMenu nodeMenu, functionMenu;
+    private JMenu songMenu, nodeMenu, functionMenu;
 
     private boolean bProjectOpen;
 
@@ -44,18 +44,6 @@ public class MainWindow extends JFrame {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.getContentPane().setPreferredSize(dimension);
-
-        this.jMenuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
-        JMenuItem newProject = new JMenuItem("New Project");
-        JMenuItem openProject = new JMenuItem("Open Project");
-        JMenuItem saveProject = new JMenuItem("Save Project");
-        fileMenu.add(newProject);
-        fileMenu.add(openProject);
-        fileMenu.add(new JSeparator());
-        fileMenu.add(saveProject);
-        this.jMenuBar.add(fileMenu);
-        this.setJMenuBar(jMenuBar);
 
         this.splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {
             @Override
@@ -88,6 +76,54 @@ public class MainWindow extends JFrame {
         this.splitPane.setDividerLocation(40);
 
         this.add(this.splitPane);
+
+        this.jMenuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+        JMenuItem newProject = new JMenuItem("New Project");
+        JMenuItem openProject = new JMenuItem("Open Project");
+        JMenuItem saveProject = new JMenuItem("Save Project");
+        fileMenu.add(newProject);
+        fileMenu.add(openProject);
+        fileMenu.add(new JSeparator());
+        fileMenu.add(saveProject);
+        this.jMenuBar.add(fileMenu);
+        this.setJMenuBar(jMenuBar);
+
+        this.songMenu = new JMenu("Song");
+        JMenu trackSubMenu = new JMenu("Track");
+        JMenu eventSubMeu = new JMenu("Event");
+        JMenu rhythmSubMenu = new JMenu("Rhythm");
+
+        JMenuItem addTrackMenuItem = new JMenuItem("Add Track");
+        addTrackMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                songControl.onAddTrackRequest();
+            }
+        });
+        trackSubMenu.add(addTrackMenuItem);
+
+        this.songMenu.add(trackSubMenu);
+
+        this.songMenu.add(eventSubMeu);
+
+        JMenuItem editInputRhythmMenuItem = new JMenuItem("Edit Input Notation");
+        editInputRhythmMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox notationTypeComboBox = new JComboBox(TimeSignature.values());
+                notationTypeComboBox.setSelectedIndex(TimeSignature.indexOf(eventEditWindow.getBarRoster()));
+                JOptionPane.showOptionDialog(null, notationTypeComboBox, "Edit Input Notation", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+                TimeSignature newTimeSignature = TimeSignature.values()[notationTypeComboBox.getSelectedIndex()];
+                eventEditWindow.setBarRoster(newTimeSignature);
+            }
+        });
+        rhythmSubMenu.add(editInputRhythmMenuItem);
+        this.songMenu.add(rhythmSubMenu);
+
+        this.songMenu.setEnabled(false);
+        this.jMenuBar.add(this.songMenu);
+
 
         this.nodeMenu = new JMenu("Node");
 
@@ -173,7 +209,7 @@ public class MainWindow extends JFrame {
         this.functionMenu = new JMenu("Function");
 
         JMenuItem createFunctionMenuItem = new JMenuItem("Create Function");
-        JMenu addFunction = new JMenu("Add Function");
+        JMenu addFunctionMenu = new JMenu("Add Function");
         JMenu addFunctionInstance = new JMenu("Add Function Instance");
 
         ArrayList<JMenuItem> functionItemList = new ArrayList<>();
@@ -223,7 +259,7 @@ public class MainWindow extends JFrame {
                     JMenuItem addNewFunctionItem = new JMenuItem(functionName);
                     JMenuItem addNewFunctionInstanceItem = new JMenuItem(functionName);
 
-                    addFunction.add(addNewFunctionItem);
+                    addFunctionMenu.add(addNewFunctionItem);
                     addFunctionInstance.add(addNewFunctionInstanceItem);
 
                     functionItemList.add(addNewFunctionItem);
@@ -260,7 +296,7 @@ public class MainWindow extends JFrame {
         });
         this.functionMenu.add(createFunctionMenuItem);
         this.functionMenu.add(new JSeparator());
-        this.functionMenu.add(addFunction);
+        this.functionMenu.add(addFunctionMenu);
         this.functionMenu.add(addFunctionInstance);
         jMenuBar.add(this.functionMenu);
         this.functionMenu.setEnabled(false);
@@ -362,6 +398,7 @@ public class MainWindow extends JFrame {
         this.tabbedPane.setComponentAt(3, this.functionTabbedPane);
         this.tabbedPane.setComponentAt(4, new JPanel());
 
+        this.songMenu.setEnabled(true);
         this.nodeMenu.setEnabled(true);
         this.functionMenu.setEnabled(true);
 

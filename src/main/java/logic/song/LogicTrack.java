@@ -7,11 +7,9 @@ import java.util.ArrayList;
 
 public class LogicTrack {
 
-    private String trackName;
     private ArrayList<LogicEvent> eventArrayList;
 
-    public LogicTrack(String trackName) {
-        this.trackName = trackName;
+    public LogicTrack() {
         this.eventArrayList = new ArrayList<>();
     }
 
