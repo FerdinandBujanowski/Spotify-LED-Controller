@@ -1,6 +1,7 @@
 package gui.main_panels.event_panel;
 
 import control.song.*;
+import control.type_enums.CurveType;
 import control.type_enums.TimeSignature;
 
 import javax.swing.*;
@@ -84,8 +85,9 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
         for(int i = 0; i < trackTimes.length; i++) {
             this.addTrack();
-            for(Point point : trackTimes[i].getPoints()) {
-                this.addEventToTrack(i, point.x, point.y);
+            for(int j = 0; j < trackTimes[i].getPoints().length; j++) {
+                Point point = trackTimes[i].getPoints()[j];
+                this.addEventToTrack(i, point.x, point.y, trackTimes[i].getCurveTypes()[j]);
             }
         }
 
@@ -112,7 +114,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
            @Override
            public void mouseClicked(MouseEvent e) {
                //TODO: user input triggers requests to SongControl
-               if(e.getClickCount() == 2) {
+               if(e.getClickCount() == 2 && e.getButton()  == MouseEvent.BUTTON1) {
                    Point clickLocation = e.getPoint();
 
                    int msInSong = clickLocation.x * (int)EVENT_WIDTH_DIVISION;
@@ -143,7 +145,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
-    public void addEventToTrack(int trackNumber, int msStart, int msDuration) {
+    public void addEventToTrack(int trackNumber, int msStart, int msDuration, CurveType curveType) {
         JLabel eventLabel = new JLabel() {
             @Override
             public void paintComponent(Graphics g) {
@@ -153,7 +155,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             }
         };
         eventLabel.setOpaque(true);
-        eventLabel.setBackground(new Color(0, 11, 147));
+        eventLabel.setBackground(curveType.getColor());
 
         eventLabel.setBounds(
                 msStart / (int)this.EVENT_WIDTH_DIVISION,
@@ -165,16 +167,48 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         eventLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                //TODO: user input triggers request to SongControl
 
-                System.out.println("Event clicked [track "
-                        + trackNumber + " - milliseconds " + msStart + " to " + (msStart + msDuration) + "]");
+                if(e.getButton() == MouseEvent.BUTTON3) {
+
+                    JComboBox curveTypeComboBox = new JComboBox(CurveType.values());
+                    curveTypeComboBox.setSelectedIndex(CurveType.indexOf(curveType));
+                    JOptionPane.showOptionDialog(null, curveTypeComboBox, "Edit Curve Type", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+                    CurveType newCurveType = CurveType.values()[curveTypeComboBox.getSelectedIndex()];
+
+                    songControl.onUpdateEventRequest(
+                            trackNumber,
+                            msStart,
+                            false,
+                            newCurveType,
+                            msStart,
+                            msDuration
+                    );
+                } else if(
+                        e.getButton() == MouseEvent.BUTTON1) {
+                    if(e.getClickCount() == 2) {
+                        songControl.onUpdateEventRequest(
+                                trackNumber,
+                                msStart,
+                                true,
+                                curveType,
+                                0,
+                                0
+                        );
+                    }
+                }
             }
         });
 
         this.eventLabels.get(trackNumber).add(eventLabel);
         this.add(eventLabel);
         eventLabel.getParent().setComponentZOrder(eventLabel, 0);
+        this.repaint();
+    }
+
+    @Override
+    public void deleteEvent(int trackNumber, int eventIndex) {
+        this.remove(this.eventLabels.get(trackNumber).get(eventIndex));
+        this.eventLabels.get(trackNumber).remove(eventIndex);
         this.repaint();
     }
 }

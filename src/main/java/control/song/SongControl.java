@@ -16,6 +16,7 @@ import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import control.spotify.SpotifyWebHandler;
+import control.type_enums.CurveType;
 import logic.song.LogicEvent;
 import logic.song.LogicTrack;
 import org.apache.hc.core5.http.ParseException;
@@ -229,7 +230,7 @@ public class SongControl implements TrackRequestAcceptor {
         TrackTime[] trackTimes = new TrackTime[this.logicTracks.size()];
 
         for(int i = 0; i < this.logicTracks.size(); i++) {
-            trackTimes[i] = new TrackTime(this.logicTracks.get(i).getEvents(), this.logicTracks.get(i).getCurveTypes());
+            trackTimes[i] = new TrackTime(this.logicTracks.get(i).getEventsCopyArray(), this.logicTracks.get(i).getCurveTypes());
         }
         return trackTimes;
     }
@@ -250,20 +251,29 @@ public class SongControl implements TrackRequestAcceptor {
     @Override
     public void onAddEventToTrackRequest(int trackNumber, int msStart, int msDuration) {
         if(this.logicTracks.get(trackNumber) != null) {
-            int oldLength = this.logicTracks.get(trackNumber).getEvents().length;
+            int oldLength = this.logicTracks.get(trackNumber).getEventsCopyArray().length;
             this.logicTracks.get(trackNumber).addEventToTrack(msStart, msStart + msDuration);
 
             //TODO: Prüfen nach Overlaps klappt anscheinend noch nicht
-            LogicEvent[] events = this.logicTracks.get(trackNumber).getEvents();
+            LogicEvent[] events = this.logicTracks.get(trackNumber).getEventsCopyArray();
             if(events.length > oldLength) {
                 LogicEvent newEvent = events[oldLength];
-                this.eventWindow.addEventToTrack(trackNumber, newEvent.getMsStart(), newEvent.getMsDuration());
+                this.eventWindow.addEventToTrack(trackNumber, newEvent.getMsStart(), newEvent.getMsDuration(), newEvent.getCurveType());
             }
         }
     }
 
     @Override
-    public void onUpdateEventRequest(int trackNumber, int msStartOld, boolean deleted, int msStartNew, int msDurationNew) {
+    public void onUpdateEventRequest(int trackNumber, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew) {
+        int eventIndex = this.logicTracks.get(trackNumber).getEventIndex(msStartOld);
+        if(eventIndex == -1) return;
 
+        this.logicTracks.get(trackNumber).removeEventAtIndex(eventIndex);
+        this.eventWindow.deleteEvent(trackNumber, eventIndex);
+
+        if(!deleted) {
+            this.logicTracks.get(trackNumber).addEventToTrack(msStartNew, msStartNew + msDurationNew);
+            this.eventWindow.addEventToTrack(trackNumber, msStartNew, msDurationNew, curveType);
+        }
     }
 }

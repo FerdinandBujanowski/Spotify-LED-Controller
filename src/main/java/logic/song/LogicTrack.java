@@ -45,7 +45,21 @@ public class LogicTrack {
         return eventA.getMsStart() < eventE.getMsStart() && eventA.getMsEnd() > eventE.getMsStart();
     }
 
-    public LogicEvent[] getEvents() {
+    public int getEventIndex(int ms) {
+        for(int i = 0; i < this.eventArrayList.size(); i++) {
+            LogicEvent event = this.eventArrayList.get(i);
+            if(ms >= event.getMsStart() && ms < event.getMsEnd()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void removeEventAtIndex(int eventIndex) {
+        this.eventArrayList.remove(eventIndex);
+    }
+
+    public LogicEvent[] getEventsCopyArray() {
         LogicEvent[] eventCopy = new LogicEvent[this.eventArrayList.size()];
         for(int i = 0; i < eventCopy.length; i++) {
             eventCopy[i] = this.eventArrayList.get(i);
