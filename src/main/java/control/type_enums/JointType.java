@@ -6,19 +6,35 @@ import java.awt.*;
 
 public enum JointType {
 
-    BOOLEAN_TYPE(new Color(189, 62, 66), BooleanJointDataType.class),
-    COLOR_TYPE(new Color(189, 62, 168), ColorJointDataType.class),
-    FUNCTION_INSTANCE_TYPE(new Color(100, 100, 100), FunctionInstanceJointDataType.class),
-    INTEGER_TYPE(new Color(16, 8, 77), IntegerJointDataType.class),
-    INTERVAL_TYPE(new Color(37, 110, 35, 255), IntervalJointDataType.class),
-    NUMBER_TYPE(new Color(62, 74, 189), NumberJointDataType.class),
-    UNIT_NUMBER_TYPE(new Color(62, 189, 189), UnitNumberJointDataType.class);
+    /*
+    COLOR PALETTE:
+    0, 56, 68,
+    0, 82, 86,
+    0, 108, 103,
+    121, 128, 142,
+    241, 148, 180,
+    248, 163, 90,
+    255, 177, 0,
+    255, 206, 99,
+    255, 235, 198
+     */
+
+    NUMBER_TYPE(new Color(0, 56, 68), NumberJointDataType.class, "Number"),
+    INTEGER_TYPE(new Color(0, 82, 86), IntegerJointDataType.class, "Integer"),
+    UNIT_NUMBER_TYPE(new Color(0, 108, 103), UnitNumberJointDataType.class, "Unit Number"),
+    INTERVAL_TYPE(new Color(121, 128, 142), IntervalJointDataType.class, "Interval"),
+    BOOLEAN_TYPE(new Color(241, 148, 180), BooleanJointDataType.class, "Boolean"),
+    COLOR_TYPE(new Color(248, 163, 90), ColorJointDataType.class, "Color"),
+    FUNCTION_INSTANCE_TYPE(new Color(255, 177, 0), FunctionInstanceJointDataType.class, "Function Instance");
 
     private Color color;
     private Class typeClass;
-    JointType(Color color, Class typeClass) {
+    String name;
+
+    JointType(Color color, Class typeClass, String name) {
         this.color = color;
         this.typeClass = typeClass;
+        this.name = name;
     }
 
     public Color getColor() {
@@ -48,5 +64,10 @@ public enum JointType {
         }
 
         return jointDataType;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 }
