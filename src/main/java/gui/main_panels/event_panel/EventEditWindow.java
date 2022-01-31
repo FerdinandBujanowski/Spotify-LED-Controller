@@ -16,6 +16,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
     private ArrayList<JLabel> trackLabels;
     private ArrayList<ArrayList<JLabel>> eventLabels;
+    private JLabel cursorLabel;
 
     private double EVENT_WIDTH_DIVISION = 20;
     private TimeSignature barRoster;
@@ -28,6 +29,13 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
         this.trackLabels = new ArrayList<>();
         this.eventLabels = new ArrayList<>();
+
+        this.cursorLabel = new JLabel();
+        this.cursorLabel.setOpaque(true);
+        this.cursorLabel.setBackground(Color.BLUE);
+
+        this.add(this.cursorLabel);
+        this.cursorLabel.setLocation(0, 0);
 
         this.barRoster = TimeSignature.ONE_FOUR;
 
@@ -72,6 +80,17 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
+    public void setPreferredSize(Dimension preferredSize) {
+        super.setPreferredSize(preferredSize);
+        this.cursorLabel.setBounds(
+                this.cursorLabel.getX(),
+                this.cursorLabel.getY(),
+                2,
+                this.getSize().height
+        );
+    }
+
+    @Override
     public void syncTracks(TrackTime[] trackTimes) {
 
         int totalWidth = 0;
@@ -107,6 +126,10 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                this.getPreferredSize().width,
                30
        );
+       this.setPreferredSize(new Dimension(
+               this.getPreferredSize().width,
+               this.getPreferredSize().height + 50
+       ));
 
        int currentIndex = this.trackLabels.size();
 
@@ -135,7 +158,17 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
        this.trackLabels.add(trackLabel);
        this.add(trackLabel);
 
+        JLabel numberLabel = new JLabel("" + (this.trackLabels.size()));
+        numberLabel.setBounds(
+                5,
+                5 + ((this.trackLabels.size() - 1) * 50),
+                20,
+                10
+        );
+        this.add(numberLabel);
+
        this.eventLabels.add(new ArrayList<>());
+
        this.repaint();
     }
 
@@ -210,5 +243,18 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         this.remove(this.eventLabels.get(trackNumber).get(eventIndex));
         this.eventLabels.get(trackNumber).remove(eventIndex);
         this.repaint();
+    }
+
+    @Override
+    public void tick(int ms) {
+
+        this.cursorLabel.setBounds(
+                (int)Math.round(ms / this.EVENT_WIDTH_DIVISION),
+                0,
+                this.cursorLabel.getWidth(),
+                this.cursorLabel.getHeight()
+        );
+        System.out.println(this.cursorLabel.getX());
+
     }
 }

@@ -25,7 +25,7 @@ public class Main {
         );
         mainWindow.setVisible(true);
 
-        /**
+        /*
         SpotifyWebHandler spotifyWebHandler = new SpotifyWebHandler();
 
         GetInformationAboutUsersCurrentPlaybackRequest usersCurrentPlaybackRequest = spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
@@ -37,6 +37,22 @@ public class Main {
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
-         **/
+         */
+
+        int i;
+        long currentTimeMillis = System.currentTimeMillis();
+        while(true) {
+            i = (int)(System.currentTimeMillis() - currentTimeMillis);
+            if(songControl.isSongSelected()) {
+                songControl.tick(i);
+            } else {
+                try {
+                    Thread.sleep(1);
+                    currentTimeMillis = System.currentTimeMillis();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

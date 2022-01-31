@@ -15,5 +15,6 @@ public interface EventGraphicUnit {
     void addEventToTrack(int trackNumber, int msStart, int msDuration, CurveType curveType);
     void deleteEvent(int trackNumber, int oldEventIndex);
     //...
+    void tick(int ms);
 
 }

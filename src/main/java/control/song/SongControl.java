@@ -34,6 +34,8 @@ public class SongControl implements TrackRequestAcceptor {
     private String songId;
     private boolean songSelected;
 
+    private int currentSongMs;
+
     private Track[] lastSearchedSongList;
     private Track selectedSong;
 
@@ -51,6 +53,7 @@ public class SongControl implements TrackRequestAcceptor {
 
         this.songId = "";
         this.songSelected = false;
+        this.currentSongMs = 0;
 
         this.lastSearchedSongList = new Track[] {};
         this.selectedSong = null;
@@ -162,6 +165,10 @@ public class SongControl implements TrackRequestAcceptor {
         }
     }
 
+    public boolean isSongSelected() {
+        return this.songSelected;
+    }
+
     public String[] getDeviceNameList() {
         if(this.currentAvailableDevices.length == 0) {
             return null;
@@ -233,6 +240,16 @@ public class SongControl implements TrackRequestAcceptor {
             trackTimes[i] = new TrackTime(this.logicTracks.get(i).getEventsCopyArray(), this.logicTracks.get(i).getCurveTypes());
         }
         return trackTimes;
+    }
+
+    @Override
+    public int getCurrentSongMs() {
+        return this.currentSongMs;
+    }
+
+    @Override
+    public void tick(int ms) {
+        eventWindow.tick(ms);
     }
 
     @Override

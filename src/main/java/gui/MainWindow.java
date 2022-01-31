@@ -91,7 +91,6 @@ public class MainWindow extends JFrame {
 
         this.songMenu = new JMenu("Song");
         JMenu trackSubMenu = new JMenu("Track");
-        JMenu eventSubMeu = new JMenu("Event");
         JMenu rhythmSubMenu = new JMenu("Rhythm");
 
         JMenuItem addTrackMenuItem = new JMenuItem("Add Track");
@@ -104,8 +103,6 @@ public class MainWindow extends JFrame {
         trackSubMenu.add(addTrackMenuItem);
 
         this.songMenu.add(trackSubMenu);
-
-        this.songMenu.add(eventSubMeu);
 
         JMenuItem editInputRhythmMenuItem = new JMenuItem("Edit Input Notation");
         editInputRhythmMenuItem.addActionListener(new ActionListener() {
@@ -123,7 +120,6 @@ public class MainWindow extends JFrame {
 
         this.songMenu.setEnabled(false);
         this.jMenuBar.add(this.songMenu);
-
 
         this.nodeMenu = new JMenu("Node");
 

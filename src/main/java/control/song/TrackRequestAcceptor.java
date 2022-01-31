@@ -13,6 +13,9 @@ public interface TrackRequestAcceptor {
 
     TrackTime[] getTrackTimes();
 
+    int getCurrentSongMs();
+    void tick(int ms);
+
     void onAddTrackRequest();
     void onUpdateTrackRequest(int trackNumber, boolean deleted);
 
