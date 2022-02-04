@@ -32,7 +32,7 @@ public class SongControl implements TrackRequestAcceptor {
 
     private User lastConnectedUser;
     private String songId;
-    private boolean songSelected;
+    private boolean songSelected, songPlaying, songPaused;
 
     private int currentSongMs;
 
@@ -53,6 +53,9 @@ public class SongControl implements TrackRequestAcceptor {
 
         this.songId = "";
         this.songSelected = false;
+        this.songPlaying = false;
+        this.songPaused = true;
+
         this.currentSongMs = 0;
 
         this.lastSearchedSongList = new Track[] {};
@@ -165,8 +168,38 @@ public class SongControl implements TrackRequestAcceptor {
         }
     }
 
+    public void updatePlayingState() {
+        if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
+            GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
+                    this.spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
+            //TODO: ...
+            try {
+                CurrentlyPlayingContext currentlyPlayingContext = currentPlaybackRequest.execute();
+                this.songPlaying = currentlyPlayingContext.getItem().getId().equals(this.songId);
+                if(this.songPlaying) {
+                    this.currentSongMs = currentlyPlayingContext.getProgress_ms();
+                }
+                this.songPaused = !currentlyPlayingContext.getIs_playing();
+            } catch (IOException | SpotifyWebApiException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public boolean isSongSelected() {
         return this.songSelected;
+    }
+
+    public boolean isSongPlaying() {
+        return this.songPlaying;
+    }
+
+    public boolean isSongPaused() {
+        return this.songPaused;
+    }
+
+    public boolean isSongSynced() {
+        return false;
     }
 
     public String[] getDeviceNameList() {

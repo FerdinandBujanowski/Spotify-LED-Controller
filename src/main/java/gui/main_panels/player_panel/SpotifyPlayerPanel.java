@@ -16,13 +16,16 @@ public class SpotifyPlayerPanel extends JPanel {
     private SongControl songControl;
 
     private final JLabel connectedLabel;
-    private JButton connectToSpotifyButton;
+    private final JButton connectToSpotifyButton;
 
     private final JTextField searchSongField;
     private final JButton searchSongButton;
 
     private final JComboBox<String> selectSongBox;
     private final JButton selectSongButton;
+
+    private final JLabel songConnectedLabel;
+    private  final JButton songConnectButton;
 
     private JLabel currentDevicesText;
     private JButton refreshDevicesButton;
@@ -142,6 +145,17 @@ public class SpotifyPlayerPanel extends JPanel {
 
         this.add(this.songImageLabel);
 
+        //Synced Label
+        this.songConnectedLabel = new JLabel("", SwingConstants.CENTER);
+        this.songConnectedLabel.setBounds(windowDimension.width / 2 - 200, 430, 200, 20);
+        this.songConnectedLabel.setForeground(Color.WHITE);
+        this.add(this.songConnectedLabel);
+
+        //Sync Button
+        this.songConnectButton = new JButton("Connect Song");
+        this.songConnectButton.setBounds(windowDimension.width / 2, 430, 200, 20);
+        this.add(this.songConnectButton);
+
         //Current Devices Text
         this.currentDevicesText = new JLabel();
     }
@@ -152,7 +166,12 @@ public class SpotifyPlayerPanel extends JPanel {
         try {
             this.connectedLabel.setText("Connected to " + this.songControl.getLastConnectedUserName() + "'s Spotify");
         } catch (NullPointerException e) {
-            this.connectedLabel.setText("[ not connected ]");
+            this.connectedLabel.setText("[not connected]");
+        }
+        if(!this.songControl.isSongPlaying()) {
+            this.songConnectedLabel.setText("[not connected]");
+        } else {
+            this.songConnectedLabel.setText("[connected]");
         }
     }
 

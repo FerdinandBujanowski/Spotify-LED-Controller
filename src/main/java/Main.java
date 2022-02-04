@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Main {
+
     public static void main(String[] args) {
 
         try {
@@ -25,22 +26,9 @@ public class Main {
         );
         mainWindow.setVisible(true);
 
-        /*
-        SpotifyWebHandler spotifyWebHandler = new SpotifyWebHandler();
-
-        GetInformationAboutUsersCurrentPlaybackRequest usersCurrentPlaybackRequest = spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
-        try {
-            CurrentlyPlayingContext currentlyPlayingContext = usersCurrentPlaybackRequest.execute();
-            Track currentSong = (Track) currentlyPlayingContext.getItem();
-
-            System.out.println("Currently Playing: " + currentSong.getName() + " by " + currentSong.getArtists()[0].getName() + ": " + currentSong.getDurationMs());
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            e.printStackTrace();
-        }
-         */
-
         int i;
         long currentTimeMillis = System.currentTimeMillis();
+        /*
         while(true) {
             i = (int)(System.currentTimeMillis() - currentTimeMillis);
             if(songControl.isSongSelected()) {
@@ -52,6 +40,29 @@ public class Main {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+         */
+        Thread asyncThread = new Thread(() -> {
+            while(true) {
+                //TODO: every 500ms or so, update Song playing status
+                songControl.updatePlayingState();
+                mainWindow.repaintWindows();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        asyncThread.start();
+
+        while (true) {
+            //TODO: as long as Spotify and SongControl are still synchronized, update the GUI accordingly
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

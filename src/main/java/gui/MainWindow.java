@@ -9,11 +9,15 @@ import gui.main_panels.function_panels.FunctionTabbedPane;
 import gui.main_panels.node_panel.NodeEditWindow;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -61,8 +65,28 @@ public class MainWindow extends JFrame {
         this.tabbedPane.addTab("LED's", null);
 
         JPanel buttonPanel = new JPanel(null);
-        JButton playButton = new JButton("|>/||");
         JSlider songSlider = new JSlider(0, 1000, 0);
+
+        ImageIcon playIcon;
+        BufferedImage playImage = null;
+        try {
+            playImage = ImageIO.read(new File("images\\icon\\play.png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        playIcon = new ImageIcon(SpotifyPlayerPanel.getScaledImage(playImage, 20, 20));
+
+        ImageIcon pauseIcon = new ImageIcon("../images/icon/pause.png");
+
+        JButton playButton = new JButton(playIcon);
+
+        playButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
         buttonPanel.add(playButton);
         playButton.setSize(100, 20);
         playButton.setLocation((dimension.width - playButton.getSize().width) / 2, 0);
@@ -432,5 +456,13 @@ public class MainWindow extends JFrame {
                 super.approveSelection();
             }
         };
+    }
+
+    public void repaintWindows() {
+        if(this.spotifyPlayerPanel != null) this.spotifyPlayerPanel.repaint();
+        if(this.eventEditWindow != null) this.eventEditWindow.repaint();
+        if(this.nodeEditWindow != null) this.nodeEditWindow.repaint();
+        if(this.functionTabbedPane != null) this.functionTabbedPane.repaint();
+        this.repaint();
     }
 }

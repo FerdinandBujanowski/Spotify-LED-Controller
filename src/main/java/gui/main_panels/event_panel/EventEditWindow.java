@@ -63,15 +63,15 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 double msFullBar = msSingleBeat * timeMeasure.getBeatsPerBar();
 
                 g.setColor(Color.GRAY);
-                for(int i = 0; i < (int)Math.round(timeMeasure.getBeatsDuration() * (1.0 / this.barRoster.getRatio())); i++) {
-                    int x = (int)Math.round((timeMeasure.getMsStart() / this.EVENT_WIDTH_DIVISION)
+                for(int i = 0; i < (int)Math.floor(timeMeasure.getBeatsDuration() * (1.0 / this.barRoster.getRatio())); i++) {
+                    int x = (int)Math.floor((timeMeasure.getMsStart() / this.EVENT_WIDTH_DIVISION)
                     + ((this.barRoster.getRatio() * (double)i) * (msFullBar / this.EVENT_WIDTH_DIVISION)));
                     g.drawLine(x, 0, x, this.getHeight());
                 }
 
                 g.setColor(Color.BLACK);
                 for(int i = 0; i < timeMeasure.getBeatsDuration(); i += timeMeasure.getBeatsPerBar()) {
-                    int x = (int)Math.round((timeMeasure.getMsStart() / this.EVENT_WIDTH_DIVISION)
+                    int x = (int)Math.floor((timeMeasure.getMsStart() / this.EVENT_WIDTH_DIVISION)
                             + ((double)i * (msSingleBeat / this.EVENT_WIDTH_DIVISION)));
                     g.drawLine(x, 0, x, this.getHeight());
                 }
@@ -136,7 +136,6 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
        trackLabel.addMouseListener(new MouseAdapter() {
            @Override
            public void mouseClicked(MouseEvent e) {
-               //TODO: user input triggers requests to SongControl
                if(e.getClickCount() == 2 && e.getButton()  == MouseEvent.BUTTON1) {
                    Point clickLocation = e.getPoint();
 
@@ -147,8 +146,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
                    songControl.onAddEventToTrackRequest(
                            currentIndex,
-                           (msInSong) - (int)Math.round(msInTimeMeasure % msOneSection),
-                           (int)Math.round(msOneSection)
+                           (msInSong) - (int)Math.floor(msInTimeMeasure % msOneSection),
+                           (int)Math.floor(msOneSection)
                    );
 
                }
