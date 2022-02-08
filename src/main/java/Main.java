@@ -47,25 +47,14 @@ public class Main {
 
         AtomicInteger currentMs = new AtomicInteger((int) System.currentTimeMillis());
         AtomicInteger msSince = new AtomicInteger(0);
-        AtomicInteger lastUpdatedMs = new AtomicInteger(0);
 
         Thread asyncThreadA = new Thread(() -> {
             while(true) {
                 //TODO: every 500ms or so, update Song playing status
                 if(songControl.isSongSelected()) {
-                    if(songControl.isSongPaused()) {
-                        long msBeforeRequest = System.currentTimeMillis();
-                        songControl.updatePlayingState("longer update loop");
-                        long msAfterRequest = System.currentTimeMillis();
-                        int difference = (int)(msAfterRequest - msBeforeRequest);
-
-                        //System.out.println(msAfterRequest - msBeforeRequest);
-                        lastUpdatedMs.set(songControl.getCurrentSongMs());
-                        songControl.tick(lastUpdatedMs.get());
-
-                        currentMs.set((int)System.currentTimeMillis());
-                        //msSince.set((int)(msAfterRequest - msBeforeRequest));
-                        msSince.set(0);
+                    songControl.updatePlayingState();
+                    if(songControl.isSongPlaying() && songControl.isSongPaused()) {
+                        songControl.setCurrentSongMs(songControl.getUpdatedSongMs());
                     }
                 }
                 mainWindow.repaintWindows();
@@ -91,8 +80,6 @@ public class Main {
                         msSince.set((int)(System.currentTimeMillis() - currentMs.get()));
 
                         int correctMS = msSince.get() + songControl.getCurrentSongMs();
-
-                        System.out.println(songControl.getCurrentSongMs() / 1000.0);
                         songControl.tick(correctMS);
                     } else {
                         currentMs.set((int)System.currentTimeMillis());

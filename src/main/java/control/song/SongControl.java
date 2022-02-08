@@ -166,27 +166,42 @@ public class SongControl implements TrackRequestAcceptor {
         }
     }
 
-    public void updatePlayingState(String context) {
+    public void updatePlayingState() {
         if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
             GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
                     this.spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
-            //TODO: ...
-            GetUsersCurrentlyPlayingTrackRequest currentlyPlayingTrackRequest =
-                    this.spotifyWebHandler.getSpotifyApi().getUsersCurrentlyPlayingTrack().build();
             try {
                 CurrentlyPlayingContext currentlyPlayingContext = currentPlaybackRequest.execute();
-                CurrentlyPlaying currentlyPlaying = currentlyPlayingTrackRequest.execute();
 
                 this.songPlaying = currentlyPlayingContext.getItem().getId().equals(this.songId);
                 if(this.songPlaying) {
-                    this.currentSongMs = currentlyPlayingContext.getProgress_ms();
-                    System.out.println("Context: [" + context + "] - ms: " + this.currentSongMs);
+                    this.songPaused = !currentlyPlayingContext.getIs_playing();
+                } else {
+                    this.songPaused = true;
                 }
-                this.songPaused = !currentlyPlayingContext.getIs_playing();
             } catch (IOException | SpotifyWebApiException | ParseException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public int getUpdatedSongMs() {
+        if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
+            GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
+                    this.spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
+            try {
+                CurrentlyPlayingContext currentlyPlayingContext = currentPlaybackRequest.execute();
+                return currentlyPlayingContext.getProgress_ms();
+
+            } catch (IOException | SpotifyWebApiException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public void setCurrentSongMs(int newMs) {
+        this.currentSongMs = newMs;
     }
 
     public boolean isSpotifyConnected() {
@@ -240,7 +255,7 @@ public class SongControl implements TrackRequestAcceptor {
         PauseUsersPlaybackRequest pauseUsersPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().pauseUsersPlayback().build();
         try {
             pauseUsersPlaybackRequest.execute();
-            this.updatePlayingState("pause playback");
+            this.songPaused = true;
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
@@ -251,9 +266,8 @@ public class SongControl implements TrackRequestAcceptor {
         try {
             long msBefore = System.currentTimeMillis();
             resumeUsersPlaybackRequest.execute();
-            this.updatePlayingState("resume playback");
             long msAfter = System.currentTimeMillis();
-            System.out.println("    Delay: " + (msAfter - msBefore));
+            this.songPaused = false;
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
