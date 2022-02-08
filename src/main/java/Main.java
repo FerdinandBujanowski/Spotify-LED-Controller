@@ -4,6 +4,7 @@ import gui.MainWindow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
 
@@ -26,8 +27,8 @@ public class Main {
         );
         mainWindow.setVisible(true);
 
-        int i;
-        long currentTimeMillis = System.currentTimeMillis();
+        //int i;
+        //long currentTimeMillis = System.currentTimeMillis();
         /*
         while(true) {
             i = (int)(System.currentTimeMillis() - currentTimeMillis);
@@ -43,10 +44,25 @@ public class Main {
             }
         }
          */
-        Thread asyncThread = new Thread(() -> {
+
+        AtomicInteger currentMs = new AtomicInteger((int) System.currentTimeMillis());
+        AtomicInteger msSince = new AtomicInteger();
+        AtomicInteger lastUpdatedMs = new AtomicInteger(0);
+
+        Thread asyncThreadA = new Thread(() -> {
             while(true) {
                 //TODO: every 500ms or so, update Song playing status
-                songControl.updatePlayingState();
+                if(songControl.isSongSelected()) {
+                    long msBeforeRequest = System.currentTimeMillis();
+                    songControl.updatePlayingState();
+                    long msAfterRequest = System.currentTimeMillis();
+
+                    System.out.println(msAfterRequest - msBeforeRequest);
+                    lastUpdatedMs.set(songControl.getCurrentSongMs());
+
+                    currentMs.set((int)System.currentTimeMillis());
+                    msSince.set((int)(msAfterRequest - msBeforeRequest));
+                }
                 mainWindow.repaintWindows();
                 try {
                     Thread.sleep(500);
@@ -55,15 +71,32 @@ public class Main {
                 }
             }
         });
-        asyncThread.start();
+        asyncThreadA.start();
 
-        while (true) {
-            //TODO: as long as Spotify and SongControl are still synchronized, update the GUI accordingly
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        Thread asyncThreadB = new Thread(() -> {
+            while(true) {
+                //TODO: as long as Spotify and SongControl are still synchronized, update the GUI accordingly
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if(songControl.isSongPlaying()) {
+                    if(!songControl.isSongPaused()) {
+                        msSince.set((int)(System.currentTimeMillis() - currentMs.get()));
+
+                        int msSinceInt = msSince.intValue();
+                        int lastUpdatedInt = lastUpdatedMs.intValue();
+                        int correctMS = msSinceInt + lastUpdatedInt;
+
+                        songControl.tick(correctMS);
+                    } else {
+                        currentMs.set((int)System.currentTimeMillis());
+                        msSince.set(0);
+                    }
+                }
             }
-        }
+        });
+        asyncThreadB.start();
     }
 }

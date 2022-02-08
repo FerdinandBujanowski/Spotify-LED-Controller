@@ -52,12 +52,7 @@ public class SpotifyPlayerPanel extends JPanel {
         this.connectToSpotifyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(songControl.connectToSpotify()) {
-                    searchSongField.setEnabled(true);
-                    searchSongButton.setEnabled(true);
-                    selectSongBox.setEnabled(true);
-                    selectSongButton.setEnabled(true);
-                }
+                songControl.connectToSpotify();
                 repaint();
             }
         });
@@ -136,7 +131,6 @@ public class SpotifyPlayerPanel extends JPanel {
                 }
             }
         });
-
         this.add(selectSongButton);
 
         //Song Image Label
@@ -147,13 +141,19 @@ public class SpotifyPlayerPanel extends JPanel {
 
         //Synced Label
         this.songConnectedLabel = new JLabel("", SwingConstants.CENTER);
-        this.songConnectedLabel.setBounds(windowDimension.width / 2 - 200, 430, 200, 20);
+        this.songConnectedLabel.setBounds(windowDimension.width / 2 - 150, 430, 150, 20);
         this.songConnectedLabel.setForeground(Color.WHITE);
         this.add(this.songConnectedLabel);
 
         //Sync Button
         this.songConnectButton = new JButton("Connect Song");
-        this.songConnectButton.setBounds(windowDimension.width / 2, 430, 200, 20);
+        this.songConnectButton.setBounds(windowDimension.width / 2, 430, 150, 20);
+        this.songConnectButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
         this.add(this.songConnectButton);
 
         //Current Devices Text
@@ -163,15 +163,26 @@ public class SpotifyPlayerPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        try {
+        if(this.songControl.isSpotifyConnected()) {
             this.connectedLabel.setText("Connected to " + this.songControl.getLastConnectedUserName() + "'s Spotify");
-        } catch (NullPointerException e) {
+            this.searchSongField.setEnabled(true);
+            this.searchSongButton.setEnabled(true);
+            this.selectSongBox.setEnabled(true);
+            this.selectSongButton.setEnabled(true);
+            this.songConnectButton.setEnabled(true);
+
+        } else {
             this.connectedLabel.setText("[not connected]");
+            this.searchSongField.setEnabled(false);
+            this.searchSongButton.setEnabled(false);
+            this.selectSongBox.setEnabled(false);
+            this.selectSongButton.setEnabled(false);
+            this.songConnectButton.setEnabled(false);
         }
         if(!this.songControl.isSongPlaying()) {
             this.songConnectedLabel.setText("[not connected]");
         } else {
-            this.songConnectedLabel.setText("[connected]");
+            this.songConnectedLabel.setText("[connected at " + this.songControl.getCurrentSongMs() + "ms]");
         }
     }
 

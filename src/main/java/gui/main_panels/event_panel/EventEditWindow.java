@@ -184,6 +184,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 super.paintComponent(g);
                 g.setColor(Color.BLACK);
                 g.drawRect(0, 0, this.getSize().width, this.getSize().height);
+
+
+                if(!this.isEnabled()) {
+                    g.setColor(Color.WHITE);
+                    g.fillRect(0, 0, this.getWidth(), this.getHeight());
+                }
             }
         };
         eventLabel.setOpaque(true);
@@ -253,7 +259,16 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 this.cursorLabel.getWidth(),
                 this.cursorLabel.getHeight()
         );
-        System.out.println(this.cursorLabel.getX());
 
+        for(int i = 0; i < this.trackLabels.size(); i++) {
+            int currentEventIndex = this.songControl.getCorrespondingEventIndex(i, ms);
+            for(int j = 0; j < this.eventLabels.get(i).size(); j++) {
+                if(currentEventIndex == j) {
+                    this.eventLabels.get(i).get(j).setEnabled(false);
+                } else if(!this.eventLabels.get(i).get(j).isEnabled()) {
+                    this.eventLabels.get(i).get(j).setEnabled(true);
+                }
+            }
+        }
     }
 }

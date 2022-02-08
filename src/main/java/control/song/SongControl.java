@@ -30,6 +30,7 @@ public class SongControl implements TrackRequestAcceptor {
     private SpotifyWebHandler spotifyWebHandler;
     private EventGraphicUnit eventWindow;
 
+    private boolean spotifyConnected;
     private User lastConnectedUser;
     private String songId;
     private boolean songSelected, songPlaying, songPaused;
@@ -71,7 +72,7 @@ public class SongControl implements TrackRequestAcceptor {
     }
 
 
-    public boolean connectToSpotify() {
+    public void connectToSpotify() {
         this.spotifyWebHandler.init();
         if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
             GetCurrentUsersProfileRequest currentUsersProfileRequest = this.spotifyWebHandler.getSpotifyApi().getCurrentUsersProfile().build();
@@ -81,12 +82,11 @@ public class SongControl implements TrackRequestAcceptor {
                 this.currentAvailableDevices = this.spotifyWebHandler.getSpotifyApi().getUsersAvailableDevices().build()
                         .execute();
 
-                return true;
+                this.spotifyConnected = true;
             } catch (IOException | SpotifyWebApiException | ParseException e) {
-                e.printStackTrace();
+                this.spotifyConnected = false;
             }
         }
-        return false;
     }
 
     public String getLastConnectedUserName() {
@@ -186,6 +186,10 @@ public class SongControl implements TrackRequestAcceptor {
         }
     }
 
+    public boolean isSpotifyConnected() {
+        return this.spotifyConnected;
+    }
+
     public boolean isSongSelected() {
         return this.songSelected;
     }
@@ -225,7 +229,11 @@ public class SongControl implements TrackRequestAcceptor {
         return currentlyPlayingContext;
     }
 
-    public void onPausePlayback() {
+    public void onStartPlayback() {
+
+    }
+
+    private void onPausePlayback() {
         PauseUsersPlaybackRequest pauseUsersPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().pauseUsersPlayback().build();
         try {
             pauseUsersPlaybackRequest.execute();
@@ -234,12 +242,22 @@ public class SongControl implements TrackRequestAcceptor {
         }
     }
 
-    public void onResumePlayback() {
+    private void onResumePlayback() {
         StartResumeUsersPlaybackRequest resumeUsersPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().startResumeUsersPlayback().build();
         try {
             resumeUsersPlaybackRequest.execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void onTogglePlayback() {
+        if(this.songSelected && this.songPlaying) {
+            if(this.songPaused) {
+                this.onResumePlayback();
+            } else {
+                this.onPausePlayback();
+            }
         }
     }
 
@@ -262,6 +280,11 @@ public class SongControl implements TrackRequestAcceptor {
             }
         }
         return null;
+    }
+
+    @Override
+    public int getCorrespondingEventIndex(int trackNumber, int ms) {
+        return this.logicTracks.get(trackNumber).getEventIndex(ms);
     }
 
     @Override

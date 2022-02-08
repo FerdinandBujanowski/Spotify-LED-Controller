@@ -7,6 +7,7 @@ import control.node.NodeControl;
 import gui.main_panels.event_panel.EventEditWindow;
 import gui.main_panels.function_panels.FunctionTabbedPane;
 import gui.main_panels.node_panel.NodeEditWindow;
+import gui.main_panels.player_panel.PlayButton;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
 
 import javax.imageio.ImageIO;
@@ -28,6 +29,8 @@ public class MainWindow extends JFrame {
     private NodeEditWindow nodeEditWindow;
     private EventEditWindow eventEditWindow;
     private FunctionTabbedPane functionTabbedPane;
+
+    private PlayButton playButton;
 
     private JMenuBar jMenuBar;
     private JTabbedPane tabbedPane;
@@ -67,25 +70,7 @@ public class MainWindow extends JFrame {
         JPanel buttonPanel = new JPanel(null);
         JSlider songSlider = new JSlider(0, 1000, 0);
 
-        ImageIcon playIcon;
-        BufferedImage playImage = null;
-        try {
-            playImage = ImageIO.read(new File("images\\icon\\play.png"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        playIcon = new ImageIcon(SpotifyPlayerPanel.getScaledImage(playImage, 20, 20));
-
-        ImageIcon pauseIcon = new ImageIcon("../images/icon/pause.png");
-
-        JButton playButton = new JButton(playIcon);
-
-        playButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
+        this.playButton = new PlayButton(songControl);
 
         buttonPanel.add(playButton);
         playButton.setSize(100, 20);
@@ -463,6 +448,8 @@ public class MainWindow extends JFrame {
         if(this.eventEditWindow != null) this.eventEditWindow.repaint();
         if(this.nodeEditWindow != null) this.nodeEditWindow.repaint();
         if(this.functionTabbedPane != null) this.functionTabbedPane.repaint();
+
+        this.playButton.updateIcon();
         this.repaint();
     }
 }

@@ -10,6 +10,7 @@ public interface TrackRequestAcceptor {
 
     ArrayList<TimeMeasure> getTimeMeasures();
     TimeMeasure getCorrespondingTimeMeasure(int ms);
+    int getCorrespondingEventIndex(int trackNumber, int ms);
 
     TrackTime[] getTrackTimes();
 
