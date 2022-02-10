@@ -19,7 +19,7 @@ public class ConstantColorNode extends LogicNode {
                 new OutputJoint[] {
                         new OutputJoint(
                                 new ColorJointDataType(),
-                                "[" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ", " + color.getAlpha() + "]"
+                                "[" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + "]"
                         )
                 }
         );

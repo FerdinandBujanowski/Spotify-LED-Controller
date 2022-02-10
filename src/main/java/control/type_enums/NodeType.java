@@ -14,6 +14,7 @@ import logic.node.nodes.debug.DebugNode;
 import logic.node.nodes.logical_operators.*;
 import logic.node.nodes.math_functions.*;
 import logic.node.nodes.type_cast.*;
+import logic.node.nodes.update.UpdateNode;
 
 public enum NodeType {
     //TODO: Neue Nodes hier einfügen
@@ -63,7 +64,10 @@ public enum NodeType {
     SIN_NODE(1, 1, "Sine Wave", "Math Functions", SinNode.class),
 
     //TYPE CAST
-    NUMBER_TO_UNIT_NODE(1, 1, "Number to Unit", "Type Cast", CastNumberToUnitNode.class);
+    NUMBER_TO_UNIT_NODE(1, 1, "Number to Unit", "Type Cast", CastNumberToUnitNode.class),
+
+    //UPDATE
+    UPDATE_NODE(2, 1, "Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT });
 
     private int numberInputNodes, numberOutputNodes;
     private String name, categoryName;

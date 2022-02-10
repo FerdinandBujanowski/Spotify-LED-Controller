@@ -15,7 +15,6 @@ public class CreateColorNode extends LogicNode {
                         new InputJoint(new NumberJointDataType(), "R"),
                         new InputJoint(new NumberJointDataType(), "G"),
                         new InputJoint(new NumberJointDataType(), "B"),
-                        new InputJoint(new NumberJointDataType(), "Alpha"),
                 },
                 new OutputJoint[] {
                         new OutputJoint(new ColorJointDataType(), "Color")
@@ -28,7 +27,6 @@ public class CreateColorNode extends LogicNode {
         int r = (int)Math.round((double)inputJoints[0].getJointDataType().getData());
         int g = (int)Math.round((double)inputJoints[1].getJointDataType().getData());
         int b = (int)Math.round((double)inputJoints[2].getJointDataType().getData());
-        int a = (int)Math.round((double)inputJoints[3].getJointDataType().getData());
-        return new ColorJointDataType[] { new ColorJointDataType(new Color(r, g, b, a)) };
+        return new ColorJointDataType[] { new ColorJointDataType(new Color(r, g, b)) };
     }
 }

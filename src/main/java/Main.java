@@ -1,6 +1,7 @@
 import control.node.NodeControl;
 import control.song.SongControl;
 import gui.MainWindow;
+import logic.mask.LogicMask;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,24 +27,6 @@ public class Main {
                 songControl
         );
         mainWindow.setVisible(true);
-
-        //int i;
-        //long currentTimeMillis = System.currentTimeMillis();
-        /*
-        while(true) {
-            i = (int)(System.currentTimeMillis() - currentTimeMillis);
-            if(songControl.isSongSelected()) {
-                songControl.tick(i);
-            } else {
-                try {
-                    Thread.sleep(1);
-                    currentTimeMillis = System.currentTimeMillis();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-         */
 
         AtomicInteger currentMs = new AtomicInteger((int) System.currentTimeMillis());
         AtomicInteger msSince = new AtomicInteger(0);

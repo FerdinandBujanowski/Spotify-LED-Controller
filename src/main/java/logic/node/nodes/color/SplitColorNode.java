@@ -20,7 +20,6 @@ public class SplitColorNode extends LogicNode {
                         new OutputJoint(new NumberJointDataType(), "R"),
                         new OutputJoint(new NumberJointDataType(), "G"),
                         new OutputJoint(new NumberJointDataType(), "B"),
-                        new OutputJoint(new NumberJointDataType(), "A")
                 }
         );
     }
@@ -31,12 +30,10 @@ public class SplitColorNode extends LogicNode {
         double r = inputColor.getRed();
         double g = inputColor.getGreen();
         double b = inputColor.getBlue();
-        double a = inputColor.getAlpha();
         return new NumberJointDataType[] {
                 new NumberJointDataType(r),
                 new NumberJointDataType(g),
                 new NumberJointDataType(b),
-                new NumberJointDataType(a)
         };
     }
 }
