@@ -8,9 +8,9 @@ import logic.node.joint.joint_types.IntegerJointDataType;
 import logic.node.joint.joint_types.MaskJointDataType;
 import logic.node.joint.joint_types.UnitNumberJointDataType;
 
-public class PlainMaskNode extends LogicNode {
+public class MaskNode extends LogicNode {
 
-    public PlainMaskNode(int nodeIndex) {
+    public MaskNode(int nodeIndex) {
         super(
                 nodeIndex,
                 new InputJoint[] {
@@ -23,7 +23,7 @@ public class PlainMaskNode extends LogicNode {
         );
     }
 
-    public PlainMaskNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints) {
+    public MaskNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints) {
         super(nodeIndex, inputJoints, outputJoints);
     }
 

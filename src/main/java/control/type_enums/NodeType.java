@@ -12,8 +12,7 @@ import logic.node.nodes.interval.CreateIntervalNode;
 import logic.node.nodes.constant.*;
 import logic.node.nodes.debug.DebugNode;
 import logic.node.nodes.logical_operators.*;
-import logic.node.nodes.mask.MaskAdditionNode;
-import logic.node.nodes.mask.PlainMaskNode;
+import logic.node.nodes.mask.*;
 import logic.node.nodes.math_functions.*;
 import logic.node.nodes.type_cast.*;
 import logic.node.nodes.update.UpdateNode;
@@ -60,8 +59,12 @@ public enum NodeType {
     LOGICAL_NOT_NODE(1, 1, "NOT", "Logical Operators", LogicalNotNode.class),
 
     //MASK
+    PLAIN_MASK_NODE(2, 1, "_PLAIN_MASK_", "Mask", MaskNode.class, true),
     MASK_ADDITION_NODE(2, 1, "Mask Addition", "Mask", MaskAdditionNode.class, true),
-    PLAIN_MASK_NODE(2, 1, "Plain Mask", "Mask", PlainMaskNode.class, true),
+    MASK_SUBTRACTION_NODE(2, 1, "Mask Subtraction", "Mask", MaskSubtractionNode.class, true),
+    MASK_DIFFERENCE_NODE(2, 1, "Mask Difference", "Mask", MaskDifferenceNode.class, true),
+    MASK_UNION_NODE(2, 1, "Mask Union", "Mask", MaskUnionNode.class, true),
+    INVERTED_MASK_NODE(2, 1, "Inverted Mask", "Mask", InvertedMaskNode.class, true),
 
     //MATH FUNCTIONS
     COS_NODE(1, 1, "Cosine Wave", "Math Functions", CosNode.class),

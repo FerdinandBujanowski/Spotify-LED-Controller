@@ -3,16 +3,17 @@ package logic.node.nodes.mask;
 import logic.mask.LogicMask;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
+import logic.node.joint.joint_types.IntegerJointDataType;
 import logic.node.joint.joint_types.MaskJointDataType;
 
-public class MaskAdditionNode extends MaskNode {
+public class InvertedMaskNode extends MaskNode {
 
-    public MaskAdditionNode(int nodeIndex) {
+    public InvertedMaskNode(int nodeIndex) {
         super(
                 nodeIndex,
                 new InputJoint[] {
-                        new InputJoint(new MaskJointDataType(), "Mask A"),
-                        new InputJoint(new MaskJointDataType(), "Mask B")
+                        new InputJoint(new MaskJointDataType(), "Mask"),
+                        new InputJoint(new IntegerJointDataType(), "Degree")
                 },
                 new OutputJoint[] {
                         new OutputJoint(new MaskJointDataType(), "Output")
@@ -23,7 +24,7 @@ public class MaskAdditionNode extends MaskNode {
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
         LogicMask maskA = (LogicMask) inputJoints[0].getJointDataType().getData();
-        LogicMask maskB = (LogicMask) inputJoints[1].getJointDataType().getData();
-        return new MaskJointDataType[] { new MaskJointDataType(LogicMask.getJoinedMask_Add(maskA, maskB)) };
+        int degree = (Integer) inputJoints[1].getJointDataType().getData();
+        return new MaskJointDataType[] { new MaskJointDataType(LogicMask.getInvertedMask(maskA, degree)) };
     }
 }
