@@ -129,9 +129,11 @@ public class GraphicNode extends JPanel {
             parentNodePanel.add(this.graphicOutputJoints[i]);
         }
 
+        GraphicNode self = this;
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+
                 currentlyMoving = true;
                 lastClickedAt.x = e.getX();
                 lastClickedAt.y = e.getY();
@@ -184,6 +186,10 @@ public class GraphicNode extends JPanel {
             parentNodePanel.setComponentZOrder(this.maskPanel, 0);
             this.maskPanel.setBounds(50, 50, 100, 100);
         }
+    }
+
+    public MaskPanel getMaskPanel() {
+        return this.maskPanel;
     }
 
     public void setLastClickedAt(Point lastClickedAt) {

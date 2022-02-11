@@ -12,8 +12,7 @@ import gui.node_components.MaskPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -26,6 +25,9 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
     private Point windowLocation;
     private int functionIndex;
 
+    private boolean currentlyMoving;
+    private int lastClickedX, lastClickedY;
+
     private double zoomFactor;
     private JButton zoomOutButton, zoomInButton;
     private JLabel zoomLabel;
@@ -37,6 +39,10 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         this.functionIndex = functionIndex;
         this.graphicNodes = new ArrayList<>();
         this.windowLocation = new Point();
+
+        this.currentlyMoving = false;
+        this.lastClickedX = 0;
+        this.lastClickedY = 0;
 
         this.zoomFactor = 1;
         this.zoomOutButton = new JButton("-");
@@ -66,6 +72,34 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
 
         this.setOpaque(true);
         this.setBackground(backgroundColor);
+
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                lastClickedX = e.getX();
+                lastClickedY = e.getY();
+                currentlyMoving = true;
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                currentlyMoving = false;
+            }
+        });
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if(currentlyMoving) {
+                    Point relativeMovement = new Point(
+                            e.getX() - lastClickedX,
+                            e.getY() - lastClickedY
+                    );
+                    moveEverything(relativeMovement);
+                    lastClickedX = e.getX();
+                    lastClickedY = e.getY();
+                }
+            }
+        });
     }
 
     public void setNodeControl(NodeControl nodeControl) {
@@ -152,6 +186,33 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         this.zoomInButton.setLocation(size.width - 100, size.height - 50);
         this.zoomLabel.setLocation(size.width - 150, size.height - 50);
         this.zoomLabel.setText("x" + this.zoomFactor);
+    }
+
+    public void moveEverything(Point relativeMovement) {
+        for(GraphicNode graphicNode : this.graphicNodes) {
+            graphicNode.setLocation(
+                    graphicNode.getX() + relativeMovement.x,
+                    graphicNode.getY() + relativeMovement.y
+            );
+            for(GraphicJoint graphicJoint : graphicNode.getGraphicInputJoints()) {
+                graphicJoint.setLocation(
+                        graphicJoint.getX() + relativeMovement.x,
+                        graphicJoint.getY() + relativeMovement.y
+                );
+            }
+            for(GraphicJoint graphicJoint : graphicNode.getGraphicOutputJoints()) {
+                graphicJoint.setLocation(
+                        graphicJoint.getX() + relativeMovement.x,
+                        graphicJoint.getY() + relativeMovement.y
+                );
+            }
+            if(graphicNode.getMaskPanel() != null) {
+                graphicNode.getMaskPanel().setLocation(
+                        graphicNode.getMaskPanel().getX() + relativeMovement.x,
+                        graphicNode.getMaskPanel().getY() + relativeMovement.y
+                );
+            }
+        }
     }
 
     public double getZoomFactor() {
@@ -282,6 +343,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         for(GraphicJoint outputJoint : graphicNode.getGraphicOutputJoints()) {
             this.remove(outputJoint);
         }
+        this.remove(graphicNode.getMaskPanel());
         this.repaint();
     }
 }
