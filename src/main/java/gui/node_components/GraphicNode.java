@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.function.Function;
 
 public class GraphicNode extends JPanel {
 
@@ -29,7 +30,9 @@ public class GraphicNode extends JPanel {
     private JLabel nameLabel;
     private JLabel[] inputNameLabels, outputNameLabels;
 
-    public GraphicNode(Point indexes, ParentNodePanel parentNodePanel, String nodeName, String[] inputJointNames, String[] outputJointNames) {
+    private MaskPanel maskPanel;
+
+    public GraphicNode(Point indexes, ParentNodePanel parentNodePanel, String nodeName, String[] inputJointNames, String[] outputJointNames, MaskPanel maskPanel) {
         super(null);
         this.indexes = indexes;
 
@@ -174,6 +177,13 @@ public class GraphicNode extends JPanel {
                 }
             }
         });
+
+        this.maskPanel = maskPanel;
+        if(this.maskPanel != null) {
+            parentNodePanel.add(this.maskPanel);
+            parentNodePanel.setComponentZOrder(this.maskPanel, 0);
+            this.maskPanel.setBounds(50, 50, 100, 100);
+        }
     }
 
     public void setLastClickedAt(Point lastClickedAt) {
@@ -188,10 +198,21 @@ public class GraphicNode extends JPanel {
     }
 
     @Override
-    public void paintComponent(Graphics g) {}
+    public void paintComponent(Graphics g) {
+        if(this.maskPanel != null) {
+            //this.maskPanel.paintComponent(g);
+        }
+    }
 
     public void setTotalLocation(int x, int y, double zoomFactor) {
         this.setLocation((int)Math.round(x * zoomFactor), (int)Math.round(y * zoomFactor));
+
+        this.maskPanel.setBounds(
+                (int)Math.round(this.getX() + (0.25 * this.getWidth())),
+                this.getY() + this.getHeight(),
+                (int)Math.round(this.getWidth() / 2.0),
+                (int)Math.round(this.getWidth() / 2.0)
+        );
 
         int maxJoints = Math.max(this.numberInputJoints, this.numberOutputJoints);
         int halfJointWidth = (int)Math.round((NodeControl.JOINT_WIDTH / 2.d) * zoomFactor);

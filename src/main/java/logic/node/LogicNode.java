@@ -112,4 +112,8 @@ public abstract class LogicNode extends LogicComponent {
         }
         return -1;
     }
+
+    public Double[][] getMaskValues(Integer nullInteger) {
+        return new Double[0][0];
+    }
 }

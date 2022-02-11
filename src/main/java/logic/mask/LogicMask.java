@@ -31,7 +31,7 @@ public class LogicMask {
         return 0;
     }
 
-    private void cleanUp() {
+    public void cleanUp() {
         this.pixels.removeIf(logicPixel -> logicPixel.getIntensity() == 0);
     }
 
@@ -133,5 +133,17 @@ public class LogicMask {
                     }
                 }
         );
+    }
+
+    public static LogicMask getInvertedMask(LogicMask mask, int degree) {
+        LogicMask newMask = new LogicMask();
+        int newDegree = (Math.max(degree, mask.getDegree()));
+
+        for(int i = -newDegree; i <= newDegree; i++) {
+            for(int j = -newDegree; j <= newDegree; j++) {
+                newMask.setIntensityAt(i, j, 1.0 - mask.getIntensityAt(i, j));
+            }
+        }
+        return newMask;
     }
 }

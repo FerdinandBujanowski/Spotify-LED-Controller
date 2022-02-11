@@ -8,6 +8,7 @@ import control.type_enums.NodeType;
 import control.math_functions.MathFunctions;
 import gui.node_components.GraphicJoint;
 import gui.node_components.GraphicNode;
+import gui.node_components.MaskPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -159,9 +160,9 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
 
     private void zoom(boolean zoomIn) {
         double oldZoomFactor = this.zoomFactor;
-        if(zoomIn && this.zoomFactor < 1.5) {
+        if(zoomIn && this.zoomFactor < 1.0) {
             this.zoomFactor = this.zoomFactor + 0.1;
-        } else if(!zoomIn && this.zoomFactor > 0.5) {
+        } else if(!zoomIn && this.zoomFactor > 0.1) {
             this.zoomFactor = this.zoomFactor - 0.1;
         } else {
             return;
@@ -227,7 +228,19 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
 
         String[] inputJointNames = this.getNodeControl().getInputJointNames(functionIndex, nodeIndex);
         String[] outputJointNames = this.getNodeControl().getOutputJointNames(functionIndex, nodeIndex);
-        GraphicNode newGraphicNode = new GraphicNode(new Point(functionIndex, nodeIndex), this, nodeName, inputJointNames, outputJointNames);
+
+        MaskPanel maskPanel = null;
+        if(nodeType.hasMaskOutput()) {
+            maskPanel = new MaskPanel(this.getNodeControl().getMaskValuesFunctionForNode(functionIndex, nodeIndex));
+        }
+        GraphicNode newGraphicNode = new GraphicNode(
+                new Point(functionIndex, nodeIndex),
+                this,
+                nodeName,
+                inputJointNames,
+                outputJointNames,
+                maskPanel
+        );
         this.add(newGraphicNode);
         newGraphicNode.setTotalSize(this.zoomFactor);
         newGraphicNode.setTotalLocation(x, y, this.zoomFactor);

@@ -12,6 +12,7 @@ import logic.node.nodes.interval.CreateIntervalNode;
 import logic.node.nodes.constant.*;
 import logic.node.nodes.debug.DebugNode;
 import logic.node.nodes.logical_operators.*;
+import logic.node.nodes.mask.PlainMaskNode;
 import logic.node.nodes.math_functions.*;
 import logic.node.nodes.type_cast.*;
 import logic.node.nodes.update.UpdateNode;
@@ -57,6 +58,9 @@ public enum NodeType {
     LOGICAL_OR_NODE(2, 1, "OR", "Logical Operators", LogicalOrNode.class),
     LOGICAL_NOT_NODE(1, 1, "NOT", "Logical Operators", LogicalNotNode.class),
 
+    //MASK
+    PLAIN_MASK_NODE(2, 1, "Plain Mask", "Mask", PlainMaskNode.class, true),
+
     //MATH FUNCTIONS
     COS_NODE(1, 1, "Cosine Wave", "Math Functions", CosNode.class),
     LERP_NODE(3, 1, "Linear Interpolation", "Math Functions", LerpNode.class),
@@ -74,8 +78,9 @@ public enum NodeType {
     private Class nodeClass;
 
     private InputDialogType[] inputDialogTypes;
+    private boolean maskOutput;
 
-    NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass, InputDialogType[] inputDialogTypes) {
+    NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass, InputDialogType[] inputDialogTypes, boolean maskOutput) {
         this.numberInputNodes = numberInputNodes;
         this.numberOutputNodes = numberOutputNodes;
         this.name = name;
@@ -83,10 +88,19 @@ public enum NodeType {
         this.nodeClass = nodeClass;
 
         this.inputDialogTypes = inputDialogTypes;
+        this.maskOutput = maskOutput;
     }
 
     NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass) {
-        this(numberInputNodes, numberOutputNodes, name, categoryName, nodeClass, new InputDialogType[0]);
+        this(numberInputNodes, numberOutputNodes, name, categoryName, nodeClass, new InputDialogType[0], false);
+    }
+
+    NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass, InputDialogType[] inputDialogTypes) {
+        this(numberInputNodes, numberOutputNodes, name, categoryName, nodeClass, inputDialogTypes, false);
+    }
+
+    NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass, boolean maskOutput) {
+        this(numberInputNodes, numberOutputNodes, name, categoryName, nodeClass, new InputDialogType[0], maskOutput);
     }
 
     public int getNumberInputNodes() {
@@ -105,6 +119,9 @@ public enum NodeType {
 
     public InputDialogType[] getInputDialogTypes() {
         return this.inputDialogTypes;
+    }
+    public boolean hasMaskOutput() {
+        return this.maskOutput;
     }
 
     public static NodeType getNodeTypeByTypeClass(Class nodeClass) {

@@ -13,14 +13,6 @@ public class NodeEditWindow extends ParentNodePanel {
 
     public NodeEditWindow(NodeControl nodeControl) {
         super(nodeControl, -1, Color.LIGHT_GRAY);
-
-        /**
-        SpinnerNumberModel spinnerNumberModel = new SpinnerNumberModel(0, 0, 10, 1);
-        JSpinner spinner = new JSpinner(spinnerNumberModel);
-        spinner.setSize(50, 30);
-        this.add(spinner);
-         **/
-
     }
 
     @Override

@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.function.Function;
 
 public class NodeControl implements Serializable {
 
@@ -166,6 +167,11 @@ public class NodeControl implements Serializable {
                 };
             default: return null;
         }
+    }
+
+    public Function<Integer, Double[][]> getMaskValuesFunctionForNode(int functionIndex, int nodeIndex) {
+        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
+        return logicNode::getMaskValues;
     }
 
     public String[] getInputJointNames(int functionIndex, int nodeIndex) {
