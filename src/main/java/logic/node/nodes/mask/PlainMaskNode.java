@@ -23,6 +23,10 @@ public class PlainMaskNode extends LogicNode {
         );
     }
 
+    public PlainMaskNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints) {
+        super(nodeIndex, inputJoints, outputJoints);
+    }
+
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
         LogicMask logicMask = new LogicMask();

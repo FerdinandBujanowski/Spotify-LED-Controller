@@ -12,12 +12,14 @@ public class MaskPanel extends JPanel {
         this.getValuesFunction = function;
 
         this.setOpaque(true);
-        this.setBackground(new Color(128, 128, 128));
+        this.setBackground(Color.BLACK);
     }
 
     @Override
     public void paintComponent(Graphics g) {
-        //super.paintComponent(g);
+
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         Double[][] values = this.getValuesFunction.apply(0);
         double step = this.getWidth() / (double)values.length;
@@ -32,7 +34,7 @@ public class MaskPanel extends JPanel {
                         (int)Math.round(step),
                         (int)Math.round(step)
                 );
-                g.setColor(new Color(128, 128, 128));
+                g.setColor(Color.BLACK);
                 g.drawRect(
                         (int)Math.round(step * i),
                         (int)Math.round(step * j),

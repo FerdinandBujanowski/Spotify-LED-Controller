@@ -12,6 +12,7 @@ import logic.node.nodes.interval.CreateIntervalNode;
 import logic.node.nodes.constant.*;
 import logic.node.nodes.debug.DebugNode;
 import logic.node.nodes.logical_operators.*;
+import logic.node.nodes.mask.MaskAdditionNode;
 import logic.node.nodes.mask.PlainMaskNode;
 import logic.node.nodes.math_functions.*;
 import logic.node.nodes.type_cast.*;
@@ -59,6 +60,7 @@ public enum NodeType {
     LOGICAL_NOT_NODE(1, 1, "NOT", "Logical Operators", LogicalNotNode.class),
 
     //MASK
+    MASK_ADDITION_NODE(2, 1, "Mask Addition", "Mask", MaskAdditionNode.class, true),
     PLAIN_MASK_NODE(2, 1, "Plain Mask", "Mask", PlainMaskNode.class, true),
 
     //MATH FUNCTIONS

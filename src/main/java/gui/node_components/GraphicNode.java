@@ -207,12 +207,14 @@ public class GraphicNode extends JPanel {
     public void setTotalLocation(int x, int y, double zoomFactor) {
         this.setLocation((int)Math.round(x * zoomFactor), (int)Math.round(y * zoomFactor));
 
-        this.maskPanel.setBounds(
-                (int)Math.round(this.getX() + (0.25 * this.getWidth())),
-                this.getY() + this.getHeight(),
-                (int)Math.round(this.getWidth() / 2.0),
-                (int)Math.round(this.getWidth() / 2.0)
-        );
+        if(this.maskPanel != null) {
+            this.maskPanel.setBounds(
+                    (int)Math.round(this.getX() + (0.25 * this.getWidth())),
+                    this.getY() + this.getHeight(),
+                    (int)Math.round(this.getWidth() / 2.0),
+                    (int)Math.round(this.getWidth() / 2.0)
+            );
+        }
 
         int maxJoints = Math.max(this.numberInputJoints, this.numberOutputJoints);
         int halfJointWidth = (int)Math.round((NodeControl.JOINT_WIDTH / 2.d) * zoomFactor);
