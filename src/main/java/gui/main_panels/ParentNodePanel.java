@@ -232,12 +232,19 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         this.zoomFactor = bigDecimal.doubleValue();
 
         for(GraphicNode graphicNode : this.graphicNodes) {
+
             graphicNode.setTotalSize(this.zoomFactor);
+
+            int halfWidth = (int)Math.round(this.getWidth() / 2.0);
+            int halfHeight = (int)Math.round(this.getHeight() / 2.0);
+
+            this.moveEverything(new Point(-halfWidth, -halfHeight));
             graphicNode.setTotalLocation(
-                    (int)Math.round(graphicNode.getX() / oldZoomFactor),
-                    (int)Math.round(graphicNode.getY() / oldZoomFactor),
+                    (int)Math.round((graphicNode.getX()) / oldZoomFactor),
+                    (int)Math.round((graphicNode.getY()) / oldZoomFactor),
                     this.zoomFactor
             );
+            this.moveEverything(new Point(halfWidth, halfHeight));
         }
         repaint();
     }
