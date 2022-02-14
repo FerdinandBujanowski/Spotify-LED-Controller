@@ -157,6 +157,17 @@ public class SongControl implements TrackRequestAcceptor {
         }
     }
 
+    public int getTrackCount() {
+        return this.logicTracks.size();
+    }
+    public Double getTrackIntensityAt(Integer trackIndex) {
+        if(this.logicTracks.get(trackIndex) == null) {
+            return 0.d;
+        } else {
+            return this.logicTracks.get(trackIndex).getIntensityAt(this.currentSongMs);
+        }
+    }
+
     public String getImageURL() {
         try {
             return this.selectedSong.getAlbum().getImages()[0].getUrl();

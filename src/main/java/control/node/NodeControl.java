@@ -9,6 +9,7 @@ import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.FunctionInstanceJointDataType;
 import logic.node.joint.joint_types.JointDataType;
+import logic.node.joint.joint_types.UnitNumberJointDataType;
 
 import javax.swing.*;
 import java.io.Serializable;
@@ -26,6 +27,7 @@ public class NodeControl implements Serializable {
     private int jointHoveredNodeIndex, jointHoveredJointIndex;
 
     private ArrayList<LogicFunction> logicFunctions;
+    private ArrayList<LogicNode> layerNodes;
 
     public NodeControl() {
         this.logicNodes = new ArrayList<>();
@@ -34,6 +36,7 @@ public class NodeControl implements Serializable {
         this.jointHoveredJointIndex = -1;
 
         this.logicFunctions = new ArrayList<>();
+        this.layerNodes = new ArrayList<>();
     }
 
     public int getNextFreeNodeIndex(int functionIndex) {
@@ -133,6 +136,33 @@ public class NodeControl implements Serializable {
         } else {
             this.findFunction(functionIndexGoal).getLogicNodes().add(logicNodeInstance);
         }
+    }
+
+    public void addTrackNode(int functionIndexGoal, int trackIndex, Function<Integer, Double> intensityFunction, int newNodeIndex) {
+
+        LogicNode trackNode = new LogicNode(
+                newNodeIndex,
+                new InputJoint[] {},
+                new OutputJoint[] {
+                        new OutputJoint(new UnitNumberJointDataType(), "Intensity")
+                }
+        ) {
+            @Override
+            public JointDataType[] function(InputJoint[] inputJoints) {
+                return new UnitNumberJointDataType[] {
+                        new UnitNumberJointDataType(intensityFunction.apply(trackIndex))
+                };
+            }
+        };
+        if(functionIndexGoal == -1) {
+            this.logicNodes.add(trackNode);
+        } else {
+            this.findFunction(functionIndexGoal).getLogicNodes().add(trackNode);
+        }
+    }
+
+    public void addLayerNode(int newNodeIndex) {
+        //TODO : mach hier mal was
     }
 
     public int[] getNodeIndexArray(int functionIndex) {
@@ -384,7 +414,6 @@ public class NodeControl implements Serializable {
                 }
             }
         }
-
         //Connections werden kopiert
         for(NodeConnection connection : connections) {
             ThreeCoordinatePoint outputCoordinates = connection.getOutputCoordinates();

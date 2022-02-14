@@ -38,9 +38,10 @@ public class Main {
                     songControl.updatePlayingState();
                     if(songControl.isSongPlaying() && songControl.isSongPaused()) {
                         songControl.setCurrentSongMs(songControl.getUpdatedSongMs());
+                        songControl.tick(songControl.getUpdatedSongMs());
                     }
                 }
-                mainWindow.repaintWindows();
+                mainWindow.repaintWindows(songControl);
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

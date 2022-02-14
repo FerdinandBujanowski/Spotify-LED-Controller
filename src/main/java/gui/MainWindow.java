@@ -10,15 +10,11 @@ import gui.main_panels.node_panel.NodeEditWindow;
 import gui.main_panels.player_panel.PlayButton;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -38,6 +34,7 @@ public class MainWindow extends JFrame {
     JSplitPane splitPane;
 
     private JMenu songMenu, nodeMenu, functionMenu;
+    private JMenu createTrackNodeMenu;
 
     private boolean bProjectOpen;
 
@@ -103,12 +100,6 @@ public class MainWindow extends JFrame {
         JMenu rhythmSubMenu = new JMenu("Rhythm");
 
         JMenuItem addTrackMenuItem = new JMenuItem("Add Track");
-        addTrackMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                songControl.onAddTrackRequest();
-            }
-        });
         trackSubMenu.add(addTrackMenuItem);
 
         this.songMenu.add(trackSubMenu);
@@ -126,6 +117,24 @@ public class MainWindow extends JFrame {
         });
         rhythmSubMenu.add(editInputRhythmMenuItem);
         this.songMenu.add(rhythmSubMenu);
+
+        this.songMenu.add(new JSeparator());
+
+        this.createTrackNodeMenu = new JMenu("Create Track Node");
+        addTrackMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int trackCount = songControl.getTrackCount();
+                songControl.onAddTrackRequest();
+                if(trackCount < songControl.getTrackCount()) {
+                    String trackName = "Track " + songControl.getTrackCount();
+                    JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, trackCount, songControl);
+                    createTrackNodeMenu.add(newTrackNodeItem);
+                }
+            }
+        });
+
+        this.songMenu.add(createTrackNodeMenu);
 
         this.songMenu.setEnabled(false);
         this.jMenuBar.add(this.songMenu);
@@ -392,6 +401,32 @@ public class MainWindow extends JFrame {
         this.enableTabs();
     }
 
+    private JMenuItem createTrackToNodeItem(String trackName, int trackIndex, SongControl songControl) {
+        JMenuItem trackToNodeItem = new JMenuItem(trackName);
+        trackToNodeItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO : Track Node wird "gebacken"
+                if(tabbedPane.getSelectedComponent() == nodeEditWindow) {
+                    nodeEditWindow.addTrackNode(
+                            trackIndex,
+                            songControl::getTrackIntensityAt,
+                            trackName,
+                            0, 0
+                    );
+                } else if(tabbedPane.getSelectedComponent() == functionTabbedPane) {
+                    functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).addTrackNode(
+                            trackIndex,
+                            songControl::getTrackIntensityAt,
+                            trackName,
+                            0, 0
+                    );
+                }
+            }
+        });
+        return trackToNodeItem;
+    }
+
     private void enableTabs() {
         this.tabbedPane.setComponentAt(0, this.spotifyPlayerPanel);
         this.tabbedPane.setComponentAt(1, new JScrollPane(
@@ -443,12 +478,22 @@ public class MainWindow extends JFrame {
         };
     }
 
-    public void repaintWindows() {
+    public void repaintWindows(SongControl songControl) {
         if(this.spotifyPlayerPanel != null) this.spotifyPlayerPanel.repaint();
         if(this.eventEditWindow != null) this.eventEditWindow.repaint();
         if(this.nodeEditWindow != null) this.nodeEditWindow.repaint();
         if(this.functionTabbedPane != null) this.functionTabbedPane.repaint();
 
+        if(this.createTrackNodeMenu.getItemCount() != songControl.getTrackCount()) {
+            while(this.createTrackNodeMenu.getItemCount() != 0) {
+                this.createTrackNodeMenu.remove(0);
+            }
+            for(int i = 0; i < songControl.getTrackCount(); i++) {
+                String trackName = "Track " + (i + 1);
+                JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, i, songControl);
+                this.createTrackNodeMenu.add(newTrackNodeItem);
+            }
+        }
         this.playButton.updateIcon();
         this.repaint();
     }

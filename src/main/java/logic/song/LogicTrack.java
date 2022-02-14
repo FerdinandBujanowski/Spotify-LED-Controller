@@ -55,6 +55,21 @@ public class LogicTrack {
         return -1;
     }
 
+    public Double getIntensityAt(Integer ms) {
+        int eventIndex = this.getEventIndex(ms);
+        if(eventIndex == -1) {
+            return 0.d;
+        }
+        LogicEvent logicEvent = this.eventArrayList.get(eventIndex);
+        if(logicEvent == null) {
+            return 0.d;
+        } else {
+            int msInto = ms - logicEvent.getMsStart();
+            double x = (double)msInto / (double)logicEvent.getMsDuration();
+            return logicEvent.getCurveType().getCurve(x);
+        }
+    }
+
     public void removeEventAtIndex(int eventIndex) {
         this.eventArrayList.remove(eventIndex);
     }
