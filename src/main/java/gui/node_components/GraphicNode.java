@@ -204,11 +204,7 @@ public class GraphicNode extends JPanel {
     }
 
     @Override
-    public void paintComponent(Graphics g) {
-        if(this.maskPanel != null) {
-            //this.maskPanel.paintComponent(g);
-        }
-    }
+    public void paintComponent(Graphics g) {}
 
     public void setTotalLocation(int x, int y, double zoomFactor) {
         this.setLocation((int)Math.round(x * zoomFactor), (int)Math.round(y * zoomFactor));

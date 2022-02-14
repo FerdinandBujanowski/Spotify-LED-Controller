@@ -53,6 +53,18 @@ public class LogicMask {
         return degree;
     }
 
+    public Double[][] getValues() {
+        this.cleanUp();
+        int degree = this.getDegree();
+        Double[][] values = new Double[(degree * 2) + 1][(degree * 2) + 1];
+        for(int i = 0; i < values.length; i++) {
+            for(int j = 0; j < values.length; j++) {
+                values[i][j] = this.getIntensityAt(i - degree, j - degree);
+            }
+        }
+        return values;
+    }
+
     @Override
     public String toString() {
         int degree = this.getDegree();

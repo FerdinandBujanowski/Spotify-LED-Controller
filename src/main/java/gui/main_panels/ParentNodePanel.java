@@ -298,7 +298,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         String[] outputJointNames = this.getNodeControl().getOutputJointNames(functionIndex, nodeIndex);
 
         MaskPanel maskPanel = null;
-        if(nodeType.hasMaskOutput()) {
+        if(nodeType != null && nodeType.hasMaskOutput()) {
             maskPanel = new MaskPanel(this.getNodeControl().getMaskValuesFunctionForNode(functionIndex, nodeIndex));
         }
         GraphicNode newGraphicNode = new GraphicNode(
@@ -350,7 +350,9 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         for(GraphicJoint outputJoint : graphicNode.getGraphicOutputJoints()) {
             this.remove(outputJoint);
         }
-        this.remove(graphicNode.getMaskPanel());
+        if(graphicNode.getMaskPanel() != null) {
+            this.remove(graphicNode.getMaskPanel());
+        }
         this.repaint();
     }
 }

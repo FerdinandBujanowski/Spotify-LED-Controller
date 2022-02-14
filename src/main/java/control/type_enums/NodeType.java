@@ -65,6 +65,8 @@ public enum NodeType {
     MASK_DIFFERENCE_NODE(2, 1, "Mask Difference", "Mask", MaskDifferenceNode.class, true),
     MASK_UNION_NODE(2, 1, "Mask Union", "Mask", MaskUnionNode.class, true),
     INVERTED_MASK_NODE(2, 1, "Inverted Mask", "Mask", InvertedMaskNode.class, true),
+    SHOW_MASK_NODE(1, 0, "Show Mask", "Mask", ShowMaskNode.class, true),
+    GET_DEGREE_NODE(1, 1, "Get Degree", "Mask", GetDegreeNode.class, false),
 
     //MATH FUNCTIONS
     COS_NODE(1, 1, "Cosine Wave", "Math Functions", CosNode.class),
