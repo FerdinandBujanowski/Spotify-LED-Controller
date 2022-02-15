@@ -19,6 +19,7 @@ import logic.song.LogicEvent;
 import logic.song.LogicTrack;
 import org.apache.hc.core5.http.ParseException;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -160,11 +161,11 @@ public class SongControl implements TrackRequestAcceptor {
     public int getTrackCount() {
         return this.logicTracks.size();
     }
-    public Double getTrackIntensityAt(Integer trackIndex) {
-        if(this.logicTracks.get(trackIndex) == null) {
+    public Double getTrackIntensityAt(Point coordinates) {
+        if(this.logicTracks.get(coordinates.x) == null) {
             return 0.d;
         } else {
-            return this.logicTracks.get(trackIndex).getIntensityAt(this.currentSongMs);
+            return this.logicTracks.get(coordinates.x).getIntensityAt(coordinates.y);
         }
     }
 

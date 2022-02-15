@@ -1,6 +1,6 @@
 package logic.node.joint.joint_types;
 
-import logic.mask.LogicMask;
+import logic.led.LogicMask;
 
 public class MaskJointDataType implements JointDataType {
 

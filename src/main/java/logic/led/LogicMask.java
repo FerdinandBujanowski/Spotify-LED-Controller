@@ -1,4 +1,4 @@
-package logic.mask;
+package logic.led;
 
 import java.awt.*;
 import java.util.ArrayList;

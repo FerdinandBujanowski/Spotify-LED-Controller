@@ -33,7 +33,7 @@ public class MainWindow extends JFrame {
 
     JSplitPane splitPane;
 
-    private JMenu songMenu, nodeMenu, functionMenu;
+    private JMenu songMenu, nodeMenu, functionMenu, ledMenu;
     private JMenu createTrackNodeMenu;
 
     private boolean bProjectOpen;
@@ -315,6 +315,18 @@ public class MainWindow extends JFrame {
         jMenuBar.add(this.functionMenu);
         this.functionMenu.setEnabled(false);
 
+        this.ledMenu = new JMenu("LED");
+        JMenuItem addLayerMenuItem = new JMenuItem("Add Layer");
+        addFunctionInstance.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        this.ledMenu.add(addLayerMenuItem);
+        jMenuBar.add(this.ledMenu);
+        this.ledMenu.setEnabled(false);
+
         this.pack();
         this.setCorrectLocation();
 
@@ -441,6 +453,7 @@ public class MainWindow extends JFrame {
         this.songMenu.setEnabled(true);
         this.nodeMenu.setEnabled(true);
         this.functionMenu.setEnabled(true);
+        this.ledMenu.setEnabled(true);
 
         this.pack();
         this.repaint();

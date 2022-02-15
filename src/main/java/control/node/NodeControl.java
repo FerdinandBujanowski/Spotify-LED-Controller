@@ -12,6 +12,7 @@ import logic.node.joint.joint_types.JointDataType;
 import logic.node.joint.joint_types.UnitNumberJointDataType;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -27,7 +28,9 @@ public class NodeControl implements Serializable {
     private int jointHoveredNodeIndex, jointHoveredJointIndex;
 
     private ArrayList<LogicFunction> logicFunctions;
-    private ArrayList<LogicNode> layerNodes;
+
+    private ArrayList<Point> trackNodeIndexes;
+    private int currentSongMs;
 
     public NodeControl() {
         this.logicNodes = new ArrayList<>();
@@ -36,7 +39,9 @@ public class NodeControl implements Serializable {
         this.jointHoveredJointIndex = -1;
 
         this.logicFunctions = new ArrayList<>();
-        this.layerNodes = new ArrayList<>();
+
+        this.trackNodeIndexes = new ArrayList<>();
+        this.currentSongMs = 0;
     }
 
     public int getNextFreeNodeIndex(int functionIndex) {
@@ -138,8 +143,9 @@ public class NodeControl implements Serializable {
         }
     }
 
-    public void addTrackNode(int functionIndexGoal, int trackIndex, Function<Integer, Double> intensityFunction, int newNodeIndex) {
+    public void addTrackNode(int functionIndexGoal, int trackIndex, Function<Point, Double> intensityFunction, int newNodeIndex) {
 
+        this.trackNodeIndexes.add(new Point(functionIndexGoal, newNodeIndex));
         LogicNode trackNode = new LogicNode(
                 newNodeIndex,
                 new InputJoint[] {},
@@ -148,9 +154,9 @@ public class NodeControl implements Serializable {
                 }
         ) {
             @Override
-            public JointDataType[] function(InputJoint[] inputJoints) {
+            public JointDataType[] function(InputJoint[] nullInputJoints) {
                 return new UnitNumberJointDataType[] {
-                        new UnitNumberJointDataType(intensityFunction.apply(trackIndex))
+                        new UnitNumberJointDataType(intensityFunction.apply(new Point(trackIndex, currentSongMs)))
                 };
             }
         };
@@ -163,6 +169,7 @@ public class NodeControl implements Serializable {
 
     public void addLayerNode(int newNodeIndex) {
         //TODO : mach hier mal was
+
     }
 
     public int[] getNodeIndexArray(int functionIndex) {
@@ -453,5 +460,15 @@ public class NodeControl implements Serializable {
             }
         }
         return copy;
+    }
+
+    public void tick(int ms) {
+        this.currentSongMs = ms;
+        for(Point trackNodeIndex : this.trackNodeIndexes) {
+            LogicNode currentTrackNode = this.findNode(trackNodeIndex.x, trackNodeIndex.y);
+            if(currentTrackNode != null) {
+                currentTrackNode.onInputChangeEvent();
+            }
+        }
     }
 }

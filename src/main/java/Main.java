@@ -1,7 +1,6 @@
 import control.node.NodeControl;
 import control.song.SongControl;
 import gui.MainWindow;
-import logic.mask.LogicMask;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +37,9 @@ public class Main {
                     songControl.updatePlayingState();
                     if(songControl.isSongPlaying() && songControl.isSongPaused()) {
                         songControl.setCurrentSongMs(songControl.getUpdatedSongMs());
+
                         songControl.tick(songControl.getUpdatedSongMs());
+                        nodeControl.tick(songControl.getUpdatedSongMs());
                     }
                 }
                 mainWindow.repaintWindows(songControl);
@@ -64,7 +65,10 @@ public class Main {
                         msSince.set((int)(System.currentTimeMillis() - currentMs.get()));
 
                         int correctMS = msSince.get() + songControl.getCurrentSongMs();
+
                         songControl.tick(correctMS);
+                        nodeControl.tick(correctMS);
+
                     } else {
                         currentMs.set((int)System.currentTimeMillis());
                         msSince.set(0);

@@ -1,6 +1,6 @@
 package logic.node.nodes.mask;
 
-import logic.mask.LogicMask;
+import logic.led.LogicMask;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
