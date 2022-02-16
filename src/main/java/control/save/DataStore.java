@@ -1,23 +1,26 @@
 package control.save;
 
+import control.led.LedControl;
 import control.node.NodeControl;
 import control.song.SongControl;
 
 import java.awt.*;
 import java.io.*;
 
-public class DataStorer implements Serializable {
+public class DataStore implements Serializable {
 
-    private String selectedSongID;
-    private NodeControl nodeControl;
-    private SongControl songControl;
-    private Point[] nodeEditGraphicNodePositions;
-    private Point[][] functionEditGraphicNodePositions;
+    private final String selectedSongID;
+    private final SongControl songControl;
+    private final NodeControl nodeControl;
+    private final LedControl ledControl;
+    private final Point[] nodeEditGraphicNodePositions;
+    private final Point[][] functionEditGraphicNodePositions;
 
-    public DataStorer(String selectedSongID, NodeControl nodeControl, SongControl songControl, Point[] nodeEditGraphicNodePositions, Point[][] functionEditGraphicNodePositions) {
+    public DataStore(String selectedSongID, SongControl songControl, NodeControl nodeControl, LedControl ledControl, Point[] nodeEditGraphicNodePositions, Point[][] functionEditGraphicNodePositions) {
         this.selectedSongID = selectedSongID;
         this.nodeControl = nodeControl;
         this.songControl = songControl;
+        this.ledControl = ledControl;
         this.nodeEditGraphicNodePositions = nodeEditGraphicNodePositions;
         this.functionEditGraphicNodePositions = functionEditGraphicNodePositions;
     }
@@ -25,11 +28,14 @@ public class DataStorer implements Serializable {
     public String getSelectedSongID() {
         return this.selectedSongID;
     }
+    public SongControl getSongControl() {
+        return this.songControl;
+    }
     public NodeControl getNodeControl() {
         return this.nodeControl;
     }
-    public SongControl getSongControl() {
-        return this.songControl;
+    public LedControl getLedControl() {
+        return this.ledControl;
     }
     public Point[] getNodeEditGraphicNodePositions() {
         return this.nodeEditGraphicNodePositions;
@@ -38,12 +44,12 @@ public class DataStorer implements Serializable {
         return this.functionEditGraphicNodePositions;
     }
 
-    public static void writeToFile(String filePath, DataStorer dataStorer) {
+    public static void writeToFile(String filePath, DataStore dataStore) {
         try {
 
             FileOutputStream fileOut = new FileOutputStream(filePath);
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-            objectOut.writeObject(dataStorer);
+            objectOut.writeObject(dataStore);
             objectOut.close();
             System.out.println("The Object  was successfully written to a file");
 
@@ -52,19 +58,19 @@ public class DataStorer implements Serializable {
         }
     }
 
-    public static DataStorer readFromFile(String filePath) {
-        DataStorer newDataStorer = null;
+    public static DataStore readFromFile(String filePath) {
+        DataStore newDataStore = null;
         try {
             FileInputStream fileIn = new FileInputStream(filePath);
             ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-            newDataStorer = (DataStorer) objectIn.readObject();
+            newDataStore = (DataStore) objectIn.readObject();
             objectIn.close();
             System.out.println("Successfully read file");
         } catch(Exception ex) {
             ex.printStackTrace();
         }
 
-        return newDataStorer;
+        return newDataStore;
     }
 
 

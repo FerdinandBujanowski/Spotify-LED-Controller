@@ -1,7 +1,8 @@
 package gui;
 
+import control.led.LedControl;
 import control.song.SongControl;
-import control.save.DataStorer;
+import control.save.DataStore;
 import control.type_enums.*;
 import control.node.NodeControl;
 import gui.main_panels.event_panel.EventEditWindow;
@@ -38,7 +39,7 @@ public class MainWindow extends JFrame {
 
     private boolean bProjectOpen;
 
-    public MainWindow(Dimension dimension, String title, NodeControl nodeControl, SongControl songControl) {
+    public MainWindow(Dimension dimension, String title, SongControl songControl, NodeControl nodeControl, LedControl ledControl) {
         super(title);
 
         this.setIconImage(new ImageIcon("images\\icon\\icon.png").getImage());
@@ -317,10 +318,20 @@ public class MainWindow extends JFrame {
 
         this.ledMenu = new JMenu("LED");
         JMenuItem addLayerMenuItem = new JMenuItem("Add Layer");
-        addFunctionInstance.addActionListener(new ActionListener() {
+        addLayerMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                int currentLayerCount = ledControl.getLayerCount();
+                ledControl.addLayer();
+                if(currentLayerCount < ledControl.getLayerCount()) {
+                    nodeEditWindow.addLayerNode(
+                            ledControl.getUpdateMaskFunctionForLayer(currentLayerCount),
+                            ledControl.getUpdateColorFunctionForLayer(currentLayerCount),
+                            "Layer " + (currentLayerCount + 1),
+                            0, 0
+                    );
+                }
             }
         });
         this.ledMenu.add(addLayerMenuItem);
@@ -336,7 +347,7 @@ public class MainWindow extends JFrame {
                 if(bProjectOpen) {
                     //TODO: Abfangen, dass im Zweifelsfall das geöffnete Programm nicht gespeichert wird
                 }
-                newProject(nodeControl, songControl, dimension);
+                newProject(songControl, nodeControl, ledControl, dimension);
                 pack();
                 setCorrectLocation();
                 repaint();
@@ -353,9 +364,9 @@ public class MainWindow extends JFrame {
                 //fileOpenChooser.setCurrentDirectory(new File("params"));
                 int returnValue = fileOpenChooser.showOpenDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
-                    DataStorer data = DataStorer.readFromFile(fileOpenChooser.getSelectedFile().getPath());
+                    DataStore data = DataStore.readFromFile(fileOpenChooser.getSelectedFile().getPath());
                     if(data != null) {
-                        newProject(data.getNodeControl(), data.getSongControl(), dimension);
+                        newProject(data.getSongControl(), data.getNodeControl(), data.getLedControl(), dimension);
 
                         nodeEditWindow.updateGraphicNodes(data.getNodeEditGraphicNodePositions());
                         functionTabbedPane.updateFunctions(data.getFunctionEditGraphicNodePositions());
@@ -380,10 +391,11 @@ public class MainWindow extends JFrame {
                         functionEditGraphicNodePositions[i][j] = functionTabbedPane.getFunctionEditWindows().get(i).getGraphicNodes().get(j).getLocation();
                     }
                 }
-                DataStorer dataStorer = new DataStorer(
+                DataStore dataStore = new DataStore(
                         null,
-                        nodeControl,
                         songControl,
+                        nodeControl,
+                        ledControl,
                         nodeEditGraphicNodePositions,
                         functionEditGraphicNodePositions
                 );
@@ -395,18 +407,18 @@ public class MainWindow extends JFrame {
                 fileSaveChooser.setSelectedFile(new File("new_song.ledcontrol"));
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
-                    DataStorer.writeToFile(fileSaveChooser.getSelectedFile().getPath(), dataStorer);
+                    DataStore.writeToFile(fileSaveChooser.getSelectedFile().getPath(), dataStore);
                 }
             }
         });
     }
 
-    private void newProject(NodeControl nodeControl, SongControl songControl, Dimension dimension) {
+    private void newProject(SongControl songControl, NodeControl nodeControl, LedControl ledControl, Dimension dimension) {
 
         this.spotifyPlayerPanel = new SpotifyPlayerPanel(songControl, dimension);
+        this.eventEditWindow = new EventEditWindow(songControl);
         this.nodeEditWindow = new NodeEditWindow(nodeControl);
         this.functionTabbedPane = new FunctionTabbedPane(nodeControl);
-        this.eventEditWindow = new EventEditWindow(songControl);
 
         this.nodeEditWindow.setPreferredSize(dimension);
 

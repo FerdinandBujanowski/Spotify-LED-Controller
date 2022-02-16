@@ -135,6 +135,13 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         this.addGraphicNode(this.functionIndex, nextFreeIndex, null, trackName, x, y);
     }
 
+    public void addLayerNode(Function<Object, Integer> setMaskFunction, Function<Color, Integer> setColorFunction, String layerName, int x, int y) {
+        int nextFreeIndex = this.getNodeControl().getNextFreeNodeIndex(this.functionIndex);
+        this.getNodeControl().addLayerNode(nextFreeIndex, setMaskFunction, setColorFunction, layerName);
+
+        this.addGraphicNode(this.functionIndex, nextFreeIndex, null, layerName, x, y);
+    }
+
     public void updateGraphicNodes(Point[] positions) {
         int[] nodeIndexArray = nodeControl.getNodeIndexArray(this.functionIndex);
         for(int i = 0; i < nodeIndexArray.length; i++) {
@@ -321,14 +328,6 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         newGraphicNode.setTotalSize(this.zoomFactor);
         newGraphicNode.setTotalLocation(x, y, this.zoomFactor);
 
-        /**
-        GraphicInputUnit graphicInputUnit = this.getNodeControl().getGraphicInputUnitForNode(nodeType, nodeIndex);
-        if(graphicInputUnit != null) {
-            graphicInputUnit.setSize(170, NodeControl.NODE_CENTER_HEIGHT);
-            graphicInputUnit.getComponent().setSize(50, 10);
-            newGraphicNode.addGraphicInputUnit(graphicInputUnit);
-        }
-        **/
         this.graphicNodes.add(newGraphicNode);
         this.repaint();
     }

@@ -7,9 +7,7 @@ import gui.node_components.GraphicInputUnit;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 import logic.node.joint.*;
-import logic.node.joint.joint_types.FunctionInstanceJointDataType;
-import logic.node.joint.joint_types.JointDataType;
-import logic.node.joint.joint_types.UnitNumberJointDataType;
+import logic.node.joint.joint_types.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -167,9 +165,26 @@ public class NodeControl implements Serializable {
         }
     }
 
-    public void addLayerNode(int newNodeIndex) {
-        //TODO : mach hier mal was
+    public void addLayerNode(int newNodeIndex, Function<Object, Integer> setMaskFunction, Function<Color, Integer> setColorFunction, String layerName) {
+        LogicNode layerNode = new LogicNode(
+                newNodeIndex,
+                new InputJoint[] {
+                        new InputJoint(new MaskJointDataType(), "Mask"),
+                        new InputJoint(new ColorJointDataType(), "Color")
+                },
+                new OutputJoint[] {},
+                layerName
+        ) {
 
+            @Override
+            public void onInputChangeEvent() {
+                super.onInputChangeEvent();
+                setMaskFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
+                setColorFunction.apply((Color)this.getInputJoints()[1].getJointDataType().getData());
+            }
+        };
+
+        this.logicNodes.add(layerNode);
     }
 
     public int[] getNodeIndexArray(int functionIndex) {

@@ -15,9 +15,14 @@ public class LogicLayer {
         this.color = Color.BLACK;
     }
 
-    public void updateValues(LogicMask logicMask, Color color) {
-        this.logicMask = logicMask;
+    public Integer updateMask(Object mask) {
+        this.logicMask = (LogicMask) mask;
+        return 0;
+    }
+
+    public Integer updateColor(Color color) {
         this.color = color;
+        return 0;
     }
 
     public Color getColorAt(int x, int y) {

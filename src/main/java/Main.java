@@ -1,3 +1,4 @@
+import control.led.LedControl;
 import control.node.NodeControl;
 import control.song.SongControl;
 import gui.MainWindow;
@@ -15,15 +16,18 @@ public class Main {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
-        NodeControl nodeControl = new NodeControl();
+
         SongControl songControl = new SongControl();
+        NodeControl nodeControl = new NodeControl();
+        LedControl ledControl = new LedControl();
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         MainWindow mainWindow = new MainWindow(
                 new Dimension((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.75)),
                 "LED Node Control",
+                songControl,
                 nodeControl,
-                songControl
+                ledControl
         );
         mainWindow.setVisible(true);
 
@@ -68,6 +72,7 @@ public class Main {
 
                         songControl.tick(correctMS);
                         nodeControl.tick(correctMS);
+                        mainWindow.repaintWindows(songControl);
 
                     } else {
                         currentMs.set((int)System.currentTimeMillis());
