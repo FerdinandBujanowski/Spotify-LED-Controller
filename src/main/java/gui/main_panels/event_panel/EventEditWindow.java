@@ -182,13 +182,22 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             @Override
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
+
                 g.setColor(Color.BLACK);
                 g.drawRect(0, 0, this.getSize().width, this.getSize().height);
-
-
                 if(!this.isEnabled()) {
                     g.setColor(Color.WHITE);
                     g.fillRect(0, 0, this.getWidth(), this.getHeight());
+                }
+                g.setColor(Color.WHITE);
+                for(int i = 0; i < this.getWidth(); i++) {
+                    double x = (double)i / (double)this.getWidth();
+                    g.fillRect(
+                            i,
+                            this.getHeight() - (int)Math.round(curveType.getCurve(x) * (double)this.getHeight()),
+                            1,
+                            1
+                    );
                 }
             }
         };

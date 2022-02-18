@@ -9,16 +9,16 @@ public enum CurveType {
 
     CONSTANT(MathFunctions::getConstant, new Color(35, 25, 66)),
     LINEAR(MathFunctions::getLinear, new Color(94, 84, 142)),
-    LINEAR_INVERSE(MathFunctions::getLinearInverse, new Color(0, 0, 0)),
-    QUADRATIC(MathFunctions::getQuadratic, new Color(0, 0, 0)),
-    QUADRATIC_INVERSE(MathFunctions::getQuadraticInverse, new Color(0, 0, 0)),
-    CENTER_PEAK(MathFunctions::getCenterPeak, new Color(0, 0, 0)),
-    CENTER_PEAK_INVERSE(MathFunctions::getCenterPeakInverse, new Color(0, 0, 0)),
-    COSINE(MathFunctions::getCosine, new Color(0, 0, 0)),
-    COSINE_INVERSE(MathFunctions::getCosineInverse, new Color(0, 0, 0));
+    LINEAR_INVERSE(MathFunctions::getLinearInverse, new Color(94, 84, 142)),
+    QUADRATIC(MathFunctions::getQuadratic, new Color(159, 134, 192)),
+    QUADRATIC_INVERSE(MathFunctions::getQuadraticInverse, new Color(159, 134, 192)),
+    CENTER_PEAK(MathFunctions::getCenterPeak, new Color(190, 149, 196)),
+    CENTER_PEAK_INVERSE(MathFunctions::getCenterPeakInverse, new Color(190, 149, 196)),
+    COSINE(MathFunctions::getCosine, new Color(224, 177, 203)),
+    COSINE_INVERSE(MathFunctions::getCosineInverse, new Color(224, 177, 203));
 
-    private Function<Double, Double> getCurveFunction;
-    private Color color;
+    private final Function<Double, Double> getCurveFunction;
+    private final Color color;
 
     CurveType(Function<Double, Double> getCurveFunction, Color color) {
         this.getCurveFunction = getCurveFunction;
