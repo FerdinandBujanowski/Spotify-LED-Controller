@@ -9,9 +9,13 @@ public enum CurveType {
 
     CONSTANT(MathFunctions::getConstant, new Color(35, 25, 66)),
     LINEAR(MathFunctions::getLinear, new Color(94, 84, 142)),
-    LOGARITHMIC(MathFunctions::getLogarithmic, new Color(159, 134, 192)),
-    BEZIER(MathFunctions::getBezier, new Color(190, 149, 196)),
-    EXPONENTIAL(MathFunctions::getExponential, new Color(224, 177, 203));
+    LINEAR_INVERSE(MathFunctions::getLinearInverse, new Color(0, 0, 0)),
+    QUADRATIC(MathFunctions::getQuadratic, new Color(0, 0, 0)),
+    QUADRATIC_INVERSE(MathFunctions::getQuadraticInverse, new Color(0, 0, 0)),
+    CENTER_PEAK(MathFunctions::getCenterPeak, new Color(0, 0, 0)),
+    CENTER_PEAK_INVERSE(MathFunctions::getCenterPeakInverse, new Color(0, 0, 0)),
+    COSINE(MathFunctions::getCosine, new Color(0, 0, 0)),
+    COSINE_INVERSE(MathFunctions::getCosineInverse, new Color(0, 0, 0));
 
     private Function<Double, Double> getCurveFunction;
     private Color color;

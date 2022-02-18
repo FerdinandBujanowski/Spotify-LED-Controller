@@ -126,7 +126,8 @@ public class SongControl implements TrackRequestAcceptor {
             for(AudioAnalysisMeasure bar : this.selectedSongAnalysis.getBars()) {
                 this.logicTracks.get(0).addEventToTrack(
                         (int)(bar.getStart() * 1000),
-                        (int)((bar.getStart() + bar.getDuration()) * 1000)
+                        (int)((bar.getStart() + bar.getDuration()) * 1000),
+                        CurveType.CONSTANT
                 );
             }
 
@@ -136,7 +137,8 @@ public class SongControl implements TrackRequestAcceptor {
                 beatDurationSum += beat.getDuration();
                 this.logicTracks.get(1).addEventToTrack(
                         (int)(beat.getStart() * 1000),
-                        (int)((beat.getStart() + beat.getDuration()) * 1000)
+                        (int)((beat.getStart() + beat.getDuration()) * 1000),
+                        CurveType.CONSTANT
                 );
             }
             GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest =
@@ -359,7 +361,7 @@ public class SongControl implements TrackRequestAcceptor {
     public void onAddEventToTrackRequest(int trackNumber, int msStart, int msDuration) {
         if(this.logicTracks.get(trackNumber) != null) {
             int oldLength = this.logicTracks.get(trackNumber).getEventsCopyArray().length;
-            this.logicTracks.get(trackNumber).addEventToTrack(msStart, msStart + msDuration);
+            this.logicTracks.get(trackNumber).addEventToTrack(msStart, msStart + msDuration, CurveType.CONSTANT);
 
             //TODO: Prüfen nach Overlaps klappt anscheinend noch nicht
             LogicEvent[] events = this.logicTracks.get(trackNumber).getEventsCopyArray();
@@ -379,7 +381,7 @@ public class SongControl implements TrackRequestAcceptor {
         this.eventWindow.deleteEvent(trackNumber, eventIndex);
 
         if(!deleted) {
-            this.logicTracks.get(trackNumber).addEventToTrack(msStartNew, msStartNew + msDurationNew);
+            this.logicTracks.get(trackNumber).addEventToTrack(msStartNew, msStartNew + msDurationNew, curveType);
             this.eventWindow.addEventToTrack(trackNumber, msStartNew, msDurationNew, curveType);
         }
     }

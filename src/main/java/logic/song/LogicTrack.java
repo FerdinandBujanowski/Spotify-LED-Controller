@@ -13,7 +13,7 @@ public class LogicTrack {
         this.eventArrayList = new ArrayList<>();
     }
 
-    public void addEventToTrack(int msStart, int msEnd) {
+    public void addEventToTrack(int msStart, int msEnd, CurveType curveType) {
         int msDuration = msEnd - msStart;
         try {
             LogicEvent event = new LogicEvent(msStart, msEnd);
@@ -26,6 +26,7 @@ public class LogicTrack {
                 }
                 overlappingEvent = this.getOverlappingEvent(event);
             }
+            event.setCurveType(curveType);
             this.eventArrayList.add(event);
         } catch (EventTimeNegativeException e) {
             e.printStackTrace();
@@ -67,6 +68,7 @@ public class LogicTrack {
             int msInto = ms - logicEvent.getMsStart();
             double x = (double)msInto / (double)logicEvent.getMsDuration();
             double curve = logicEvent.getCurveType().getCurve(x);
+            System.out.println(logicEvent.getCurveType());
 
             System.out.println(
                     "ms into : " + msInto + "/" + logicEvent.getMsDuration() + " - " +
