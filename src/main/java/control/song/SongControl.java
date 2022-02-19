@@ -5,10 +5,7 @@ import com.wrapper.spotify.model_objects.miscellaneous.*;
 import com.wrapper.spotify.model_objects.specification.AudioFeatures;
 import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.model_objects.specification.User;
-import com.wrapper.spotify.requests.data.player.GetInformationAboutUsersCurrentPlaybackRequest;
-import com.wrapper.spotify.requests.data.player.GetUsersCurrentlyPlayingTrackRequest;
-import com.wrapper.spotify.requests.data.player.PauseUsersPlaybackRequest;
-import com.wrapper.spotify.requests.data.player.StartResumeUsersPlaybackRequest;
+import com.wrapper.spotify.requests.data.player.*;
 import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
@@ -294,6 +291,16 @@ public class SongControl implements TrackRequestAcceptor {
             } else {
                 this.onPausePlayback();
             }
+        }
+    }
+
+    public void onSkipTo(int ms) {
+        SeekToPositionInCurrentlyPlayingTrackRequest request =
+                this.spotifyWebHandler.getSpotifyApi().seekToPositionInCurrentlyPlayingTrack(ms).build();
+        try {
+            request.execute();
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            e.printStackTrace();
         }
     }
 

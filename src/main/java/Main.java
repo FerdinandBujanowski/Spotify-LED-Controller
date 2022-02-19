@@ -40,10 +40,12 @@ public class Main {
                 if(songControl.isSongSelected()) {
                     songControl.updatePlayingState();
                     if(songControl.isSongPlaying() && songControl.isSongPaused()) {
-                        songControl.setCurrentSongMs(songControl.getUpdatedSongMs());
+                        int updatedMS = songControl.getUpdatedSongMs();
+                        songControl.setCurrentSongMs(updatedMS);
+                        songControl.onSkipTo(updatedMS);
 
-                        songControl.tick(songControl.getUpdatedSongMs());
-                        nodeControl.tick(songControl.getUpdatedSongMs());
+                        songControl.tick(updatedMS);
+                        nodeControl.tick(updatedMS);
                     }
                 }
                 mainWindow.repaintWindows(songControl);
