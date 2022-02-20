@@ -3,6 +3,7 @@ package gui;
 import control.led.LedControl;
 import control.song.SongControl;
 import control.save.DataStore;
+import control.song.TrackRequestAcceptor;
 import control.type_enums.*;
 import control.node.NodeControl;
 import gui.main_panels.event_panel.EventEditWindow;
@@ -366,7 +367,10 @@ public class MainWindow extends JFrame {
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     DataStore data = DataStore.readFromFile(fileOpenChooser.getSelectedFile().getPath());
                     if(data != null) {
-                        newProject(data.getSongControl(), data.getNodeControl(), data.getLedControl(), dimension);
+
+                        newProject(songControl, nodeControl, data.getLedControl(), dimension);
+                        songControl.reinitialize(data.getEventSaveUnit());
+                        nodeControl.reinitialize(data.getNodeSaveUnit());
 
                         nodeEditWindow.updateGraphicNodes(data.getNodeEditGraphicNodePositions());
                         functionTabbedPane.updateFunctions(data.getFunctionEditGraphicNodePositions());
@@ -392,9 +396,8 @@ public class MainWindow extends JFrame {
                     }
                 }
                 DataStore dataStore = new DataStore(
-                        null,
-                        songControl,
-                        nodeControl,
+                        songControl.createEventSaveUnit(),
+                        nodeControl.createNodeSaveUnit(),
                         ledControl,
                         nodeEditGraphicNodePositions,
                         functionEditGraphicNodePositions
@@ -434,7 +437,7 @@ public class MainWindow extends JFrame {
                 if(tabbedPane.getSelectedComponent() == nodeEditWindow) {
                     nodeEditWindow.addTrackNode(
                             trackIndex,
-                            songControl::getTrackIntensityAt,
+                            ((TrackRequestAcceptor)songControl)::getTrackIntensityAt,
                             trackName,
                             0, 0
                     );

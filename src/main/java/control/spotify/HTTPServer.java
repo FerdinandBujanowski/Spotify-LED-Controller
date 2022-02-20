@@ -6,9 +6,10 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 
-public class HTTPServer {
+public class HTTPServer implements Serializable {
 
     private String code;
 

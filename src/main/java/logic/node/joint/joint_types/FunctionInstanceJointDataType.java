@@ -2,7 +2,9 @@ package logic.node.joint.joint_types;
 
 import logic.node.LogicNode;
 
-public class FunctionInstanceJointDataType implements JointDataType {
+import java.io.Serializable;
+
+public class FunctionInstanceJointDataType implements JointDataType, Serializable {
 
     LogicNode functionInstance;
 

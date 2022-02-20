@@ -1,6 +1,8 @@
 package logic.node.joint.own_types;
 
-public class Interval {
+import java.io.Serializable;
+
+public class Interval implements Serializable {
 
     //start INCLUSIVE, end EXCLUSIVE
     private int start, end;

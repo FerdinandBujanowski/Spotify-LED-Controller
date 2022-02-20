@@ -8,9 +8,10 @@ import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.JointDataType;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class LogicFunction extends LogicComponent {
+public class LogicFunction extends LogicComponent implements Serializable {
 
     private final int functionIndex;
     private ArrayList<LogicNode> logicNodes;

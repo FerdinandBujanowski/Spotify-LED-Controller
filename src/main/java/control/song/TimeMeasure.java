@@ -1,6 +1,8 @@
 package control.song;
 
-public class TimeMeasure {
+import java.io.Serializable;
+
+public class TimeMeasure implements Serializable {
 
     private int beatsPerBar;
     private float beatsPerMinute;

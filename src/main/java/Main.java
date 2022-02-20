@@ -1,6 +1,7 @@
 import control.led.LedControl;
 import control.node.NodeControl;
 import control.song.SongControl;
+import control.spotify.SpotifyWebHandler;
 import gui.MainWindow;
 
 import javax.swing.*;

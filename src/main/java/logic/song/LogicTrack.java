@@ -3,9 +3,10 @@ package logic.song;
 import control.exceptions.EventTimeNegativeException;
 import control.type_enums.CurveType;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class LogicTrack {
+public class LogicTrack implements Serializable {
 
     private ArrayList<LogicEvent> eventArrayList;
 

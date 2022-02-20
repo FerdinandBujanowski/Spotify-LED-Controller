@@ -2,37 +2,31 @@ package control.save;
 
 import control.led.LedControl;
 import control.node.NodeControl;
-import control.song.SongControl;
 
 import java.awt.*;
 import java.io.*;
 
 public class DataStore implements Serializable {
 
-    private final String selectedSongID;
-    private final SongControl songControl;
-    private final NodeControl nodeControl;
+    private final EventSaveUnit eventSaveUnit;
+    private final NodeSaveUnit nodeSaveUnit;
     private final LedControl ledControl;
     private final Point[] nodeEditGraphicNodePositions;
     private final Point[][] functionEditGraphicNodePositions;
 
-    public DataStore(String selectedSongID, SongControl songControl, NodeControl nodeControl, LedControl ledControl, Point[] nodeEditGraphicNodePositions, Point[][] functionEditGraphicNodePositions) {
-        this.selectedSongID = selectedSongID;
-        this.nodeControl = nodeControl;
-        this.songControl = songControl;
+    public DataStore(EventSaveUnit eventSaveUnit, NodeSaveUnit nodeSaveUnit, LedControl ledControl, Point[] nodeEditGraphicNodePositions, Point[][] functionEditGraphicNodePositions) {
+        this.eventSaveUnit = eventSaveUnit;
+        this.nodeSaveUnit = nodeSaveUnit;
         this.ledControl = ledControl;
         this.nodeEditGraphicNodePositions = nodeEditGraphicNodePositions;
         this.functionEditGraphicNodePositions = functionEditGraphicNodePositions;
     }
 
-    public String getSelectedSongID() {
-        return this.selectedSongID;
+    public EventSaveUnit getEventSaveUnit() {
+        return this.eventSaveUnit;
     }
-    public SongControl getSongControl() {
-        return this.songControl;
-    }
-    public NodeControl getNodeControl() {
-        return this.nodeControl;
+    public NodeSaveUnit getNodeSaveUnit() {
+        return this.nodeSaveUnit;
     }
     public LedControl getLedControl() {
         return this.ledControl;
@@ -69,9 +63,6 @@ public class DataStore implements Serializable {
         } catch(Exception ex) {
             ex.printStackTrace();
         }
-
         return newDataStore;
     }
-
-
 }

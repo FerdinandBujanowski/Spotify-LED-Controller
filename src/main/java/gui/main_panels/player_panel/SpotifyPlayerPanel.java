@@ -117,18 +117,7 @@ public class SpotifyPlayerPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 songControl.selectSongBySearchedList(selectSongBox.getSelectedIndex());
-
-                String imageURL = songControl.getImageURL();
-                if(imageURL != null) {
-                    BufferedImage image = null;
-                    try {
-                        image = ImageIO.read(new URL(imageURL));
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                    songImageLabel.setIcon(new ImageIcon(getScaledImage(image, 300, 300)));
-                    repaint();
-                }
+                repaint();
             }
         });
         this.add(selectSongButton);
@@ -183,6 +172,11 @@ public class SpotifyPlayerPanel extends JPanel {
             this.songConnectedLabel.setText("[not connected]");
         } else {
             this.songConnectedLabel.setText("[connected at " + this.songControl.getCurrentSongMs() + "ms]");
+        }
+
+        ImageIcon albumImage = this.songControl.getAlbumImage();
+        if(albumImage != null) {
+            this.songImageLabel.setIcon(albumImage);
         }
     }
 

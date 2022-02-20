@@ -4,9 +4,10 @@ import control.type_enums.CurveType;
 import logic.song.LogicEvent;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class TrackTime {
+public class TrackTime implements Serializable {
 
     private Point[] points;
     private CurveType[] curveTypes;

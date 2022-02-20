@@ -3,7 +3,9 @@ package logic.song;
 import control.exceptions.EventTimeNegativeException;
 import control.type_enums.CurveType;
 
-public class LogicEvent {
+import java.io.Serializable;
+
+public class LogicEvent implements Serializable {
 
     private int msStart, msDuration, msEnd;
 

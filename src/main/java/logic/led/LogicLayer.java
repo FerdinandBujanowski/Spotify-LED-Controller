@@ -1,8 +1,9 @@
 package logic.led;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class LogicLayer {
+public class LogicLayer implements Serializable {
 
     private LogicMask logicMask;
     private Color color;

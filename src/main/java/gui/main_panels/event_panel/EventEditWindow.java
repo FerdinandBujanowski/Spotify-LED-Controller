@@ -93,6 +93,13 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     @Override
     public void syncTracks(TrackTime[] trackTimes) {
 
+        while(this.trackLabels.size() != 0) {
+            this.trackLabels.remove(0);
+        }
+        while(this.eventLabels.size() != 0) {
+            this.eventLabels.remove(0);
+        }
+
         int totalWidth = 0;
         for(TimeMeasure timeMeasure : this.songControl.getTimeMeasures()) {
             int msSingleBeat = timeMeasure.getLengthOneBeat();

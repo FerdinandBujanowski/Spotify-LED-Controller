@@ -1,6 +1,8 @@
 package logic.led;
 
-public class LogicPixel {
+import java.io.Serializable;
+
+public class LogicPixel implements Serializable {
 
     public final int x, y;
     private double intensity;

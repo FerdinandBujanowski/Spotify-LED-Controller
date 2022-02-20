@@ -1,10 +1,11 @@
 package logic.led;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-public class LogicMask {
+public class LogicMask implements Serializable {
 
     public ArrayList<LogicPixel> pixels;
 

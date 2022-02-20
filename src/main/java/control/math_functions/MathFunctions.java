@@ -1,6 +1,8 @@
 package control.math_functions;
 
-public abstract class MathFunctions {
+import java.io.Serializable;
+
+public abstract class MathFunctions implements Serializable {
 
     public static double getBezier(double currentX, boolean negative) {
         if(!negative) {

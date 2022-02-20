@@ -1,7 +1,9 @@
 package control.node;
 
+import control.SerializableFunction;
 import control.exceptions.CannotDeleteNodeException;
 import control.exceptions.JointConnectionFailedException;
+import control.save.NodeSaveUnit;
 import control.type_enums.*;
 import gui.node_components.GraphicInputUnit;
 import logic.function.LogicFunction;
@@ -23,23 +25,28 @@ public class NodeControl implements Serializable {
 
     private ArrayList<LogicNode> logicNodes;
     private ArrayList<NodeConnection> nodeConnections;
-    private int jointHoveredNodeIndex, jointHoveredJointIndex;
-
     private ArrayList<LogicFunction> logicFunctions;
-
     private ArrayList<Point> trackNodeIndexes;
+
     private int currentSongMs;
+    private int jointHoveredNodeIndex, jointHoveredJointIndex;
 
     public NodeControl() {
         this.logicNodes = new ArrayList<>();
         this.nodeConnections = new ArrayList<>();
+        this.logicFunctions = new ArrayList<>();
+        this.trackNodeIndexes = new ArrayList<>();
+
+        this.currentSongMs = 0;
         this.jointHoveredNodeIndex = -1;
         this.jointHoveredJointIndex = -1;
+    }
 
-        this.logicFunctions = new ArrayList<>();
-
-        this.trackNodeIndexes = new ArrayList<>();
-        this.currentSongMs = 0;
+    public void reinitialize(NodeSaveUnit nodeSaveUnit) {
+        this.logicNodes = nodeSaveUnit.getLogicNodes();
+        this.nodeConnections = nodeSaveUnit.getNodeConnections();
+        this.logicFunctions = nodeSaveUnit.getLogicFunctions();
+        this.trackNodeIndexes = nodeSaveUnit.getTrackNodeIndexes();
     }
 
     public int getNextFreeNodeIndex(int functionIndex) {
@@ -141,7 +148,7 @@ public class NodeControl implements Serializable {
         }
     }
 
-    public void addTrackNode(int functionIndexGoal, int trackIndex, Function<Point, Double> intensityFunction, int newNodeIndex) {
+    public void addTrackNode(int functionIndexGoal, int trackIndex, SerializableFunction<Point, Double> intensityFunction, int newNodeIndex) {
 
         this.trackNodeIndexes.add(new Point(functionIndexGoal, newNodeIndex));
         LogicNode trackNode = new LogicNode(
@@ -165,7 +172,7 @@ public class NodeControl implements Serializable {
         }
     }
 
-    public void addLayerNode(int newNodeIndex, Function<Object, Integer> setMaskFunction, Function<Color, Integer> setColorFunction, String layerName) {
+    public void addLayerNode(int newNodeIndex, SerializableFunction<Object, Integer> setMaskFunction, SerializableFunction<Color, Integer> setColorFunction, String layerName) {
         LogicNode layerNode = new LogicNode(
                 newNodeIndex,
                 new InputJoint[] {
@@ -221,7 +228,7 @@ public class NodeControl implements Serializable {
         }
     }
 
-    public Function<Integer, Double[][]> getMaskValuesFunctionForNode(int functionIndex, int nodeIndex) {
+    public SerializableFunction<Integer, Double[][]> getMaskValuesFunctionForNode(int functionIndex, int nodeIndex) {
         LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
         return logicNode::getMaskValues;
     }
@@ -485,5 +492,14 @@ public class NodeControl implements Serializable {
                 currentTrackNode.onInputChangeEvent();
             }
         }
+    }
+
+    public NodeSaveUnit createNodeSaveUnit() {
+        return new NodeSaveUnit(
+                this.logicNodes,
+                this.nodeConnections,
+                this.logicFunctions,
+                this.trackNodeIndexes
+        );
     }
 }

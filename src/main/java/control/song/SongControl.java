@@ -10,31 +10,36 @@ import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
 import com.wrapper.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
 import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
+import control.save.EventSaveUnit;
 import control.spotify.SpotifyWebHandler;
 import control.type_enums.CurveType;
+import gui.main_panels.player_panel.SpotifyPlayerPanel;
 import logic.song.LogicEvent;
 import logic.song.LogicTrack;
 import org.apache.hc.core5.http.ParseException;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SongControl implements TrackRequestAcceptor {
+public class SongControl implements TrackRequestAcceptor, Serializable {
 
-    private SpotifyWebHandler spotifyWebHandler;
+    SpotifyWebHandler spotifyWebHandler;
     private EventGraphicUnit eventWindow;
 
     private boolean spotifyConnected;
     private User lastConnectedUser;
     private String songId;
+    private ImageIcon albumImage;
     private boolean songSelected, songPlaying, songPaused;
-
     private int currentSongMs;
-
     private Track[] lastSearchedSongList;
-    private Track selectedSong;
 
     private AudioAnalysis selectedSongAnalysis;
     private AudioFeatures selectedSongFeatures;
@@ -49,6 +54,7 @@ public class SongControl implements TrackRequestAcceptor {
         this.eventWindow = null;
 
         this.songId = "";
+        this.albumImage = null;
         this.songSelected = false;
         this.songPlaying = false;
         this.songPaused = true;
@@ -56,7 +62,6 @@ public class SongControl implements TrackRequestAcceptor {
         this.currentSongMs = 0;
 
         this.lastSearchedSongList = new Track[] {};
-        this.selectedSong = null;
 
         this.selectedSongAnalysis = null;
         this.selectedSongFeatures = null;
@@ -67,15 +72,30 @@ public class SongControl implements TrackRequestAcceptor {
         this.logicTracks = new ArrayList<>();
     }
 
+    public SongControl(EventSaveUnit eventSaveUnit) {
+        this();
+        this.songSelected = true;
+        this.songId = eventSaveUnit.getSelectedSongId();
+        this.logicTracks = eventSaveUnit.getLogicTracks();
+    }
+
+    public void reinitialize(EventSaveUnit eventSaveUnit) {
+        this.songSelected = true;
+        this.songId = eventSaveUnit.getSelectedSongId();
+        this.albumImage = eventSaveUnit.getAlbumImage();
+        this.logicTracks = eventSaveUnit.getLogicTracks();
+        this.timeMeasures = eventSaveUnit.getTimeMeasures();
+        this.eventWindow.syncTracks(this.getTrackTimes());
+    }
 
     public void connectToSpotify() {
-        this.spotifyWebHandler.init();
-        if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
-            GetCurrentUsersProfileRequest currentUsersProfileRequest = this.spotifyWebHandler.getSpotifyApi().getCurrentUsersProfile().build();
+        spotifyWebHandler.init();
+        if(spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
+            GetCurrentUsersProfileRequest currentUsersProfileRequest = spotifyWebHandler.getSpotifyApi().getCurrentUsersProfile().build();
             try {
                 this.lastConnectedUser = currentUsersProfileRequest.execute();
 
-                this.currentAvailableDevices = this.spotifyWebHandler.getSpotifyApi().getUsersAvailableDevices().build()
+                this.currentAvailableDevices = spotifyWebHandler.getSpotifyApi().getUsersAvailableDevices().build()
                         .execute();
 
                 this.spotifyConnected = true;
@@ -90,7 +110,7 @@ public class SongControl implements TrackRequestAcceptor {
     }
 
     public String[] searchSongByName(String input) {
-        SearchTracksRequest searchTracksRequest = this.spotifyWebHandler.getSpotifyApi().searchTracks(input).build();
+        SearchTracksRequest searchTracksRequest = spotifyWebHandler.getSpotifyApi().searchTracks(input).build();
         try {
             Track[] tracks = searchTracksRequest.execute().getItems();
             this.lastSearchedSongList = tracks;
@@ -110,71 +130,72 @@ public class SongControl implements TrackRequestAcceptor {
     }
 
     public void selectSong(Track track) {
-        this.selectedSong = track;
-        this.songId = this.selectedSong.getId();
-        this.songSelected = true;
+        if(!this.songId.equals(track.getId())) {
+            this.songId = track.getId();
+            this.songSelected = true;
 
-        GetAudioAnalysisForTrackRequest getAudioAnalysisForTrackRequest =
-                this.spotifyWebHandler.getSpotifyApi().getAudioAnalysisForTrack(this.songId).build();
-        try {
-            this.selectedSongAnalysis = getAudioAnalysisForTrackRequest.execute();
-
-            this.logicTracks.add(new LogicTrack());
-            for(AudioAnalysisMeasure bar : this.selectedSongAnalysis.getBars()) {
-                this.logicTracks.get(0).addEventToTrack(
-                        (int)(bar.getStart() * 1000),
-                        (int)((bar.getStart() + bar.getDuration()) * 1000),
-                        CurveType.CONSTANT
-                );
+            String imageURL = track.getAlbum().getImages()[0].getUrl();
+            if(imageURL != null) {
+                BufferedImage image = null;
+                try {
+                    image = ImageIO.read(new URL(imageURL));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                this.albumImage = new ImageIcon(SpotifyPlayerPanel.getScaledImage(image, 300, 300));
             }
 
-            float beatDurationSum = 0;
-            this.logicTracks.add(new LogicTrack());
-            for(AudioAnalysisMeasure beat : this.selectedSongAnalysis.getBeats()) {
-                beatDurationSum += beat.getDuration();
-                this.logicTracks.get(1).addEventToTrack(
-                        (int)(beat.getStart() * 1000),
-                        (int)((beat.getStart() + beat.getDuration()) * 1000),
-                        CurveType.CONSTANT
-                );
-            }
-            GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest =
-                    this.spotifyWebHandler.getSpotifyApi().getAudioFeaturesForTrack(this.songId).build();
-            this.selectedSongFeatures = getAudioFeaturesForTrackRequest.execute();
+            GetAudioAnalysisForTrackRequest getAudioAnalysisForTrackRequest =
+                    this.spotifyWebHandler.getSpotifyApi().getAudioAnalysisForTrack(this.songId).build();
+            try {
+                this.selectedSongAnalysis = getAudioAnalysisForTrackRequest.execute();
 
-            this.timeMeasures.add(new TimeMeasure(
-                    this.selectedSongFeatures.getTimeSignature(),
-                    this.selectedSongFeatures.getTempo(),
-                    (int)(this.selectedSongAnalysis.getBeats()[0].getStart() * 1000),
-                    this.selectedSongAnalysis.getBeats().length
-            ));
-            if(this.eventWindow != null) {
-                this.eventWindow.syncTracks(this.getTrackTimes());
-            }
+                this.logicTracks.add(new LogicTrack());
+                for(AudioAnalysisMeasure bar : this.selectedSongAnalysis.getBars()) {
+                    this.logicTracks.get(0).addEventToTrack(
+                            (int)(bar.getStart() * 1000),
+                            (int)((bar.getStart() + bar.getDuration()) * 1000),
+                            CurveType.CONSTANT
+                    );
+                }
 
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            e.printStackTrace();
+                float beatDurationSum = 0;
+                this.logicTracks.add(new LogicTrack());
+                for(AudioAnalysisMeasure beat : this.selectedSongAnalysis.getBeats()) {
+                    beatDurationSum += beat.getDuration();
+                    this.logicTracks.get(1).addEventToTrack(
+                            (int)(beat.getStart() * 1000),
+                            (int)((beat.getStart() + beat.getDuration()) * 1000),
+                            CurveType.CONSTANT
+                    );
+                }
+                GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest =
+                        this.spotifyWebHandler.getSpotifyApi().getAudioFeaturesForTrack(this.songId).build();
+                this.selectedSongFeatures = getAudioFeaturesForTrackRequest.execute();
+
+                this.timeMeasures.add(new TimeMeasure(
+                        this.selectedSongFeatures.getTimeSignature(),
+                        this.selectedSongFeatures.getTempo(),
+                        (int)(this.selectedSongAnalysis.getBeats()[0].getStart() * 1000),
+                        this.selectedSongAnalysis.getBeats().length
+                ));
+                if(this.eventWindow != null) {
+                    this.eventWindow.syncTracks(this.getTrackTimes());
+                }
+
+            } catch (IOException | SpotifyWebApiException | ParseException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public int getTrackCount() {
         return this.logicTracks.size();
     }
-    public Double getTrackIntensityAt(Point coordinates) {
-        if(this.logicTracks.get(coordinates.x) == null) {
-            return 0.d;
-        } else {
-            return this.logicTracks.get(coordinates.x).getIntensityAt(coordinates.y);
-        }
-    }
 
-    public String getImageURL() {
-        try {
-            return this.selectedSong.getAlbum().getImages()[0].getUrl();
-        } catch(NullPointerException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+    public ImageIcon getAlbumImage() {
+        return this.albumImage;
     }
 
     public void updatePlayingState() {
@@ -310,6 +331,15 @@ public class SongControl implements TrackRequestAcceptor {
     }
 
     @Override
+    public Double getTrackIntensityAt(Point coordinates) {
+        if(this.logicTracks.get(coordinates.x) == null) {
+            return 0.d;
+        } else {
+            return this.logicTracks.get(coordinates.x).getIntensityAt(coordinates.y);
+        }
+    }
+
+    @Override
     public ArrayList<TimeMeasure> getTimeMeasures() {
         return this.timeMeasures;
     }
@@ -391,5 +421,9 @@ public class SongControl implements TrackRequestAcceptor {
             this.logicTracks.get(trackNumber).addEventToTrack(msStartNew, msStartNew + msDurationNew, curveType);
             this.eventWindow.addEventToTrack(trackNumber, msStartNew, msDurationNew, curveType);
         }
+    }
+
+    public EventSaveUnit createEventSaveUnit() {
+        return new EventSaveUnit(this.songId, this.albumImage, this.logicTracks, this.timeMeasures);
     }
 }

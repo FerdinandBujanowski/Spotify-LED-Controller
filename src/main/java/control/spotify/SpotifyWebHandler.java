@@ -10,6 +10,7 @@ import org.apache.hc.core5.http.ParseException;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
