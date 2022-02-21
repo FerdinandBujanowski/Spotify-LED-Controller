@@ -26,7 +26,7 @@ public class NodeControl implements Serializable {
     private ArrayList<LogicNode> logicNodes;
     private ArrayList<NodeConnection> nodeConnections;
     private ArrayList<LogicFunction> logicFunctions;
-    private ArrayList<Point> trackNodeIndexes;
+    private ArrayList<ThreeCoordinatePoint> trackNodeIndexes;
 
     private int currentSongMs;
     private ArrayList<Double> trackIntensities;
@@ -49,6 +49,33 @@ public class NodeControl implements Serializable {
         this.nodeConnections = nodeSaveUnit.getNodeConnections();
         this.logicFunctions = nodeSaveUnit.getLogicFunctions();
         this.trackNodeIndexes = nodeSaveUnit.getTrackNodeIndexes();
+
+        for(ThreeCoordinatePoint trackNodeIndex : this.trackNodeIndexes) {
+            int indexInArrayList = this.getNodeIndexInArrayList(trackNodeIndex.getX(), trackNodeIndex.getY());
+            LogicNode oldNode = this.findNode(trackNodeIndex.getX(), trackNodeIndex.getY());
+            LogicNode newNode = new LogicNode(
+                    oldNode.getNodeIndex(),
+                    oldNode.getInputJoints(),
+                    oldNode.getOutputJoints(),
+                    oldNode.getSpecificName()
+            ) {
+                @Override
+                public JointDataType[] function(InputJoint[] nullInputJoints) {
+                    double intensity = 0.d;
+                    if(trackIntensities.get(trackNodeIndex.getZ()) != null) {
+                        intensity = trackIntensities.get(trackNodeIndex.getZ());
+                    }
+                    return new UnitNumberJointDataType[] { new UnitNumberJointDataType(intensity) };
+                }
+            };
+            if(indexInArrayList != -1) {
+                if(trackNodeIndex.getX() == -1) {
+                    this.logicNodes.set(indexInArrayList, newNode);
+                } else {
+                    this.findFunction(trackNodeIndex.getY()).getLogicNodes().set(indexInArrayList, newNode);
+                }
+            }
+        }
     }
 
     public int getNextFreeNodeIndex(int functionIndex) {
@@ -150,15 +177,16 @@ public class NodeControl implements Serializable {
         }
     }
 
-    public void addTrackNode(int functionIndexGoal, int trackIndex, int newNodeIndex) {
+    public void addTrackNode(int functionIndexGoal, int trackIndex, int newNodeIndex, String trackName) {
 
-        this.trackNodeIndexes.add(new Point(functionIndexGoal, newNodeIndex));
+        this.trackNodeIndexes.add(new ThreeCoordinatePoint(functionIndexGoal, newNodeIndex, trackIndex));
         LogicNode trackNode = new LogicNode(
                 newNodeIndex,
                 new InputJoint[] {},
                 new OutputJoint[] {
                         new OutputJoint(new UnitNumberJointDataType(), "Intensity")
-                }
+                },
+                trackName
         ) {
             @Override
             public JointDataType[] function(InputJoint[] nullInputJoints) {
@@ -261,16 +289,33 @@ public class NodeControl implements Serializable {
                     return logicNode;
                 }
             }
-            return null;
         } else {
             for(LogicNode logicNode : this.findFunction(functionIndex).getLogicNodes()) {
                 if(logicNode.getNodeIndex() == nodeIndex) {
                     return logicNode;
                 }
             }
-            return null;
         }
+        return null;
     }
+
+    public int getNodeIndexInArrayList(int functionIndex, int nodeIndex) {
+        if(functionIndex == -1) {
+            for(int i = 0; i < this.logicNodes.size(); i++) {
+                if(logicNodes.get(i).getNodeIndex() == nodeIndex) {
+                    return i;
+                }
+            }
+        } else {
+            for(int i = 0; i < this.findFunction(functionIndex).getLogicNodes().size(); i++) {
+                if(this.findFunction(functionIndex).getLogicNodes().get(i).getNodeIndex() == nodeIndex) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
     public LogicFunction findFunction(int functionIndex) {
         for(LogicFunction logicFunction : this.logicFunctions) {
             if(logicFunction.getFunctionIndex() == functionIndex) {
@@ -497,8 +542,8 @@ public class NodeControl implements Serializable {
                 this.trackIntensities.add(updatedTrackIntensities[i]);
             }
         }
-        for(Point trackNodeIndex : this.trackNodeIndexes) {
-            LogicNode currentTrackNode = this.findNode(trackNodeIndex.x, trackNodeIndex.y);
+        for(ThreeCoordinatePoint trackNodeIndex : this.trackNodeIndexes) {
+            LogicNode currentTrackNode = this.findNode(trackNodeIndex.getX(), trackNodeIndex.getY());
             if(currentTrackNode != null) {
                 currentTrackNode.onInputChangeEvent();
             }

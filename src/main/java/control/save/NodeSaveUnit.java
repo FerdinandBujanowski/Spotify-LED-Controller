@@ -1,6 +1,7 @@
 package control.save;
 
 import control.node.NodeConnection;
+import control.node.ThreeCoordinatePoint;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 
@@ -13,13 +14,13 @@ public class NodeSaveUnit implements Serializable {
     private final ArrayList<LogicNode> logicNodes;
     private final ArrayList<NodeConnection> nodeConnections;
     private final ArrayList<LogicFunction> logicFunctions;
-    private final ArrayList<Point> trackNodeIndexes;
+    private final ArrayList<ThreeCoordinatePoint> trackNodeIndexes;
 
     public NodeSaveUnit(
             ArrayList<LogicNode> logicNodes,
             ArrayList<NodeConnection> nodeConnections,
             ArrayList<LogicFunction> logicFunctions,
-            ArrayList<Point> trackNodeIndexes
+            ArrayList<ThreeCoordinatePoint> trackNodeIndexes
     ) {
         this.logicNodes = logicNodes;
         this.nodeConnections = nodeConnections;
@@ -36,7 +37,7 @@ public class NodeSaveUnit implements Serializable {
     public ArrayList<LogicFunction> getLogicFunctions() {
         return this.logicFunctions;
     }
-    public ArrayList<Point> getTrackNodeIndexes() {
+    public ArrayList<ThreeCoordinatePoint> getTrackNodeIndexes() {
         return this.trackNodeIndexes;
     }
 }

@@ -68,14 +68,7 @@ public class LogicTrack implements Serializable {
         } else {
             int msInto = ms - logicEvent.getMsStart();
             double x = (double)msInto / (double)logicEvent.getMsDuration();
-            double curve = logicEvent.getCurveType().getCurve(x);
-            System.out.println(logicEvent.getCurveType());
-
-            System.out.println(
-                    "ms into : " + msInto + "/" + logicEvent.getMsDuration() + " - " +
-                    "x : " + x + " - intensity : " + curve
-            );
-            return curve;
+            return logicEvent.getCurveType().getCurve(x);
         }
     }
 

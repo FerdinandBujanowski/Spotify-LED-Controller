@@ -369,6 +369,7 @@ public class MainWindow extends JFrame {
                     if(data != null) {
 
                         newProject(songControl, nodeControl, data.getLedControl(), dimension);
+
                         songControl.reinitialize(data.getEventSaveUnit());
                         nodeControl.reinitialize(data.getNodeSaveUnit());
 
