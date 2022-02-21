@@ -46,7 +46,7 @@ public class Main {
                         songControl.onSkipTo(updatedMS);
 
                         songControl.tick(updatedMS);
-                        nodeControl.tick(updatedMS);
+                        nodeControl.tick(updatedMS, songControl.getTrackIntensitiesAt(updatedMS));
                     }
                 }
                 mainWindow.repaintWindows(songControl);
@@ -74,7 +74,7 @@ public class Main {
                         int correctMS = msSince.get() + songControl.getCurrentSongMs();
 
                         songControl.tick(correctMS);
-                        nodeControl.tick(correctMS);
+                        nodeControl.tick(correctMS, songControl.getTrackIntensitiesAt(correctMS));
                         mainWindow.repaintWindows(songControl);
 
                     } else {

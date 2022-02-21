@@ -29,6 +29,7 @@ public class NodeControl implements Serializable {
     private ArrayList<Point> trackNodeIndexes;
 
     private int currentSongMs;
+    private ArrayList<Double> trackIntensities;
     private int jointHoveredNodeIndex, jointHoveredJointIndex;
 
     public NodeControl() {
@@ -38,6 +39,7 @@ public class NodeControl implements Serializable {
         this.trackNodeIndexes = new ArrayList<>();
 
         this.currentSongMs = 0;
+        this.trackIntensities = new ArrayList<>();
         this.jointHoveredNodeIndex = -1;
         this.jointHoveredJointIndex = -1;
     }
@@ -148,7 +150,7 @@ public class NodeControl implements Serializable {
         }
     }
 
-    public void addTrackNode(int functionIndexGoal, int trackIndex, SerializableFunction<Point, Double> intensityFunction, int newNodeIndex) {
+    public void addTrackNode(int functionIndexGoal, int trackIndex, int newNodeIndex) {
 
         this.trackNodeIndexes.add(new Point(functionIndexGoal, newNodeIndex));
         LogicNode trackNode = new LogicNode(
@@ -160,9 +162,11 @@ public class NodeControl implements Serializable {
         ) {
             @Override
             public JointDataType[] function(InputJoint[] nullInputJoints) {
-                return new UnitNumberJointDataType[] {
-                        new UnitNumberJointDataType(intensityFunction.apply(new Point(trackIndex, currentSongMs)))
-                };
+                double intensity = 0.d;
+                if(trackIntensities.get(trackIndex) != null) {
+                    intensity = trackIntensities.get(trackIndex);
+                }
+                return new UnitNumberJointDataType[] { new UnitNumberJointDataType(intensity) };
             }
         };
         if(functionIndexGoal == -1) {
@@ -484,8 +488,15 @@ public class NodeControl implements Serializable {
         return copy;
     }
 
-    public void tick(int ms) {
+    public void tick(int ms, double[] updatedTrackIntensities) {
         this.currentSongMs = ms;
+        for(int i = 0; i < updatedTrackIntensities.length; i++) {
+            if(i < this.trackIntensities.size()) {
+                this.trackIntensities.set(i, updatedTrackIntensities[i]);
+            } else {
+                this.trackIntensities.add(updatedTrackIntensities[i]);
+            }
+        }
         for(Point trackNodeIndex : this.trackNodeIndexes) {
             LogicNode currentTrackNode = this.findNode(trackNodeIndex.x, trackNodeIndex.y);
             if(currentTrackNode != null) {

@@ -437,14 +437,12 @@ public class MainWindow extends JFrame {
                 if(tabbedPane.getSelectedComponent() == nodeEditWindow) {
                     nodeEditWindow.addTrackNode(
                             trackIndex,
-                            ((TrackRequestAcceptor)songControl)::getTrackIntensityAt,
                             trackName,
                             0, 0
                     );
                 } else if(tabbedPane.getSelectedComponent() == functionTabbedPane) {
                     functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).addTrackNode(
                             trackIndex,
-                            songControl::getTrackIntensityAt,
                             trackName,
                             0, 0
                     );

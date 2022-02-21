@@ -211,7 +211,7 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
                 } else {
                     this.songPaused = true;
                 }
-            } catch (IOException | SpotifyWebApiException | ParseException e) {
+            } catch (IOException | SpotifyWebApiException | ParseException | NullPointerException e) {
                 e.printStackTrace();
             }
         }
@@ -281,6 +281,14 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
 
     public void onStartPlayback() {
 
+    }
+
+    public double[] getTrackIntensitiesAt(int ms) {
+        double[] values = new double[this.logicTracks.size()];
+        for(int i = 0; i < values.length; i++) {
+            values[i] = this.getTrackIntensityAt(new Point(i, ms));
+        }
+        return values;
     }
 
     private void onPausePlayback() {
