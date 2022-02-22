@@ -90,14 +90,6 @@ public class LogicFunction extends LogicComponent implements Serializable {
         this.jointHoveredJointIndex = jointHoveredJointIndex;
     }
 
-    /**
-     * Erstellt aus allen bisher in der Funktion gespeicherten Nodes eine Node,
-     * die wie die Funktion funktioniert (indem alle Nodes / Joints kopiert werden,
-     * und in der überschriebenen "function"-Funktion zum Berechnen der Outputs benutzt werden)
-     * @param nodeIndex globaler Index, den die neu erstellte Node haben wird
-     * @param functionName Name im GUI
-     * @return Überschriebenes Objekt der LogicNode-Klasse
-     */
     public LogicNode bakeNode(int nodeIndex, String functionName) {
 
         //Alle Nodes der Funktion werden kopiert (inklusive der Verbindungen)

@@ -152,34 +152,10 @@ public class NodeControl implements Serializable {
             this.findFunction(functionIndexGoal).getLogicNodes().add(logicNodeToAdd);
         }
     }
-    public void addFunctionInstanceNode(int functionIndexOrigin, int functionIndexGoal, int newNodeIndex, String functionName) {
-        LogicNode logicNodeFunction = this.findFunction(functionIndexOrigin).bakeNode(newNodeIndex, functionName);
 
-        LogicNode logicNodeInstance = new LogicNode(
-                getNextFreeNodeIndex(functionIndexGoal),
-                new InputJoint[] {},
-                new OutputJoint[] {
-                        new OutputJoint(new FunctionInstanceJointDataType(logicNodeFunction), "Instance")
-                },
-                "Function: " + functionName
-                ) {
-            @Override
-            public JointDataType[] function(InputJoint[] inputJoints) {
-                //TODO: Hier nicht so sicher was da stehen sollte
-                return super.function(inputJoints);
-            }
-        };
+    public void addTrackNode(int trackIndex, int newNodeIndex, String trackName) {
 
-        if(functionIndexGoal == -1) {
-            this.logicNodes.add(logicNodeInstance);
-        } else {
-            this.findFunction(functionIndexGoal).getLogicNodes().add(logicNodeInstance);
-        }
-    }
-
-    public void addTrackNode(int functionIndexGoal, int trackIndex, int newNodeIndex, String trackName) {
-
-        this.trackNodeIndexes.add(new ThreeCoordinatePoint(functionIndexGoal, newNodeIndex, trackIndex));
+        this.trackNodeIndexes.add(new ThreeCoordinatePoint(-1, newNodeIndex, trackIndex));
         LogicNode trackNode = new LogicNode(
                 newNodeIndex,
                 new InputJoint[] {},
@@ -197,11 +173,7 @@ public class NodeControl implements Serializable {
                 return new UnitNumberJointDataType[] { new UnitNumberJointDataType(intensity) };
             }
         };
-        if(functionIndexGoal == -1) {
-            this.logicNodes.add(trackNode);
-        } else {
-            this.findFunction(functionIndexGoal).getLogicNodes().add(trackNode);
-        }
+        this.logicNodes.add(trackNode);
     }
 
     public void addLayerNode(int newNodeIndex, SerializableFunction<Object, Integer> setMaskFunction, SerializableFunction<Color, Integer> setColorFunction, String layerName) {

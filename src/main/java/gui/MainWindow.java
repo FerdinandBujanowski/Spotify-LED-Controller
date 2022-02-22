@@ -226,10 +226,8 @@ public class MainWindow extends JFrame {
 
         JMenuItem createFunctionMenuItem = new JMenuItem("Create Function");
         JMenu addFunctionMenu = new JMenu("Add Function");
-        JMenu addFunctionInstance = new JMenu("Add Function Instance");
 
         ArrayList<JMenuItem> functionItemList = new ArrayList<>();
-        ArrayList<JMenuItem> functionInstanceItemList = new ArrayList<>();
 
         createFunctionMenuItem.addActionListener(new ActionListener() {
             @Override
@@ -273,13 +271,10 @@ public class MainWindow extends JFrame {
                     functionTabbedPane.setSelectedIndex(functionTabbedPane.getTabCount() - 1);
 
                     JMenuItem addNewFunctionItem = new JMenuItem(functionName);
-                    JMenuItem addNewFunctionInstanceItem = new JMenuItem(functionName);
 
                     addFunctionMenu.add(addNewFunctionItem);
-                    addFunctionInstance.add(addNewFunctionInstanceItem);
 
                     functionItemList.add(addNewFunctionItem);
-                    functionInstanceItemList.add(addNewFunctionInstanceItem);
 
                     addNewFunctionItem.addActionListener(new ActionListener() {
                         @Override
@@ -293,27 +288,11 @@ public class MainWindow extends JFrame {
                             }
                         }
                     });
-
-                    addNewFunctionInstanceItem.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            //TODO: Function Instance Creation weiterleiten
-                            int currentFunctionIndex = functionInstanceItemList.indexOf(addNewFunctionInstanceItem);
-                            if(tabbedPane.getSelectedIndex() == 2) {
-                                nodeEditWindow.addFunctionInstanceNode(currentFunctionIndex, functionName, 10, 10);
-                            } else if(tabbedPane.getSelectedIndex() == 3) {
-                                int selectedFunctionIndex = functionTabbedPane.getSelectedIndex();
-                                functionTabbedPane.getFunctionEditWindows().get(selectedFunctionIndex).addFunctionInstanceNode(currentFunctionIndex, functionName, 10, 10);
-                            }
-                        }
-                    });
                 }
             }
         });
         this.functionMenu.add(createFunctionMenuItem);
-        this.functionMenu.add(new JSeparator());
         this.functionMenu.add(addFunctionMenu);
-        this.functionMenu.add(addFunctionInstance);
         jMenuBar.add(this.functionMenu);
         this.functionMenu.setEnabled(false);
 
@@ -442,10 +421,11 @@ public class MainWindow extends JFrame {
                             0, 0
                     );
                 } else if(tabbedPane.getSelectedComponent() == functionTabbedPane) {
-                    functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).addTrackNode(
-                            trackIndex,
-                            trackName,
-                            0, 0
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Unable to create Track Nodes inside Function",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
                     );
                 }
             }

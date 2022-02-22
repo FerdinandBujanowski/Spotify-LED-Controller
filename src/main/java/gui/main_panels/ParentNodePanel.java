@@ -122,16 +122,9 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         this.addGraphicNode(this.functionIndex, nextFreeIndex, null, this.nodeControl.getSpecificNodeName(this.functionIndex, nextFreeIndex), x, y);
     }
 
-    public void addFunctionInstanceNode(int functionIndexOrigin, String functionName, int x, int y) {
-        int nextFreeIndex = this.getNodeControl().getNextFreeNodeIndex(this.functionIndex);
-        this.getNodeControl().addFunctionInstanceNode(functionIndexOrigin, this.functionIndex, nextFreeIndex, functionName);
-
-        this.addGraphicNode(this.functionIndex, nextFreeIndex, null, this.nodeControl.getSpecificNodeName(this.functionIndex, nextFreeIndex), x, y);
-    }
-
     public void addTrackNode(int trackIndex, String trackName, int x, int y) {
         int nextFreeIndex = this.getNodeControl().getNextFreeNodeIndex(this.functionIndex);
-        this.getNodeControl().addTrackNode(this.functionIndex, trackIndex, nextFreeIndex, trackName);
+        this.getNodeControl().addTrackNode(trackIndex, nextFreeIndex, trackName);
 
         this.addGraphicNode(this.functionIndex, nextFreeIndex, null, trackName, x, y);
     }
