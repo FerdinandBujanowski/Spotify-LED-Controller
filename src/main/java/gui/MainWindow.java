@@ -8,6 +8,7 @@ import control.type_enums.*;
 import control.node.NodeControl;
 import gui.main_panels.event_panel.EventEditWindow;
 import gui.main_panels.function_panels.FunctionTabbedPane;
+import gui.main_panels.led_panel.LedEditWindow;
 import gui.main_panels.node_panel.NodeEditWindow;
 import gui.main_panels.player_panel.PlayButton;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
@@ -27,6 +28,7 @@ public class MainWindow extends JFrame {
     private NodeEditWindow nodeEditWindow;
     private EventEditWindow eventEditWindow;
     private FunctionTabbedPane functionTabbedPane;
+    private LedEditWindow ledEditWindow;
 
     private PlayButton playButton;
 
@@ -303,7 +305,7 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 int currentLayerCount = ledControl.getLayerCount();
-                ledControl.addLayer();
+                ledControl.onAddLayerRequest();
                 if(currentLayerCount < ledControl.getLayerCount()) {
                     nodeEditWindow.addLayerNode(
                             ledControl.getUpdateMaskFunctionForLayer(currentLayerCount),
@@ -315,6 +317,47 @@ public class MainWindow extends JFrame {
             }
         });
         this.ledMenu.add(addLayerMenuItem);
+
+        JMenuItem addPixelMenuItem = new JMenuItem("Add LED Pixel");
+        addPixelMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFormattedTextField numberTextField = new JFormattedTextField(NumberFormat.getIntegerInstance());
+                numberTextField.setValue(0);
+                numberTextField.setFocusLostBehavior(JFormattedTextField.COMMIT);
+                JOptionPane.showOptionDialog(
+                        null, numberTextField, "Pick X",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                );
+                int x;
+                if(numberTextField.getValue().getClass() == Long.class) {
+                    x = ((Long) numberTextField.getValue()).intValue();
+                } else {
+                    x = (int)numberTextField.getValue();
+                }
+
+                numberTextField.setValue(0);
+                JOptionPane.showOptionDialog(
+                        null, numberTextField, "Pick Y",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                );
+                int y;
+                if(numberTextField.getValue().getClass() == Long.class) {
+                    y = ((Long) numberTextField.getValue()).intValue();
+                } else {
+                    y = (int)numberTextField.getValue();
+                }
+
+                try {
+                    ledControl.addPixel(x, y);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        this.ledMenu.add(new JSeparator());
+        this.ledMenu.add(addPixelMenuItem);
+
         jMenuBar.add(this.ledMenu);
         this.ledMenu.setEnabled(false);
 
@@ -402,6 +445,7 @@ public class MainWindow extends JFrame {
         this.eventEditWindow = new EventEditWindow(songControl);
         this.nodeEditWindow = new NodeEditWindow(nodeControl);
         this.functionTabbedPane = new FunctionTabbedPane(nodeControl);
+        this.ledEditWindow = new LedEditWindow(ledControl, dimension);
 
         this.nodeEditWindow.setPreferredSize(dimension);
 
@@ -442,7 +486,20 @@ public class MainWindow extends JFrame {
         ));
         this.tabbedPane.setComponentAt(2, this.nodeEditWindow);
         this.tabbedPane.setComponentAt(3, this.functionTabbedPane);
-        this.tabbedPane.setComponentAt(4, new JPanel());
+
+        JSplitPane ledSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT) {
+            @Override
+            public int getDividerLocation() {
+                return this.getWidth() - 200;
+            }
+        };
+        ledSplitPane.add(this.ledEditWindow, JSplitPane.LEFT);
+        ledSplitPane.add(new JScrollPane(
+                this.ledEditWindow.getLayersPanel(),
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        ), JSplitPane.RIGHT);
+        this.tabbedPane.setComponentAt(4, ledSplitPane);
 
         this.songMenu.setEnabled(true);
         this.nodeMenu.setEnabled(true);

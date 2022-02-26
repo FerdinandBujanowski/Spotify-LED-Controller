@@ -69,20 +69,23 @@ public enum NodeType {
     GET_DEGREE_NODE(1, 1, "Get Degree", "Mask", GetDegreeNode.class, false),
 
     //MATH FUNCTIONS
+    //TODO : round (+ up/down), power, square root
+    SIN_NODE(1, 1, "Sine Wave", "Math Functions", SinNode.class),
     COS_NODE(1, 1, "Cosine Wave", "Math Functions", CosNode.class),
     LERP_NODE(3, 1, "Linear Interpolation", "Math Functions", LerpNode.class),
-    MATH_SUM_NODE(2, 1, "Mathematical Sum", "Math Functions", MathSumNode.class),
-    SIN_NODE(1, 1, "Sine Wave", "Math Functions", SinNode.class),
 
     //TYPE CAST
+    //TODO : Unit-Number, Number-Int, Int-Number, Boolean-Int, Boolean-Unit
     NUMBER_TO_UNIT_NODE(1, 1, "Number to Unit", "Type Cast", CastNumberToUnitNode.class),
 
     //UPDATE
     UPDATE_NODE(2, 1, "Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT });
 
-    private int numberInputNodes, numberOutputNodes;
-    private String name, categoryName;
-    private Class nodeClass;
+    private final int numberInputNodes;
+    private final int numberOutputNodes;
+    private final String name;
+    private final String categoryName;
+    private final Class nodeClass;
 
     private InputDialogType[] inputDialogTypes;
     private boolean maskOutput;

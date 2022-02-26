@@ -41,6 +41,8 @@ public class LogicLayer implements Serializable {
     }
 
     private int mixWithIntensity(int a, int b, double intensity) {
-        return (int)(Math.round(a * intensity)) + (int)(Math.round(b * (1.d - intensity)));
+        int mix = (int)(Math.round(a * intensity)) + (int)(Math.round(b * (1.d - intensity)));
+        if(mix > 255) return 255;
+        return Math.max(mix, 0);
     }
 }

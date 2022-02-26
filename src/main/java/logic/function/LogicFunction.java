@@ -16,7 +16,7 @@ public class LogicFunction extends LogicComponent implements Serializable {
     private final int functionIndex;
     private ArrayList<LogicNode> logicNodes;
     private ArrayList<LogicNode> hiddenCopiedNodes;
-    private int[] inputParameterIndexes, outputParameterIndexes;
+    private ArrayList<Integer> inputParameterIndexes, outputParameterIndexes;
 
     private ArrayList<NodeConnection> nodeConnections;
     private int jointHoveredNodeIndex, jointHoveredJointIndex;
@@ -35,8 +35,8 @@ public class LogicFunction extends LogicComponent implements Serializable {
         this.logicNodes = new ArrayList<>();
         this.hiddenCopiedNodes = new ArrayList<>();
 
-        this.inputParameterIndexes = new int[inputJoints.length];
-        this.outputParameterIndexes = new int[outputJoints.length];
+        this.inputParameterIndexes = new ArrayList<>();
+        this.outputParameterIndexes = new ArrayList<>();
 
         this.nodeConnections = new ArrayList<>();
         this.jointHoveredNodeIndex = -1;
@@ -50,7 +50,7 @@ public class LogicFunction extends LogicComponent implements Serializable {
                     new OutputJoint[] { new OutputJoint(inputJoints[i].getJointDataType(), inputJoints[i].getName()) },
                     "Input Parameter"
             ) {});
-            this.inputParameterIndexes[i] = i;
+            this.inputParameterIndexes.add(i);
         }
 
         int logicNodesSize = logicNodes.size();
@@ -62,7 +62,7 @@ public class LogicFunction extends LogicComponent implements Serializable {
                     new OutputJoint[0],
                     "Output Parameter"
             ) {});
-            this.outputParameterIndexes[i] = i + logicNodesSize;
+            this.outputParameterIndexes.add(i + logicNodesSize);
         }
     }
 
@@ -105,7 +105,7 @@ public class LogicFunction extends LogicComponent implements Serializable {
 
 
         for(int inputParameterIndex : inputParameterIndexes) {
-            int finalI = inputParameterIndex - inputParameterIndexes[0];
+            int finalI = inputParameterIndex - inputParameterIndexes.get(0);
             LogicNode oldNode = hiddenNodes.get(inputParameterIndex);
             hiddenNodes.set(inputParameterIndex, new LogicNode(
                     oldNode.getNodeIndex(),
@@ -136,17 +136,17 @@ public class LogicFunction extends LogicComponent implements Serializable {
             }
         }
 
-        for(int i = 0; i < outputParameterIndexes.length; i++) {
-            int finalI = outputParameterIndexes[i] - outputParameterIndexes[0];
-            LogicNode oldNode = hiddenNodes.get(outputParameterIndexes[i]);
-            hiddenNodes.set(outputParameterIndexes[i], new LogicNode(
+        for(int i = 0; i < outputParameterIndexes.size(); i++) {
+            int finalI = outputParameterIndexes.get(i) - outputParameterIndexes.get(0);
+            LogicNode oldNode = hiddenNodes.get(outputParameterIndexes.get(i));
+            hiddenNodes.set(outputParameterIndexes.get(i), new LogicNode(
                     oldNode.getNodeIndex(),
                     new InputJoint[] { new InputJoint(newOutputJoints[finalI].getJointDataType(), newOutputJoints[finalI].getName()) },
                     oldNode.getOutputJoints(),
                     oldNode.getSpecificName()
             ) {});
             try {
-                hiddenNodes.get(outputParameterIndexes[i]).getInputJoints()[0].tryJointConnection(oldNode.getInputJoints()[0].getConnectedOutputJoint());
+                hiddenNodes.get(outputParameterIndexes.get(i)).getInputJoints()[0].tryJointConnection(oldNode.getInputJoints()[0].getConnectedOutputJoint());
             } catch (JointConnectionFailedException e) {
                 e.printStackTrace();
             }
@@ -163,11 +163,11 @@ public class LogicFunction extends LogicComponent implements Serializable {
                     hiddenNodes.get(inputParameterIndex).onInputChangeEvent();
                 }
 
-                JointDataType[] outputJointDataTypes = new JointDataType[outputParameterIndexes.length];
-                for(int i = 0; i < outputParameterIndexes.length; i++) {
+                JointDataType[] outputJointDataTypes = new JointDataType[outputParameterIndexes.size()];
+                for(int i = 0; i < outputParameterIndexes.size(); i++) {
                     try {
                         outputJointDataTypes[i] = newOutputJoints[i].getJointDataType().getClass().newInstance();
-                        outputJointDataTypes[i].setData(hiddenNodes.get(outputParameterIndexes[i]).getInputJoints()[0].getJointDataType().getData());
+                        outputJointDataTypes[i].setData(hiddenNodes.get(outputParameterIndexes.get(i)).getInputJoints()[0].getJointDataType().getData());
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();
                     }

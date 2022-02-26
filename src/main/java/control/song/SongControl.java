@@ -72,13 +72,6 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
         this.logicTracks = new ArrayList<>();
     }
 
-    public SongControl(EventSaveUnit eventSaveUnit) {
-        this();
-        this.songSelected = true;
-        this.songId = eventSaveUnit.getSelectedSongId();
-        this.logicTracks = eventSaveUnit.getLogicTracks();
-    }
-
     public void reinitialize(EventSaveUnit eventSaveUnit) {
         this.songSelected = true;
         this.songId = eventSaveUnit.getSelectedSongId();
