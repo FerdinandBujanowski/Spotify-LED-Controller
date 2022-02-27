@@ -1,0 +1,30 @@
+package logic.node.nodes.type_cast;
+
+import logic.node.LogicNode;
+import logic.node.joint.InputJoint;
+import logic.node.joint.OutputJoint;
+import logic.node.joint.joint_types.IntegerJointDataType;
+import logic.node.joint.joint_types.NumberJointDataType;
+
+public class CastIntToNumberNode extends LogicNode {
+
+    public CastIntToNumberNode(int nodeIndex) {
+        super(
+                nodeIndex,
+                new InputJoint[] {
+                        new InputJoint(new IntegerJointDataType(), "Integer")
+                },
+                new OutputJoint[] {
+                        new OutputJoint(new NumberJointDataType(), "Number")
+                }
+        );
+    }
+
+    @Override
+    public NumberJointDataType[] function(InputJoint[] inputJoints) {
+        int intValue = (Integer) inputJoints[0].getJointDataType().getData();
+        return new NumberJointDataType[] {
+                new NumberJointDataType(intValue)
+        };
+    }
+}

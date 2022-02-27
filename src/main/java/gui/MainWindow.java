@@ -46,22 +46,17 @@ public class MainWindow extends JFrame {
         super(title);
 
         this.setIconImage(new ImageIcon("images\\icon\\icon.png").getImage());
-
         this.bProjectOpen = false;
-
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.getContentPane().setPreferredSize(dimension);
-
         this.splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {
             @Override
             public int getDividerLocation() {
                 return 40;
             }
         };
-
         this.tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-
         this.tabbedPane.addTab("Spotify Player", null);
         this.tabbedPane.addTab("Events", null);
         this.tabbedPane.addTab("Nodes", null);
@@ -72,7 +67,6 @@ public class MainWindow extends JFrame {
         JSlider songSlider = new JSlider(0, 1000, 0);
 
         this.playButton = new PlayButton(songControl);
-
         buttonPanel.add(playButton);
         playButton.setSize(100, 20);
         playButton.setLocation((dimension.width - playButton.getSize().width) / 2, 0);
@@ -80,13 +74,10 @@ public class MainWindow extends JFrame {
         songSlider.setSize(dimension.width, 20);
         songSlider.setLocation(0, 20);
         songSlider.setMinorTickSpacing(1);
-
         this.splitPane.add(this.tabbedPane, JSplitPane.BOTTOM);
         this.splitPane.add(buttonPanel);
         this.splitPane.setDividerLocation(40);
-
         this.add(this.splitPane);
-
         this.jMenuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         JMenuItem newProject = new JMenuItem("New Project");
@@ -98,14 +89,11 @@ public class MainWindow extends JFrame {
         fileMenu.add(saveProject);
         this.jMenuBar.add(fileMenu);
         this.setJMenuBar(jMenuBar);
-
         this.songMenu = new JMenu("Song");
         JMenu trackSubMenu = new JMenu("Track");
         JMenu rhythmSubMenu = new JMenu("Rhythm");
-
         JMenuItem addTrackMenuItem = new JMenuItem("Add Track");
         trackSubMenu.add(addTrackMenuItem);
-
         this.songMenu.add(trackSubMenu);
 
         JMenuItem editInputRhythmMenuItem = new JMenuItem("Edit Input Notation");
@@ -121,7 +109,6 @@ public class MainWindow extends JFrame {
         });
         rhythmSubMenu.add(editInputRhythmMenuItem);
         this.songMenu.add(rhythmSubMenu);
-
         this.songMenu.add(new JSeparator());
 
         this.createTrackNodeMenu = new JMenu("Create Track Node");
@@ -139,10 +126,8 @@ public class MainWindow extends JFrame {
         });
 
         this.songMenu.add(createTrackNodeMenu);
-
         this.songMenu.setEnabled(false);
         this.jMenuBar.add(this.songMenu);
-
         this.nodeMenu = new JMenu("Node");
 
         ArrayList<String> nodeCategories = new ArrayList<>();
@@ -207,8 +192,21 @@ public class MainWindow extends JFrame {
                                 }
                             }
                             case UNIT_NUMBER_TYPE_INPUT -> {
-                                //TODO: Textfeld formatieren, dass nur Doubles zwischen 0 und 1 erlaubt sind
+                                JFormattedTextField numberTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
+                                numberTextField.setValue(0.0);
+                                numberTextField.setFocusLostBehavior(JFormattedTextField.COMMIT);
+                                JOptionPane.showOptionDialog(
+                                        null, numberTextField, inputDialogTypes[i].getMessage(),
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                                );
+                                Object value = numberTextField.getValue();
+                                if(numberTextField.getValue().getClass() == Long.class) {
+                                    value = ((Long) numberTextField.getValue()).doubleValue();
+                                }
+                                if((Double)value > 1.d) value = 1.d;
+                                else if((Double)value < 0.d) value = 0.d;
 
+                                extraParameters[i] = value;
                             }
                         }
                     }
@@ -223,12 +221,9 @@ public class MainWindow extends JFrame {
         }
         jMenuBar.add(this.nodeMenu);
         this.nodeMenu.setEnabled(false);
-
         this.functionMenu = new JMenu("Function");
-
         JMenuItem createFunctionMenuItem = new JMenuItem("Create Function");
         JMenu addFunctionMenu = new JMenu("Add Function");
-
         ArrayList<JMenuItem> functionItemList = new ArrayList<>();
 
         createFunctionMenuItem.addActionListener(new ActionListener() {
@@ -268,16 +263,11 @@ public class MainWindow extends JFrame {
 
                     int newPanelIndex = functionTabbedPane.addPanel(functionName);
                     functionTabbedPane.onFunctionCreated(newPanelIndex, inputNames, inputTypes, outputNames, outputTypes);
-
                     tabbedPane.setSelectedComponent(functionTabbedPane);
                     functionTabbedPane.setSelectedIndex(functionTabbedPane.getTabCount() - 1);
-
                     JMenuItem addNewFunctionItem = new JMenuItem(functionName);
-
                     addFunctionMenu.add(addNewFunctionItem);
-
                     functionItemList.add(addNewFunctionItem);
-
                     addNewFunctionItem.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -297,7 +287,6 @@ public class MainWindow extends JFrame {
         this.functionMenu.add(addFunctionMenu);
         jMenuBar.add(this.functionMenu);
         this.functionMenu.setEnabled(false);
-
         this.ledMenu = new JMenu("LED");
         JMenuItem addLayerMenuItem = new JMenuItem("Add Layer");
         addLayerMenuItem.addActionListener(new ActionListener() {
@@ -357,10 +346,8 @@ public class MainWindow extends JFrame {
         });
         this.ledMenu.add(new JSeparator());
         this.ledMenu.add(addPixelMenuItem);
-
         jMenuBar.add(this.ledMenu);
         this.ledMenu.setEnabled(false);
-
         this.pack();
         this.setCorrectLocation();
 
@@ -391,10 +378,8 @@ public class MainWindow extends JFrame {
                     if(data != null) {
 
                         newProject(songControl, nodeControl, data.getLedControl(), dimension);
-
                         songControl.reinitialize(data.getEventSaveUnit());
                         nodeControl.reinitialize(data.getNodeSaveUnit());
-
                         nodeEditWindow.updateGraphicNodes(data.getNodeEditGraphicNodePositions());
                         functionTabbedPane.updateFunctions(data.getFunctionEditGraphicNodePositions());
 

@@ -18,7 +18,6 @@ import logic.node.nodes.type_cast.*;
 import logic.node.nodes.update.UpdateNode;
 
 public enum NodeType {
-    //TODO: Neue Nodes hier einfügen
 
     //BASIC OPERATIONS
     ADD_NODE(2, 1, "Add", "Basic Operations", AddNode.class),
@@ -65,18 +64,24 @@ public enum NodeType {
     MASK_DIFFERENCE_NODE(2, 1, "Mask Difference", "Mask", MaskDifferenceNode.class, true),
     MASK_UNION_NODE(2, 1, "Mask Union", "Mask", MaskUnionNode.class, true),
     INVERTED_MASK_NODE(2, 1, "Inverted Mask", "Mask", InvertedMaskNode.class, true),
+    MOVE_MASK_NODE(3, 1, "Move Mask", "Mask", MoveMaskNode.class, true),
+    SCALE_MASK_NODE(3, 1, "Scale Mask", "Mask", ScaleMaskNode.class, true),
     SHOW_MASK_NODE(1, 0, "Show Mask", "Mask", ShowMaskNode.class, true),
     GET_DEGREE_NODE(1, 1, "Get Degree", "Mask", GetDegreeNode.class, false),
 
+
     //MATH FUNCTIONS
-    //TODO : round (+ up/down), power, square root
+    //TODO : round (+ up/down), power, square root, modulo
     SIN_NODE(1, 1, "Sine Wave", "Math Functions", SinNode.class),
     COS_NODE(1, 1, "Cosine Wave", "Math Functions", CosNode.class),
     LERP_NODE(3, 1, "Linear Interpolation", "Math Functions", LerpNode.class),
 
     //TYPE CAST
-    //TODO : Unit-Number, Number-Int, Int-Number, Boolean-Int, Boolean-Unit
+    //TODO : Boolean-Int, Boolean-Unit
     NUMBER_TO_UNIT_NODE(1, 1, "Number to Unit", "Type Cast", CastNumberToUnitNode.class),
+    UNIT_TO_NUMBER_NODE(1, 1, "Unit to Number", "Type Cast", CastUnitToNumberNode.class),
+    INT_TO_NUMBER_NODE(1, 1, "Int to Number", "Type Cast", CastIntToNumberNode.class),
+    BOOLEAN_TO_NUMBER_NODE(1, 1, "Boolean to Number", "Type Cast", CastBooleanToNumberNode.class),
 
     //UPDATE
     UPDATE_NODE(2, 1, "Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT });

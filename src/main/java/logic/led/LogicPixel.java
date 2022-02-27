@@ -10,7 +10,7 @@ public class LogicPixel implements Serializable {
     public LogicPixel(int x, int y, double intensity) {
         this.x = x;
         this.y = y;
-        this.intensity = intensity;
+        this.setIntensity(intensity);
     }
 
     public LogicPixel(int x, int y) {
@@ -22,10 +22,10 @@ public class LogicPixel implements Serializable {
     }
 
     public void setIntensity(double intensity) {
-        if(intensity > 1) {
-            this.intensity = 1;
-        } else if(intensity < 0) {
-            this.intensity = 0;
+        if(intensity > 1.0) {
+            this.intensity = 1.0;
+        } else if(intensity < 0.0) {
+            this.intensity = 0.0;
         } else {
             this.intensity = intensity;
         }

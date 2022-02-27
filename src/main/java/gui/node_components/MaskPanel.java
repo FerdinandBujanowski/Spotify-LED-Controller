@@ -27,7 +27,11 @@ public class MaskPanel extends JPanel {
         for(int i = 0; i < values.length; i++) {
             for(int j = 0; j < values.length; j++) {
                 int intensity = (int)Math.round(values[i][j] * 255);
-                g.setColor(new Color(intensity, intensity, intensity));
+                try {
+                    g.setColor(new Color(intensity, intensity, intensity));
+                } catch(IllegalArgumentException e) {
+                    System.out.println("intensity " + intensity);
+                }
                 g.fillRect(
                         (int)Math.round(step * i),
                         (int)Math.round(step * j),
