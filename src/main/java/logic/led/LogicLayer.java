@@ -27,17 +27,18 @@ public class LogicLayer implements Serializable {
     }
 
     public Color getColorAt(int x, int y) {
+        double intensity = this.logicMask.getIntensityAt(x, y);
+        Color lowerColor;
         if(this.lowerLayer == null) {
-            return this.color;
+            lowerColor = Color.BLACK;
         } else {
-            Color lowerColor = this.lowerLayer.getColorAt(x, y);
-            double intensity = this.logicMask.getIntensityAt(x, y);
-            return new Color(
-                    this.mixWithIntensity(this.color.getRed(), lowerColor.getRed(), intensity),
-                    this.mixWithIntensity(this.color.getGreen(), lowerColor.getGreen(), intensity),
-                    this.mixWithIntensity(this.color.getBlue(), lowerColor.getBlue(), intensity)
-            );
+            lowerColor = this.lowerLayer.getColorAt(x, y);
         }
+        return new Color(
+                this.mixWithIntensity(this.color.getRed(), lowerColor.getRed(), intensity),
+                this.mixWithIntensity(this.color.getGreen(), lowerColor.getGreen(), intensity),
+                this.mixWithIntensity(this.color.getBlue(), lowerColor.getBlue(), intensity)
+        );
     }
 
     private int mixWithIntensity(int a, int b, double intensity) {

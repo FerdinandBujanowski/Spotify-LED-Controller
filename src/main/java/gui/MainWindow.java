@@ -159,7 +159,7 @@ public class MainWindow extends JFrame {
                                         null, jointTypeComboBox, inputDialogTypes[i].getMessage(),
                                         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
                                 );
-                                extraParameters[i] = (JointType) JointType.values()[jointTypeComboBox.getSelectedIndex()];
+                                extraParameters[i] = JointType.values()[jointTypeComboBox.getSelectedIndex()];
                             }
                             case NUMBER_TYPE_INPUT -> {
                                 JFormattedTextField numberTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
@@ -207,6 +207,14 @@ public class MainWindow extends JFrame {
                                 else if((Double)value < 0.d) value = 0.d;
 
                                 extraParameters[i] = value;
+                            }
+                            case ROUND_PIXEL_INPUT -> {
+                                JComboBox algorithmComboBox = new JComboBox(PixelAlgorithmType.values());
+                                JOptionPane.showOptionDialog(
+                                        null, algorithmComboBox, inputDialogTypes[i].getMessage(),
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                                );
+                                extraParameters[i] = PixelAlgorithmType.values()[algorithmComboBox.getSelectedIndex()];
                             }
                         }
                     }

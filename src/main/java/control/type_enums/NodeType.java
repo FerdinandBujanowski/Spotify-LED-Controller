@@ -63,12 +63,14 @@ public enum NodeType {
     MASK_SUBTRACTION_NODE(2, 1, "Mask Subtraction", "Mask", MaskSubtractionNode.class, true),
     MASK_DIFFERENCE_NODE(2, 1, "Mask Difference", "Mask", MaskDifferenceNode.class, true),
     MASK_UNION_NODE(2, 1, "Mask Union", "Mask", MaskUnionNode.class, true),
+    MASK_X_MASK_NODE(2, 1, "Mask X Mask", "Mask", MultiplyMaskWithMaskNode.class, true),
+    MASK_X_NUMBER_NODE(2, 1, "Mask X Number", "Mask", MultiplyMaskWithUnitNode.class, true),
     INVERTED_MASK_NODE(2, 1, "Inverted Mask", "Mask", InvertedMaskNode.class, true),
     MOVE_MASK_NODE(3, 1, "Move Mask", "Mask", MoveMaskNode.class, true),
-    SCALE_MASK_NODE(3, 1, "Scale Mask", "Mask", ScaleMaskNode.class, true),
+    SCALE_MASK_NODE(3, 1, "Scale Mask", "Mask", ScaleMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
+    ROTATE_MASK_NODE(2, 1, "Rotate Mask", "Mask", RotateMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
     SHOW_MASK_NODE(1, 0, "Show Mask", "Mask", ShowMaskNode.class, true),
     GET_DEGREE_NODE(1, 1, "Get Degree", "Mask", GetDegreeNode.class, false),
-
 
     //MATH FUNCTIONS
     //TODO : round (+ up/down), power, square root, modulo
@@ -77,7 +79,6 @@ public enum NodeType {
     LERP_NODE(3, 1, "Linear Interpolation", "Math Functions", LerpNode.class),
 
     //TYPE CAST
-    //TODO : Boolean-Int, Boolean-Unit
     NUMBER_TO_UNIT_NODE(1, 1, "Number to Unit", "Type Cast", CastNumberToUnitNode.class),
     UNIT_TO_NUMBER_NODE(1, 1, "Unit to Number", "Type Cast", CastUnitToNumberNode.class),
     INT_TO_NUMBER_NODE(1, 1, "Int to Number", "Type Cast", CastIntToNumberNode.class),

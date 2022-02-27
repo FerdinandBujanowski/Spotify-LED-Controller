@@ -7,17 +7,16 @@ import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.MaskJointDataType;
 import logic.node.joint.joint_types.NumberJointDataType;
 
-public class ScaleMaskNode extends MaskNode {
+public class RotateMaskNode extends MaskNode {
 
     private final PixelAlgorithmType pixelAlgorithmType;
 
-    public ScaleMaskNode(int nodeIndex, PixelAlgorithmType pixelAlgorithmType) {
+    public RotateMaskNode(int nodeIndex, PixelAlgorithmType pixelAlgorithmType) {
         super(
                 nodeIndex,
                 new InputJoint[] {
                         new InputJoint(new MaskJointDataType(), "Mask"),
-                        new InputJoint(new NumberJointDataType(), "Factor X"),
-                        new InputJoint(new NumberJointDataType(), "Factor Y")
+                        new InputJoint(new NumberJointDataType(), "Radians")
                 },
                 new OutputJoint[] {
                         new OutputJoint(
@@ -32,18 +31,9 @@ public class ScaleMaskNode extends MaskNode {
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
         LogicMask logicMask = (LogicMask) inputJoints[0].getJointDataType().getData();
-        double scaleX = (Double) inputJoints[1].getJointDataType().getData();
-        double scaleY = (Double) inputJoints[2].getJointDataType().getData();
-
-        if(this.pixelAlgorithmType == PixelAlgorithmType.CLOSEST_NEIGHBOR) {
-
-            return new MaskJointDataType[] {
-                    new MaskJointDataType(LogicMask.getScaledMask_Closest(logicMask, scaleX, scaleY))
-            };
-        } else if(this.pixelAlgorithmType == PixelAlgorithmType.LINEAR_INTERPOLATION) {
-            return new MaskJointDataType[] {
-                    new MaskJointDataType(LogicMask.getScaledMask_Linear(logicMask, scaleX, scaleY))
-            };
-        } else return new MaskJointDataType[0];
+        double radians = (Double) inputJoints[1].getJointDataType().getData();
+        return new MaskJointDataType[] {
+                new MaskJointDataType(LogicMask.getRotatedMask_Closest(logicMask, radians))
+        };
     }
 }
