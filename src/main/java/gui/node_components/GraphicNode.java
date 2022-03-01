@@ -324,11 +324,6 @@ public class GraphicNode extends JPanel {
         }
     }
 
-    public void addGraphicInputUnit(GraphicInputUnit graphicInputUnit) {
-        this.add(graphicInputUnit, 0);
-        graphicInputUnit.setLocation(15, NodeControl.NODE_TOP_HEIGHT + this.graphicInputJoints.length * NodeControl.NODE_CENTER_HEIGHT);
-    }
-
     public GraphicJoint getOutputJoint(int jointIndex) {
         return this.graphicOutputJoints[jointIndex];
     }

@@ -220,7 +220,7 @@ public class LogicMask implements Serializable {
                 double oldX_d = i / scaleX;
                 int oldX_high = (int)Math.ceil(oldX_d);
                 int oldX_low = (int)Math.floor(oldX_d);
-                double oldY_d = i / scaleY;
+                double oldY_d = j / scaleY;
                 int oldY_high = (int)Math.ceil(oldY_d);
                 int oldY_low = (int)Math.floor(oldY_d);
 

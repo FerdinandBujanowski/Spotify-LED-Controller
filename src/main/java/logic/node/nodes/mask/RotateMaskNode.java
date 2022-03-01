@@ -30,6 +30,7 @@ public class RotateMaskNode extends MaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
+        //TODO : zwei verschiedene Algorithmen
         LogicMask logicMask = (LogicMask) inputJoints[0].getJointDataType().getData();
         double radians = (Double) inputJoints[1].getJointDataType().getData();
         return new MaskJointDataType[] {

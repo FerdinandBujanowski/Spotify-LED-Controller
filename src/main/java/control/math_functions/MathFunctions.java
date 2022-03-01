@@ -13,10 +13,10 @@ public abstract class MathFunctions implements Serializable {
     }
 
     public static double getCosine(double value) {
-        return (Math.cos(value * Math.PI) + 1) / 2;
+        return (- Math.cos(value * Math.PI) + 1) / 2;
     }
     public static double getCosineInverse(double value) {
-        return (- Math.cos(value * Math.PI) + 1) / 2;
+        return (Math.cos(value * Math.PI) + 1) / 2;
     }
     public static double getConstant(double value) {
         return 1;

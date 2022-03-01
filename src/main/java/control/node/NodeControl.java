@@ -5,18 +5,15 @@ import control.exceptions.CannotDeleteNodeException;
 import control.exceptions.JointConnectionFailedException;
 import control.save.NodeSaveUnit;
 import control.type_enums.*;
-import gui.node_components.GraphicInputUnit;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.*;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.function.Function;
 
 public class NodeControl implements Serializable {
 
@@ -212,25 +209,6 @@ public class NodeControl implements Serializable {
         return nodeIndexArray;
     }
 
-    public GraphicInputUnit getGraphicInputUnitForNode(NodeType nodeType, int nodeIndex) {
-        switch(nodeType) {
-            case CONSTANT_NUMBER_NODE:
-                NodeControl thisNodeControl = this;
-                JTextField jTextField = new JTextField(50);
-                jTextField.setOpaque(true);
-                SpinnerNumberModel numberModel = new SpinnerNumberModel(0, 0, 10, 0.1);
-                JSpinner jSpinner = new JSpinner();
-                jSpinner.setModel(numberModel);
-
-                return new GraphicInputUnit(jSpinner) {
-                    @Override
-                    public int getPreferredWidth() {
-                        return 100;
-                    }
-                };
-            default: return null;
-        }
-    }
 
     public SerializableFunction<Integer, Double[][]> getMaskValuesFunctionForNode(int functionIndex, int nodeIndex) {
         LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
