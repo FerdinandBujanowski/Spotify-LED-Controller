@@ -73,10 +73,13 @@ public enum NodeType {
     GET_DEGREE_NODE(1, 1, "Get Degree", "Mask", GetDegreeNode.class, false),
 
     //MATH FUNCTIONS
-    //TODO : round (+ up/down), power, square root, modulo
     SIN_NODE(1, 1, "Sine Wave", "Math Functions", SinNode.class),
     COS_NODE(1, 1, "Cosine Wave", "Math Functions", CosNode.class),
     LERP_NODE(3, 1, "Linear Interpolation", "Math Functions", LerpNode.class),
+    ROUND_NODE(1, 1, "Round Number", "Math Functions", RoundNode.class, new InputDialogType[] { InputDialogType.ROUND_INPUT }),
+    POWER_NODE(2, 1, "Power", "Math Functions", PowerNode.class),
+    SQRT_NODE(1, 1, "Square Root", "Math Functions", SquareRootNode.class),
+    MODULO_NODE(2, 1, "Modulo", "Math Functions", ModuloNode.class),
 
     //TYPE CAST
     NUMBER_TO_UNIT_NODE(1, 1, "Number to Unit", "Type Cast", CastNumberToUnitNode.class),

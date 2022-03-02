@@ -127,10 +127,16 @@ class LayersPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO : Layer wird sichtbar / unsichtbar gemacht
+
             }
         });
 
         this.setPreferredSize(new Dimension(this.getWidth(), this.layerLabels.size() * 30));
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
     }
 
 }

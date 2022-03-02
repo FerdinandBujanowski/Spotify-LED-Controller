@@ -216,6 +216,14 @@ public class MainWindow extends JFrame {
                                 );
                                 extraParameters[i] = PixelAlgorithmType.values()[algorithmComboBox.getSelectedIndex()];
                             }
+                            case ROUND_INPUT -> {
+                                JComboBox algorithmComboBox = new JComboBox(RoundAlgorithmType.values());
+                                JOptionPane.showOptionDialog(
+                                        null, algorithmComboBox, inputDialogTypes[i].getMessage(),
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                                );
+                                extraParameters[i] = RoundAlgorithmType.values()[algorithmComboBox.getSelectedIndex()];
+                            }
                         }
                     }
                     if(tabbedPane.getSelectedComponent() == nodeEditWindow) {
