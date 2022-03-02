@@ -57,12 +57,19 @@ import java.util.function.Function;
         } else {
             throw new Exception("Pixel already set");
         }
+        this.ledGraphicUnit.update();
     }
 
     @Override
     public void addPixelRow(int xFrom, int yFrom, int xTo, int yTo) {
 
     }
+
+     @Override
+     public void enableLayer(int layerIndex, boolean isEnabled) {
+        this.logicLayers.get(layerIndex).setEnabled(isEnabled);
+        this.ledGraphicUnit.update();
+     }
 
      @Override
      public Point[] getPixels() {

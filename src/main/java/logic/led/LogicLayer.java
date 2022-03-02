@@ -7,6 +7,7 @@ public class LogicLayer implements Serializable {
 
     private LogicMask logicMask;
     private Color color;
+    private boolean isEnabled;
 
     private LogicLayer lowerLayer;
 
@@ -14,6 +15,7 @@ public class LogicLayer implements Serializable {
         this.lowerLayer = lowerLayer;
         this.logicMask = new LogicMask();
         this.color = Color.BLACK;
+        this.isEnabled = true;
     }
 
     public Integer updateMask(Object mask) {
@@ -27,6 +29,9 @@ public class LogicLayer implements Serializable {
     }
 
     public Color getColorAt(int x, int y) {
+        if(!this.isEnabled) {
+            return(this.lowerLayer != null ? this.lowerLayer.getColorAt(x, y) : Color.BLACK);
+        }
         double intensity = this.logicMask.getIntensityAt(x, y);
         Color lowerColor;
         if(this.lowerLayer == null) {
@@ -45,5 +50,9 @@ public class LogicLayer implements Serializable {
         int mix = (int)(Math.round(a * intensity)) + (int)(Math.round(b * (1.d - intensity)));
         if(mix > 255) return 255;
         return Math.max(mix, 0);
+    }
+
+    public void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
     }
 }

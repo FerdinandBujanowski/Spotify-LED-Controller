@@ -10,6 +10,8 @@ public interface LedRequestAcceptor {
     void addPixel(int x, int y) throws Exception;
     void addPixelRow(int xFrom, int yFrom, int xTo, int yTo);
 
+    void enableLayer(int layerIndex, boolean isEnabled);
+
     Point[] getPixels();
     int getFinalDegree();
     Color getColorAt(int x, int y);

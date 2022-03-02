@@ -25,12 +25,12 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
         this.drawOnlyLedPixels = false;
 
-        this.layersPanel = new LayersPanel(this);
+        this.layersPanel = new LayersPanel(ledControl, this);
 
         this.pixelPanel = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
-                super.paintComponent(g);
+                //super.paintComponent(g);
 
                 Point[] pixels = ledControl.getPixels();
                 int finalDegree = ledControl.getFinalDegree();
@@ -88,19 +88,25 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         this.layersPanel.repaint();
         this.repaint();
     }
+
+    @Override
+    public void update() {
+        this.repaint();
+    }
 }
 
 class LayersPanel extends JPanel {
 
-
+    private LedRequestAcceptor ledRequestAcceptor;
     private LedGraphicUnit ledGraphicUnit;
 
     private ArrayList<JLabel> layerLabels;
     private ArrayList<JCheckBox> layerCheckBoxes;
 
-    public LayersPanel(LedGraphicUnit ledGraphicUnit) {
+    public LayersPanel(LedRequestAcceptor ledRequestAcceptor, LedGraphicUnit ledGraphicUnit) {
         super(null);
 
+        this.ledRequestAcceptor = ledRequestAcceptor;
         this.ledGraphicUnit = ledGraphicUnit;
         this.layerLabels = new ArrayList<>();
         this.layerCheckBoxes = new ArrayList<>();
@@ -110,15 +116,13 @@ class LayersPanel extends JPanel {
     }
 
     public void addLayer(int newIndex) {
-        JLabel newLayerLabel = new JLabel("Layer " + newIndex, SwingConstants.CENTER);
+        JLabel newLayerLabel = new JLabel("Layer " + (newIndex + 1), SwingConstants.CENTER);
         newLayerLabel.setForeground(Color.WHITE);
-        newLayerLabel.setBounds(50, this.layerLabels.size() * 30, 100, 30);
         this.layerLabels.add(newLayerLabel);
         this.add(newLayerLabel);
 
         JCheckBox newLayerCheckBox = new JCheckBox();
         newLayerCheckBox.setSelected(true);
-        newLayerCheckBox.setBounds(50, this.layerCheckBoxes.size() * 30 + 5, 20, 20);
         newLayerCheckBox.setBackground(new Color(40, 40, 40));
         this.layerCheckBoxes.add(newLayerCheckBox);
         this.add(newLayerCheckBox);
@@ -127,7 +131,7 @@ class LayersPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO : Layer wird sichtbar / unsichtbar gemacht
-
+                ledRequestAcceptor.enableLayer(newIndex, newLayerCheckBox.isSelected());
             }
         });
 
@@ -137,6 +141,11 @@ class LayersPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        for(int i = 1; i <= this.layerLabels.size(); i++) {
+            this.layerLabels.get(this.layerLabels.size() - i).setBounds(50, (i - 1) * 30, 100, 30);
+            this.layerCheckBoxes.get(this.layerCheckBoxes.size() - i).setBounds(50, (i - 1) * 30 + 5, 20, 20);
+        }
     }
 
 }
