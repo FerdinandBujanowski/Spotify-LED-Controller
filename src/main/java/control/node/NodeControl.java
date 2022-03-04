@@ -103,9 +103,9 @@ public class NodeControl implements Serializable {
             parameterClasses[i + 1] = extraParameters[i].getClass();
             newParameters[i + 1] = extraParameters[i];
         }
-
         try {
             newNode = (LogicNode) nodeType.getNodeClass().getDeclaredConstructor(parameterClasses).newInstance(newParameters);
+            newNode.setNodeTypeName(nodeType.toString());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }

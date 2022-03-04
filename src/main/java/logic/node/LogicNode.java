@@ -1,5 +1,6 @@
 package logic.node;
 
+import control.type_enums.NodeType;
 import logic.LogicComponent;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -12,11 +13,14 @@ public abstract class LogicNode extends LogicComponent {
 
     private final int nodeIndex;
     private String specificName;
+    //TODO : evtl das in Konstruktor der Unterklassen packen ?
+    private String nodeTypeName;
 
     public LogicNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, String specificName) {
         super(inputJoints, outputJoints);
         this.nodeIndex = nodeIndex;
         this.specificName = specificName;
+        this.nodeTypeName = "";
 
         for(int i = 0; i < outputJoints.length; i++) {
             outputJoints[i].setParentNode(this, i);
@@ -35,6 +39,13 @@ public abstract class LogicNode extends LogicComponent {
     }
     public String getSpecificName() {
         return this.specificName;
+    }
+
+    public void setNodeTypeName(String nodeTypeName) {
+        this.nodeTypeName = nodeTypeName;
+    }
+    public String getNodeTypeName() {
+        return this.nodeTypeName;
     }
 
     public void onInputChangeEvent() {

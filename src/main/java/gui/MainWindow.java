@@ -1,22 +1,25 @@
 package gui;
 
 import control.led.LedControl;
-import control.song.SongControl;
-import control.save.DataStore;
-import control.song.TrackRequestAcceptor;
-import control.type_enums.*;
 import control.node.NodeControl;
+import control.save.DataStore;
+import control.save.JsonWriter;
+import control.save.NodeSaveUnit;
+import control.song.SongControl;
+import control.type_enums.*;
 import gui.main_panels.event_panel.EventEditWindow;
 import gui.main_panels.function_panels.FunctionTabbedPane;
 import gui.main_panels.led_panel.LedEditWindow;
 import gui.main_panels.node_panel.NodeEditWindow;
 import gui.main_panels.player_panel.PlayButton;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
+import gui.node_components.GraphicNode;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -83,10 +86,13 @@ public class MainWindow extends JFrame {
         JMenuItem newProject = new JMenuItem("New Project");
         JMenuItem openProject = new JMenuItem("Open Project");
         JMenuItem saveProject = new JMenuItem("Save Project");
+        JMenuItem exportNodes = new JMenuItem("Export Nodes");
         fileMenu.add(newProject);
         fileMenu.add(openProject);
         fileMenu.add(new JSeparator());
         fileMenu.add(saveProject);
+        fileMenu.add(new JSeparator());
+        fileMenu.add(exportNodes);
         this.jMenuBar.add(fileMenu);
         this.setJMenuBar(jMenuBar);
         this.songMenu = new JMenu("Song");
@@ -408,17 +414,8 @@ public class MainWindow extends JFrame {
         saveProject.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Point[] nodeEditGraphicNodePositions = new Point[nodeEditWindow.getGraphicNodes().size()];
-                for(int i = 0; i < nodeEditGraphicNodePositions.length; i++) {
-                    nodeEditGraphicNodePositions[i] = nodeEditWindow.getGraphicNodes().get(i).getLocation();
-                }
-                Point[][] functionEditGraphicNodePositions = new Point[functionTabbedPane.getFunctionEditWindows().size()][];
-                for(int i = 0; i < functionEditGraphicNodePositions.length; i++) {
-                    functionEditGraphicNodePositions[i] = new Point[functionTabbedPane.getFunctionEditWindows().get(i).getGraphicNodes().size()];
-                    for(int j = 0; j < functionEditGraphicNodePositions[i].length; j++) {
-                        functionEditGraphicNodePositions[i][j] = functionTabbedPane.getFunctionEditWindows().get(i).getGraphicNodes().get(j).getLocation();
-                    }
-                }
+                Point[] nodeEditGraphicNodePositions = bakeGraphicNodePositions();
+                Point[][] functionEditGraphicNodePositions = bakeFunctionGraphicNodePositions();
                 DataStore dataStore = new DataStore(
                         songControl.createEventSaveUnit(),
                         nodeControl.createNodeSaveUnit(),
@@ -430,7 +427,6 @@ public class MainWindow extends JFrame {
                 JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
                 fileSaveChooser.setFileFilter(serializedFilter);
-                //fileSaveChooser.setCurrentDirectory(new File("params"));
                 fileSaveChooser.setSelectedFile(new File("new_song.ledcontrol"));
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
@@ -438,6 +434,43 @@ public class MainWindow extends JFrame {
                 }
             }
         });
+
+        exportNodes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NodeSaveUnit nodeSaveUnit = nodeControl.createNodeSaveUnit();
+                Point[] graphicNodePositions = bakeGraphicNodePositions();
+                Point[][] functionGraphicNodePositions = bakeFunctionGraphicNodePositions();
+
+                JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
+                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+                fileSaveChooser.setFileFilter(serializedFilter);
+                fileSaveChooser.setSelectedFile(new File("nodes.json"));
+                int returnValue = fileSaveChooser.showSaveDialog(getParent());
+                if(returnValue == JFileChooser.APPROVE_OPTION) {
+                    JsonWriter.writeNodesToFile(nodeSaveUnit, fileSaveChooser.getSelectedFile().getPath());
+                }
+            }
+        });
+    }
+
+    private Point[] bakeGraphicNodePositions() {
+        Point[] graphicNodePositions = new Point[nodeEditWindow.getGraphicNodes().size()];
+        for(int i = 0; i < graphicNodePositions.length; i++) {
+            graphicNodePositions[i] = nodeEditWindow.getGraphicNodes().get(i).getLocation();
+        }
+        return graphicNodePositions;
+    }
+
+    private Point[][] bakeFunctionGraphicNodePositions() {
+        Point[][] functionGraphicNodePositions = new Point[functionTabbedPane.getFunctionEditWindows().size()][];
+        for(int i = 0; i < functionGraphicNodePositions.length; i++) {
+            functionGraphicNodePositions[i] = new Point[functionTabbedPane.getFunctionEditWindows().get(i).getGraphicNodes().size()];
+            for(int j = 0; j < functionGraphicNodePositions[i].length; j++) {
+                functionGraphicNodePositions[i][j] = functionTabbedPane.getFunctionEditWindows().get(i).getGraphicNodes().get(j).getLocation();
+            }
+        }
+        return functionGraphicNodePositions;
     }
 
     private void newProject(SongControl songControl, NodeControl nodeControl, LedControl ledControl, Dimension dimension) {
