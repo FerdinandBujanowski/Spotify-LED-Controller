@@ -143,7 +143,8 @@ public class MainWindow extends JFrame {
             }
         }
         JMenu[] subMenus = new JMenu[nodeCategories.size()];
-        for(int i = 0; i < subMenus.length; i++) {
+        //TODO : "Commands" wird noch rausgelassen, da noch nicht funktioniert
+        for(int i = 0; i < subMenus.length - 1; i++) {
             subMenus[i] = new JMenu(nodeCategories.get(i));
             this.nodeMenu.add(subMenus[i]);
         }
@@ -239,7 +240,9 @@ public class MainWindow extends JFrame {
                     }
                 }
             });
-            subMenus[nodeCategories.indexOf(currentCategory)].add(currentNodeMenuItem);
+            if(nodeType.toString().charAt(0) != '_') {
+                subMenus[nodeCategories.indexOf(currentCategory)].add(currentNodeMenuItem);
+            }
         }
         jMenuBar.add(this.nodeMenu);
         this.nodeMenu.setEnabled(false);

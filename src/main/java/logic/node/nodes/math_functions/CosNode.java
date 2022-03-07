@@ -1,5 +1,6 @@
 package logic.node.nodes.math_functions;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -16,7 +17,8 @@ public class CosNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(new NumberJointDataType(), "cos(x)")
-                }
+                },
+                NodeType.COS_NODE
         );
     }
 

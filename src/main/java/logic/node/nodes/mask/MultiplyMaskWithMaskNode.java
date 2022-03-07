@@ -1,5 +1,6 @@
 package logic.node.nodes.mask;
 
+import control.type_enums.NodeType;
 import logic.led.LogicMask;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -16,7 +17,8 @@ public class MultiplyMaskWithMaskNode extends MaskNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(new MaskJointDataType(), "Output")
-                }
+                },
+                NodeType.MASK_X_MASK_NODE
         );
     }
 

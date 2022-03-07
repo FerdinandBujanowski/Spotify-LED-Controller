@@ -1,5 +1,6 @@
 package logic.node.nodes.color;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -20,7 +21,8 @@ public class SplitColorNode extends LogicNode {
                         new OutputJoint(new NumberJointDataType(), "R"),
                         new OutputJoint(new NumberJointDataType(), "G"),
                         new OutputJoint(new NumberJointDataType(), "B"),
-                }
+                },
+                NodeType.SPLIT_COLOR_NODE
         );
     }
 

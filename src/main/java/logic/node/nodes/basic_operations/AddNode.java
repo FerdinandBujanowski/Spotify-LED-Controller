@@ -1,5 +1,6 @@
 package logic.node.nodes.basic_operations;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.NumberJointDataType;
@@ -15,7 +16,8 @@ public class AddNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(new NumberJointDataType(), "Sum")
-                }
+                },
+                NodeType.ADD_NODE
         );
     }
 

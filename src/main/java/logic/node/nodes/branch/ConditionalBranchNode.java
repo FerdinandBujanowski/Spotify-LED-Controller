@@ -1,6 +1,7 @@
 package logic.node.nodes.branch;
 
 import control.type_enums.JointType;
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -19,7 +20,9 @@ public class ConditionalBranchNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(JointType.getCopyOfDataTypeByJointType(jointType), "Output")
-                }
+                },
+                NodeType.CONDITIONAL_BRANCH_NODE,
+                new Object[] { jointType }
         );
     }
 

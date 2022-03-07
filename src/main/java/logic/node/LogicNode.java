@@ -13,14 +13,14 @@ public abstract class LogicNode extends LogicComponent {
 
     private final int nodeIndex;
     private String specificName;
-    //TODO : evtl das in Konstruktor der Unterklassen packen ?
-    private String nodeTypeName;
 
-    public LogicNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, String specificName) {
+    private NodeType nodeType;
+    Object[] extraParameters;
+
+    public LogicNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, String specificName, NodeType nodeType, Object[] extraParameters) {
         super(inputJoints, outputJoints);
         this.nodeIndex = nodeIndex;
         this.specificName = specificName;
-        this.nodeTypeName = "";
 
         for(int i = 0; i < outputJoints.length; i++) {
             outputJoints[i].setParentNode(this, i);
@@ -28,10 +28,21 @@ public abstract class LogicNode extends LogicComponent {
         for(int i = 0; i < inputJoints.length; i++) {
             inputJoints[i].setParentNode(this, i);
         }
+
+        this.nodeType = nodeType;
+        this.extraParameters = extraParameters;
     }
 
-    public LogicNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints) {
-        this(nodeIndex, inputJoints, outputJoints, "");
+    public LogicNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, NodeType nodeType, Object[] extraParameters) {
+        this(nodeIndex, inputJoints, outputJoints, "", nodeType, extraParameters);
+    }
+
+    public LogicNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, String specificName, NodeType nodeType) {
+        this(nodeIndex, inputJoints, outputJoints, specificName, nodeType, new Object[0]);
+    }
+
+    public LogicNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, NodeType nodeType) {
+        this(nodeIndex, inputJoints, outputJoints, "", nodeType);
     }
     
     public int getNodeIndex() {
@@ -41,11 +52,11 @@ public abstract class LogicNode extends LogicComponent {
         return this.specificName;
     }
 
-    public void setNodeTypeName(String nodeTypeName) {
-        this.nodeTypeName = nodeTypeName;
+    public NodeType getNodeType() {
+        return this.nodeType;
     }
-    public String getNodeTypeName() {
-        return this.nodeTypeName;
+    public Object[] getExtraParameters() {
+        return this.extraParameters;
     }
 
     public void onInputChangeEvent() {

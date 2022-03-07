@@ -1,5 +1,6 @@
 package logic.node.nodes.constant;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -13,7 +14,8 @@ public class PiNode extends LogicNode {
                 new InputJoint[] {},
                 new OutputJoint[] {
                         new OutputJoint(new NumberJointDataType(), "3.14..")
-                }
+                },
+                NodeType.PI_NODE
         );
     }
 

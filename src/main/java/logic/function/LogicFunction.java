@@ -3,6 +3,8 @@ package logic.function;
 import control.node.NodeConnection;
 import control.node.NodeControl;
 import control.exceptions.JointConnectionFailedException;
+import control.type_enums.JointType;
+import control.type_enums.NodeType;
 import logic.LogicComponent;
 import logic.node.LogicNode;
 import logic.node.joint.*;
@@ -48,7 +50,9 @@ public class LogicFunction extends LogicComponent implements Serializable {
                     finalI,
                     new InputJoint[0],
                     new OutputJoint[] { new OutputJoint(inputJoints[i].getJointDataType(), inputJoints[i].getName()) },
-                    "Input Parameter"
+                    "Input Parameter",
+                    NodeType._INPUT_PARAMETER_NODE,
+                    new Object[] {JointType.getJointTypeByTypeClass(inputJoints[i].getJointDataType().getClass())}
             ) {});
             this.inputParameterIndexes.add(i);
         }
@@ -60,7 +64,9 @@ public class LogicFunction extends LogicComponent implements Serializable {
                     finalI + logicNodesSize,
                     new InputJoint[] { new InputJoint(outputJoints[finalI].getJointDataType(), outputJoints[finalI].getName()) },
                     new OutputJoint[0],
-                    "Output Parameter"
+                    "Output Parameter",
+                    NodeType._OUTPUT_PARAMETER_NODE,
+                    new Object[] { JointType.getJointTypeByTypeClass(outputJoints[i].getJointDataType().getClass()) }
             ) {});
             this.outputParameterIndexes.add(i + logicNodesSize);
         }
@@ -111,7 +117,9 @@ public class LogicFunction extends LogicComponent implements Serializable {
                     oldNode.getNodeIndex(),
                     oldNode.getInputJoints(),
                     new OutputJoint[] { new OutputJoint(newInputJoints[finalI].getJointDataType(), newInputJoints[finalI].getName()) },
-                    oldNode.getSpecificName()
+                    oldNode.getSpecificName(),
+                    oldNode.getNodeType(),
+                    oldNode.getExtraParameters()
             ) {
                 @Override
                 public JointDataType[] function(InputJoint[] nullInputJoints) {
@@ -143,7 +151,9 @@ public class LogicFunction extends LogicComponent implements Serializable {
                     oldNode.getNodeIndex(),
                     new InputJoint[] { new InputJoint(newOutputJoints[finalI].getJointDataType(), newOutputJoints[finalI].getName()) },
                     oldNode.getOutputJoints(),
-                    oldNode.getSpecificName()
+                    oldNode.getSpecificName(),
+                    oldNode.getNodeType(),
+                    oldNode.getExtraParameters()
             ) {});
             try {
                 hiddenNodes.get(outputParameterIndexes.get(i)).getInputJoints()[0].tryJointConnection(oldNode.getInputJoints()[0].getConnectedOutputJoint());
@@ -154,7 +164,14 @@ public class LogicFunction extends LogicComponent implements Serializable {
 
         this.hiddenCopiedNodes.addAll(hiddenNodes);
 
-        return new LogicNode(nodeIndex, newInputJoints, newOutputJoints, "Function: " + functionName) {
+        return new LogicNode(
+                nodeIndex,
+                newInputJoints,
+                newOutputJoints,
+                "Function: " + functionName,
+                NodeType._FUNCTION_NODE,
+                new Object[] { functionIndex }
+        ) {
 
             @Override
             public JointDataType[] function(InputJoint[] inputJoints) {

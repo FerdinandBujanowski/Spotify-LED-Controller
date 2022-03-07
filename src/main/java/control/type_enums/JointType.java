@@ -25,8 +25,6 @@ public enum JointType {
     INTERVAL_TYPE(new Color(121, 128, 142), IntervalJointDataType.class, "Interval"),
     BOOLEAN_TYPE(new Color(241, 148, 180), BooleanJointDataType.class, "Boolean"),
     COLOR_TYPE(new Color(248, 163, 90), ColorJointDataType.class, "Color"),
-    FUNCTION_INSTANCE_TYPE(new Color(255, 177, 0), FunctionInstanceJointDataType.class, "Function Instance"),
-
     MASK_TYPE(new Color(255, 255, 255), MaskJointDataType.class, "Mask");
 
     private Color color;
@@ -68,8 +66,7 @@ public enum JointType {
         return jointDataType;
     }
 
-    @Override
-    public String toString() {
+    public String getName() {
         return this.name;
     }
 }

@@ -1,5 +1,6 @@
 package control.type_enums;
 
+import logic.node.joint.InputJoint;
 import logic.node.nodes.basic_operations.*;
 import logic.node.nodes.branch.ConditionalBranchNode;
 import logic.node.nodes.branch.ProbabilityBranchNode;
@@ -20,78 +21,83 @@ import logic.node.nodes.update.UpdateNode;
 public enum NodeType {
 
     //BASIC OPERATIONS
-    ADD_NODE(2, 1, "Add", "Basic Operations", AddNode.class),
-    SUBTRACT_NODE(2, 1, "Subtract", "Basic Operations", SubtractNode.class),
-    MULTIPLY_NODE(2, 1, "Multiply", "Basic Operations", MultiplyNode.class),
-    DIVIDE_NODE(2, 1, "Divide", "Basic Operations", DivideNode.class),
+    ADD_NODE("Add", "Basic Operations", AddNode.class),
+    SUBTRACT_NODE("Subtract", "Basic Operations", SubtractNode.class),
+    MULTIPLY_NODE("Multiply", "Basic Operations", MultiplyNode.class),
+    DIVIDE_NODE("Divide", "Basic Operations", DivideNode.class),
 
     //BRANCH
-    CONDITIONAL_BRANCH_NODE(3, 1, "Conditional Branch", "Branch", ConditionalBranchNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
-    RANDOM_BRANCH_NODE(2, 1, "Random Branch", "Branch", RandomBranchNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
-    PROBABILITY_BRANCH_NODE(3, 1, "Probability Branch", "Branch", ProbabilityBranchNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    CONDITIONAL_BRANCH_NODE("Conditional Branch", "Branch", ConditionalBranchNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    RANDOM_BRANCH_NODE("Random Branch", "Branch", RandomBranchNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    PROBABILITY_BRANCH_NODE("Probability Branch", "Branch", ProbabilityBranchNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
 
     //COLOR
-    CONSTANT_COLOR_NODE(0, 1, "Constant Color", "Color", ConstantColorNode.class, new InputDialogType[] { InputDialogType.COLOR_TYPE_INPUT }),
-    CREATE_COLOR_NODE(3, 1, "Create Color", "Color", CreateColorNode.class),
-    SPLIT_COLOR_NODE(1, 3, "Split Color", "Color", SplitColorNode.class),
+    CONSTANT_COLOR_NODE("Constant Color", "Color", ConstantColorNode.class, new InputDialogType[] { InputDialogType.COLOR_TYPE_INPUT }),
+    CREATE_COLOR_NODE("Create Color", "Color", CreateColorNode.class),
+    SPLIT_COLOR_NODE("Split Color", "Color", SplitColorNode.class),
 
     //COMPARE
-    EQUALS_NODE(2, 1, "Equals", "Compare", EqualsNode.class),
-    GREATER_NODE(2, 1, "Greater Than", "Compare", GreaterNode.class),
-    LESS_NODE(2, 1, "Less Than", "Compare", LessNode.class),
+    EQUALS_NODE("Equals", "Compare", EqualsNode.class),
+    GREATER_NODE("Greater Than", "Compare", GreaterNode.class),
+    LESS_NODE("Less Than", "Compare", LessNode.class),
 
     //Constant
-    CONSTANT_INTEGER_NODE(0, 1, "Constant Integer", "Constant", ConstantIntegerNode.class, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
-    CONSTANT_NUMBER_NODE(0, 1, "Constant Number", "Constant", ConstantNumberNode.class, new InputDialogType[] { InputDialogType.NUMBER_TYPE_INPUT }),
-    CONSTANT_UNIT_NUMBER_NODE(0, 1, "Constant Unit Number", "Constant", ConstantUnitNumberNode.class, new InputDialogType[] {InputDialogType.UNIT_NUMBER_TYPE_INPUT }),
-    PI_NODE(0, 1, "PI", "Constant", PiNode.class),
+    CONSTANT_INTEGER_NODE("Constant Integer", "Constant", ConstantIntegerNode.class, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
+    CONSTANT_NUMBER_NODE("Constant Number", "Constant", ConstantNumberNode.class, new InputDialogType[] { InputDialogType.NUMBER_TYPE_INPUT }),
+    CONSTANT_UNIT_NUMBER_NODE("Constant Unit Number", "Constant", ConstantUnitNumberNode.class, new InputDialogType[] {InputDialogType.UNIT_NUMBER_TYPE_INPUT }),
+    PI_NODE("PI", "Constant", PiNode.class),
 
     //DEBUG
-    DEBUG_NODE(1, 1, "Debug Node", "Debug", DebugNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    DEBUG_NODE("Debug Node", "Debug", DebugNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
 
     //INTERVAL
-    CREATE_INTERVAL_NODE(2, 1, "Create Interval", "Interval", CreateIntervalNode.class),
+    CREATE_INTERVAL_NODE("Create Interval", "Interval", CreateIntervalNode.class),
 
     //LOGICAL OPERATORS
-    LOGICAL_AND_NODE(2, 1, "AND", "Logical Operators", LogicalAndNode.class),
-    LOGICAL_OR_NODE(2, 1, "OR", "Logical Operators", LogicalOrNode.class),
-    LOGICAL_NOT_NODE(1, 1, "NOT", "Logical Operators", LogicalNotNode.class),
+    LOGICAL_AND_NODE("AND", "Logical Operators", LogicalAndNode.class),
+    LOGICAL_OR_NODE("OR", "Logical Operators", LogicalOrNode.class),
+    LOGICAL_NOT_NODE("NOT", "Logical Operators", LogicalNotNode.class),
 
     //MASK
-    PLAIN_MASK_NODE(2, 1, "_PLAIN_MASK_", "Mask", MaskNode.class, true),
-    MASK_ADDITION_NODE(2, 1, "Mask Addition", "Mask", MaskAdditionNode.class, true),
-    MASK_SUBTRACTION_NODE(2, 1, "Mask Subtraction", "Mask", MaskSubtractionNode.class, true),
-    MASK_DIFFERENCE_NODE(2, 1, "Mask Difference", "Mask", MaskDifferenceNode.class, true),
-    MASK_UNION_NODE(2, 1, "Mask Union", "Mask", MaskUnionNode.class, true),
-    MASK_X_MASK_NODE(2, 1, "Mask X Mask", "Mask", MultiplyMaskWithMaskNode.class, true),
-    MASK_X_NUMBER_NODE(2, 1, "Mask X Number", "Mask", MultiplyMaskWithUnitNode.class, true),
-    INVERTED_MASK_NODE(2, 1, "Inverted Mask", "Mask", InvertedMaskNode.class, true),
-    MOVE_MASK_NODE(3, 1, "Move Mask", "Mask", MoveMaskNode.class, true),
-    SCALE_MASK_NODE(3, 1, "Scale Mask", "Mask", ScaleMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
-    ROTATE_MASK_NODE(2, 1, "Rotate Mask", "Mask", RotateMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
-    SHOW_MASK_NODE(1, 0, "Show Mask", "Mask", ShowMaskNode.class, true),
-    GET_DEGREE_NODE(1, 1, "Get Degree", "Mask", GetDegreeNode.class, false),
+    PLAIN_MASK_NODE("_PLAIN_MASK_", "Mask", MaskNode.class, true),
+    MASK_ADDITION_NODE("Mask Addition", "Mask", MaskAdditionNode.class, true),
+    MASK_SUBTRACTION_NODE("Mask Subtraction", "Mask", MaskSubtractionNode.class, true),
+    MASK_DIFFERENCE_NODE("Mask Difference", "Mask", MaskDifferenceNode.class, true),
+    MASK_UNION_NODE("Mask Union", "Mask", MaskUnionNode.class, true),
+    MASK_X_MASK_NODE("Mask X Mask", "Mask", MultiplyMaskWithMaskNode.class, true),
+    MASK_X_NUMBER_NODE("Mask X Number", "Mask", MultiplyMaskWithUnitNode.class, true),
+    INVERTED_MASK_NODE("Inverted Mask", "Mask", InvertedMaskNode.class, true),
+    MOVE_MASK_NODE("Move Mask", "Mask", MoveMaskNode.class, true),
+    SCALE_MASK_NODE("Scale Mask", "Mask", ScaleMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
+    ROTATE_MASK_NODE("Rotate Mask", "Mask", RotateMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
+    SHOW_MASK_NODE("Show Mask", "Mask", ShowMaskNode.class, true),
+    GET_DEGREE_NODE("Get Degree", "Mask", GetDegreeNode.class, false),
 
     //MATH FUNCTIONS
-    SIN_NODE(1, 1, "Sine Wave", "Math Functions", SinNode.class),
-    COS_NODE(1, 1, "Cosine Wave", "Math Functions", CosNode.class),
-    LERP_NODE(3, 1, "Linear Interpolation", "Math Functions", LerpNode.class),
-    ROUND_NODE(1, 1, "Round Number", "Math Functions", RoundNode.class, new InputDialogType[] { InputDialogType.ROUND_INPUT }),
-    POWER_NODE(2, 1, "Power", "Math Functions", PowerNode.class),
-    SQRT_NODE(1, 1, "Square Root", "Math Functions", SquareRootNode.class),
-    MODULO_NODE(2, 1, "Modulo", "Math Functions", ModuloNode.class),
+    SIN_NODE("Sine Wave", "Math Functions", SinNode.class),
+    COS_NODE("Cosine Wave", "Math Functions", CosNode.class),
+    LERP_NODE("Linear Interpolation", "Math Functions", LerpNode.class),
+    ROUND_NODE("Round Number", "Math Functions", RoundNode.class, new InputDialogType[] { InputDialogType.ROUND_INPUT }),
+    POWER_NODE("Power", "Math Functions", PowerNode.class),
+    SQRT_NODE("Square Root", "Math Functions", SquareRootNode.class),
+    MODULO_NODE("Modulo", "Math Functions", ModuloNode.class),
 
     //TYPE CAST
-    NUMBER_TO_UNIT_NODE(1, 1, "Number to Unit", "Type Cast", CastNumberToUnitNode.class),
-    UNIT_TO_NUMBER_NODE(1, 1, "Unit to Number", "Type Cast", CastUnitToNumberNode.class),
-    INT_TO_NUMBER_NODE(1, 1, "Int to Number", "Type Cast", CastIntToNumberNode.class),
-    BOOLEAN_TO_NUMBER_NODE(1, 1, "Boolean to Number", "Type Cast", CastBooleanToNumberNode.class),
+    NUMBER_TO_UNIT_NODE("Number to Unit", "Type Cast", CastNumberToUnitNode.class),
+    UNIT_TO_NUMBER_NODE("Unit to Number", "Type Cast", CastUnitToNumberNode.class),
+    INT_TO_NUMBER_NODE("Int to Number", "Type Cast", CastIntToNumberNode.class),
+    BOOLEAN_TO_NUMBER_NODE("Boolean to Number", "Type Cast", CastBooleanToNumberNode.class),
 
     //UPDATE
-    UPDATE_NODE(2, 1, "Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT });
+    UPDATE_NODE("Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
 
-    private final int numberInputNodes;
-    private final int numberOutputNodes;
+    //COMMANDS
+    _FUNCTION_NODE("Function", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
+    _INPUT_PARAMETER_NODE("Input Parameter", "Commands", null, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    _OUTPUT_PARAMETER_NODE("Output Parameter", "Commands", null, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    _TRACK_NODE("Track", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
+    _LAYER_NODE("Layer", "Commands", null);
+
     private final String name;
     private final String categoryName;
     private final Class nodeClass;
@@ -99,9 +105,7 @@ public enum NodeType {
     private InputDialogType[] inputDialogTypes;
     private boolean maskOutput;
 
-    NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass, InputDialogType[] inputDialogTypes, boolean maskOutput) {
-        this.numberInputNodes = numberInputNodes;
-        this.numberOutputNodes = numberOutputNodes;
+    NodeType(String name, String categoryName, Class nodeClass, InputDialogType[] inputDialogTypes, boolean maskOutput) {
         this.name = name;
         this.categoryName = categoryName;
         this.nodeClass = nodeClass;
@@ -110,24 +114,18 @@ public enum NodeType {
         this.maskOutput = maskOutput;
     }
 
-    NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass) {
-        this(numberInputNodes, numberOutputNodes, name, categoryName, nodeClass, new InputDialogType[0], false);
+    NodeType(String name, String categoryName, Class nodeClass) {
+        this(name, categoryName, nodeClass, new InputDialogType[0], false);
     }
 
-    NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass, InputDialogType[] inputDialogTypes) {
-        this(numberInputNodes, numberOutputNodes, name, categoryName, nodeClass, inputDialogTypes, false);
+    NodeType(String name, String categoryName, Class nodeClass, InputDialogType[] inputDialogTypes) {
+        this(name, categoryName, nodeClass, inputDialogTypes, false);
     }
 
-    NodeType(int numberInputNodes, int numberOutputNodes, String name, String categoryName, Class nodeClass, boolean maskOutput) {
-        this(numberInputNodes, numberOutputNodes, name, categoryName, nodeClass, new InputDialogType[0], maskOutput);
+    NodeType(String name, String categoryName, Class nodeClass, boolean maskOutput) {
+        this(name, categoryName, nodeClass, new InputDialogType[0], maskOutput);
     }
 
-    public int getNumberInputNodes() {
-        return this.numberInputNodes;
-    }
-    public int getNumberOutputNodes() {
-        return this.numberOutputNodes;
-    }
     public String getName() {
         return this.name;
     }

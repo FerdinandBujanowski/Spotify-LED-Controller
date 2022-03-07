@@ -1,5 +1,6 @@
 package logic.node.nodes.color;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.*;
@@ -18,7 +19,8 @@ public class CreateColorNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(new ColorJointDataType(), "Color")
-                }
+                },
+                NodeType.CREATE_COLOR_NODE
         );
     }
 

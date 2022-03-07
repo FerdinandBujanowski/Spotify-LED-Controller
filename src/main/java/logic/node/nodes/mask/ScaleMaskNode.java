@@ -1,5 +1,6 @@
 package logic.node.nodes.mask;
 
+import control.type_enums.NodeType;
 import control.type_enums.PixelAlgorithmType;
 import logic.led.LogicMask;
 import logic.node.joint.InputJoint;
@@ -22,9 +23,11 @@ public class ScaleMaskNode extends MaskNode {
                 new OutputJoint[] {
                         new OutputJoint(
                                 new MaskJointDataType(),
-                                "Output [" + pixelAlgorithmType.toString().toUpperCase().substring(0, 3) + "]"
+                                "Output [" + pixelAlgorithmType.getName().toUpperCase().substring(0, 3) + "]"
                         )
-                }
+                },
+                NodeType.SCALE_MASK_NODE,
+                new Object[] { pixelAlgorithmType }
         );
         this.pixelAlgorithmType = pixelAlgorithmType;
     }

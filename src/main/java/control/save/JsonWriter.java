@@ -4,11 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import control.node.NodeConnection;
 import control.node.ThreeCoordinatePoint;
-import control.save.NodeSaveUnit;
+import control.type_enums.InputDialogType;
+import control.type_enums.NodeType;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 
-import java.awt.*;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -50,6 +50,12 @@ public abstract class JsonWriter {
         }
         finalObject.add("functions", functionArray);
 
+        JsonArray trackNodeIndexArray = new JsonArray();
+        for(ThreeCoordinatePoint coordinatePoint : nodeSaveUnit.getTrackNodeIndexes()) {
+            trackNodeIndexArray.add(JsonWriter.getThreeCoordinateJsonObject(coordinatePoint));
+        }
+        finalObject.add("track_node_indexes", trackNodeIndexArray);
+
         try {
             FileWriter file = new FileWriter(path);
             file.write(finalObject.toString());
@@ -62,10 +68,23 @@ public abstract class JsonWriter {
 
     private static JsonObject getNodeJsonObject(LogicNode logicNode) {
         JsonObject nodeObject = new JsonObject();
+        NodeType nodeType = logicNode.getNodeType();
         nodeObject.addProperty("node_index", logicNode.getNodeIndex());
-        nodeObject.addProperty("node_type", logicNode.getNodeTypeName());
+        nodeObject.addProperty("node_type", nodeType.toString());
         if(!logicNode.getSpecificName().equals("")) {
             nodeObject.addProperty("specific_name", logicNode.getSpecificName());
+        }
+        Object[] extraParameters = logicNode.getExtraParameters();
+        if(extraParameters.length > 0) {
+            JsonArray extraParamArray = new JsonArray();
+            InputDialogType[] inputDialogTypes = nodeType.getInputDialogTypes();
+            for(int i = 0; i < extraParameters.length; i++) {
+                JsonObject inputObject = new JsonObject();
+                inputObject.addProperty("type", inputDialogTypes[i].toString());
+                inputObject.addProperty("value", InputDialogType.valueToString(inputDialogTypes[i], extraParameters[i]));
+                extraParamArray.add(inputObject);
+            }
+            nodeObject.add("extra_parameters", extraParamArray);
         }
         return nodeObject;
     }
@@ -77,9 +96,9 @@ public abstract class JsonWriter {
     }
     private static JsonObject getThreeCoordinateJsonObject(ThreeCoordinatePoint coordinatePoint) {
         JsonObject coordinateObject = new JsonObject();
-        coordinateObject.addProperty("x", coordinatePoint.getX());
-        coordinateObject.addProperty("y", coordinatePoint.getY());
-        coordinateObject.addProperty("z", coordinatePoint.getZ());
+        coordinateObject.addProperty("c_1", coordinatePoint.getX());
+        coordinateObject.addProperty("c_2", coordinatePoint.getY());
+        coordinateObject.addProperty("c_3", coordinatePoint.getZ());
         return coordinateObject;
     }
 }

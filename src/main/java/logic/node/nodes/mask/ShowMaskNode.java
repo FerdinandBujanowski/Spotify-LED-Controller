@@ -1,5 +1,6 @@
 package logic.node.nodes.mask;
 
+import control.type_enums.NodeType;
 import logic.led.LogicMask;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -13,7 +14,8 @@ public class ShowMaskNode extends MaskNode {
                 new InputJoint[] {
                         new InputJoint(new MaskJointDataType(), "Input")
                 },
-                new OutputJoint[] {}
+                new OutputJoint[] {},
+                NodeType.SHOW_MASK_NODE
         );
     }
 

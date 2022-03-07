@@ -1,5 +1,6 @@
 package logic.node.nodes.math_functions;
 
+import control.type_enums.NodeType;
 import control.type_enums.RoundAlgorithmType;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
@@ -20,9 +21,11 @@ public class RoundNode extends LogicNode {
                 new OutputJoint[] {
                         new OutputJoint(
                                 new IntegerJointDataType(),
-                                "Output [" + roundAlgorithmType.toString().toUpperCase().substring(0, 3) + "]"
+                                "Output [" + roundAlgorithmType.getName().toUpperCase().substring(0, 3) + "]"
                         )
-                }
+                },
+                NodeType.ROUND_NODE,
+                new Object[] { roundAlgorithmType }
         );
         this.roundAlgorithmType = roundAlgorithmType;
     }

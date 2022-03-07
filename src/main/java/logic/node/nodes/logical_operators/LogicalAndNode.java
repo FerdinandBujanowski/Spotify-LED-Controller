@@ -1,5 +1,6 @@
 package logic.node.nodes.logical_operators;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.*;
@@ -15,7 +16,8 @@ public class LogicalAndNode extends LogicNode {
                 },
                 new OutputJoint[]{
                         new OutputJoint(new BooleanJointDataType(), "&&")
-                }
+                },
+                NodeType.LOGICAL_AND_NODE
         );
     }
 

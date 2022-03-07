@@ -1,5 +1,6 @@
 package logic.node.nodes.type_cast;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -16,7 +17,8 @@ public class CastUnitToNumberNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(new NumberJointDataType(), "Number")
-                }
+                },
+                NodeType.UNIT_TO_NUMBER_NODE
         );
     }
 

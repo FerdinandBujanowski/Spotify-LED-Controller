@@ -1,6 +1,7 @@
 package logic.node.nodes.update;
 
 import control.type_enums.JointType;
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -22,7 +23,9 @@ public class UpdateNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(JointType.getCopyOfDataTypeByJointType(jointType), "Data")
-                }
+                },
+                NodeType.UPDATE_NODE,
+                new Object[] { jointType }
         );
         this.toggleBoolean = false;
         this.oldData = JointType.getCopyOfDataTypeByJointType(jointType);

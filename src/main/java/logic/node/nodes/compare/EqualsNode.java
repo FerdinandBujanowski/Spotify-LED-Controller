@@ -1,5 +1,6 @@
 package logic.node.nodes.compare;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.*;
@@ -15,7 +16,8 @@ public class EqualsNode extends LogicNode {
                 },
                 new OutputJoint[]{
                         new OutputJoint(new BooleanJointDataType(), "==")
-                }
+                },
+                NodeType.EQUALS_NODE
         );
     }
 

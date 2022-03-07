@@ -1,6 +1,7 @@
 package logic.node.nodes.branch;
 
 import control.type_enums.JointType;
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.JointDataType;
@@ -18,7 +19,9 @@ public class RandomBranchNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(JointType.getCopyOfDataTypeByJointType(jointType), "Output")
-                }
+                },
+                NodeType.RANDOM_BRANCH_NODE,
+                new Object[] { jointType }
         );
     }
 

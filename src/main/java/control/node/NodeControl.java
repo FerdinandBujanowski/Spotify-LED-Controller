@@ -54,7 +54,9 @@ public class NodeControl implements Serializable {
                     oldNode.getNodeIndex(),
                     oldNode.getInputJoints(),
                     oldNode.getOutputJoints(),
-                    oldNode.getSpecificName()
+                    oldNode.getSpecificName(),
+                    oldNode.getNodeType(),
+                    oldNode.getExtraParameters()
             ) {
                 @Override
                 public JointDataType[] function(InputJoint[] nullInputJoints) {
@@ -105,7 +107,6 @@ public class NodeControl implements Serializable {
         }
         try {
             newNode = (LogicNode) nodeType.getNodeClass().getDeclaredConstructor(parameterClasses).newInstance(newParameters);
-            newNode.setNodeTypeName(nodeType.toString());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
@@ -159,7 +160,9 @@ public class NodeControl implements Serializable {
                 new OutputJoint[] {
                         new OutputJoint(new UnitNumberJointDataType(), "Intensity")
                 },
-                trackName
+                trackName,
+                NodeType._TRACK_NODE,
+                new Object[] { trackIndex }
         ) {
             @Override
             public JointDataType[] function(InputJoint[] nullInputJoints) {
@@ -181,7 +184,8 @@ public class NodeControl implements Serializable {
                         new InputJoint(new ColorJointDataType(), "Color")
                 },
                 new OutputJoint[] {},
-                layerName
+                layerName,
+                NodeType._LAYER_NODE
         ) {
 
             @Override
@@ -414,7 +418,9 @@ public class NodeControl implements Serializable {
                         currentIndex,
                         NodeControl.getCopyOfInputJointArray(logicNode.getInputJoints()),
                         NodeControl.getCopyOfOutputJointArray(logicNode.getOutputJoints()),
-                        logicNode.getSpecificName()
+                        logicNode.getSpecificName(),
+                        logicNode.getNodeType(),
+                        logicNode.getExtraParameters()
                 ) {
                     @Override
                     public JointDataType[] function(InputJoint[] inputJoints) {

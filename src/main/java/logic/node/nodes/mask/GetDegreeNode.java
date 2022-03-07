@@ -1,5 +1,6 @@
 package logic.node.nodes.mask;
 
+import control.type_enums.NodeType;
 import logic.led.LogicMask;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
@@ -17,7 +18,8 @@ public class GetDegreeNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(new IntegerJointDataType(), "Degree")
-                }
+                },
+                NodeType.GET_DEGREE_NODE
         );
     }
 

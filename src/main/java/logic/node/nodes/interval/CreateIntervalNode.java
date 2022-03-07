@@ -1,5 +1,6 @@
 package logic.node.nodes.interval;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -18,7 +19,8 @@ public class CreateIntervalNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(new IntervalJointDataType(), "Interval")
-                }
+                },
+                NodeType.CREATE_INTERVAL_NODE
         );
     }
 

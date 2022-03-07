@@ -1,5 +1,6 @@
 package logic.node.nodes.math_functions;
 
+import control.type_enums.NodeType;
 import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.*;
@@ -16,7 +17,8 @@ public class LerpNode extends LogicNode {
                 },
                 new OutputJoint[] {
                         new OutputJoint(new NumberJointDataType(), "Output")
-                }
+                },
+                NodeType.LERP_NODE
         );
     }
 
