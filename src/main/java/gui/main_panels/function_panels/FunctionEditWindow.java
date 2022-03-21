@@ -13,17 +13,7 @@ public class FunctionEditWindow extends ParentNodePanel {
 
     public FunctionEditWindow(NodeControl nodeControl, int functionIndex) {
         super(nodeControl, functionIndex, Color.DARK_GRAY);
-    }
-
-    public void addFunction(String[] inputNames, JointType[] inputTypes, String[] outputNames, JointType[] outputTypes) {
-        this.getNodeControl().addFunction(this.getFunctionIndex(), inputNames, inputTypes, outputNames, outputTypes);
-
-        int[] nodeIndexes = this.getNodeControl().getNodeIndexesOfFunctionIndex(this.getFunctionIndex());
-        for(int index : nodeIndexes) {
-            NodeType nodeType = this.getNodeControl().getNodeType(this.getFunctionIndex(), index);
-            String nodeName = nodeType == null ? this.getNodeControl().getSpecificNodeName(this.getFunctionIndex(), index) : nodeType.getName();
-            super.addGraphicNode(this.getFunctionIndex(), index, nodeType, nodeName, 10, 10);
-        }
+        nodeControl.addFunctionGraphicUnit(this);
     }
 
     @Override

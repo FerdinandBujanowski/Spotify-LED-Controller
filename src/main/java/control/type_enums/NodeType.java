@@ -92,9 +92,9 @@ public enum NodeType {
     UPDATE_NODE("Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
 
     //COMMANDS
-    _FUNCTION_NODE("Function", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
-    _INPUT_PARAMETER_NODE("Input Parameter", "Commands", null, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
-    _OUTPUT_PARAMETER_NODE("Output Parameter", "Commands", null, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    _FUNCTION_NODE("Function", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT, InputDialogType.INTEGER_TYPE_INPUT }),
+    _INPUT_PARAMETER_NODE("Input Parameter", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT, InputDialogType.JOINT_TYPE_INPUT, InputDialogType.STRING_TYPE_INPUT }),
+    _OUTPUT_PARAMETER_NODE("Output Parameter", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT, InputDialogType.JOINT_TYPE_INPUT, InputDialogType.STRING_TYPE_INPUT }),
     _TRACK_NODE("Track", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
     _LAYER_NODE("Layer", "Commands", null);
 

@@ -1,10 +1,15 @@
 package control.node;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import control.SerializableFunction;
 import control.exceptions.CannotDeleteNodeException;
+import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
 import control.save.NodeSaveUnit;
 import control.type_enums.*;
+import gui.main_panels.node_panel.NodeGraphicUnit;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 import logic.node.joint.*;
@@ -15,7 +20,10 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-public class NodeControl implements Serializable {
+public class NodeControl implements Serializable, NodeRequestAcceptor {
+
+    private NodeGraphicUnit nodeGraphicUnit;
+    private ArrayList<NodeGraphicUnit> functionGraphicUnits;
 
     public static final int JOINT_WIDTH = 14;
     public static final int NODE_TOP_HEIGHT = 25, NODE_CENTER_HEIGHT = 30, NODE_BOTTOM_HEIGHT = 15;
@@ -30,6 +38,8 @@ public class NodeControl implements Serializable {
     private int jointHoveredNodeIndex, jointHoveredJointIndex;
 
     public NodeControl() {
+        this.functionGraphicUnits = new ArrayList<>();
+
         this.logicNodes = new ArrayList<>();
         this.nodeConnections = new ArrayList<>();
         this.logicFunctions = new ArrayList<>();
@@ -77,6 +87,28 @@ public class NodeControl implements Serializable {
         }
     }
 
+    public void addNodesFromFile(JsonObject nodesObject) {
+        //FIRST : functions
+        TwoIntegerCorrespondence functionCorrespondence = new TwoIntegerCorrespondence();
+        int nextFreeFunctionIndex = this.getNextFreeFunctionIndex();
+        JsonArray functionArray = nodesObject.getAsJsonArray("functions");
+        for(int i = 0; i < functionArray.size(); i++) {
+            JsonObject functionObject = functionArray.get(i).getAsJsonObject();
+            int oldFunctionIndex = functionObject.get("node_index").getAsInt();
+            int newFunctionIndex = nextFreeFunctionIndex + oldFunctionIndex;
+            functionCorrespondence.addValue(oldFunctionIndex, newFunctionIndex);
+            JsonArray functionNodesArray = functionObject.getAsJsonArray("nodes");
+
+            ArrayList<InputJoint> functionInputJointArray = new ArrayList<>();
+            ArrayList<OutputJoint> functionOutputJointArray = new ArrayList<>();
+            ArrayList<LogicNode> remainingFunctionNodes = new ArrayList<>();
+            for(int functionNodesIndex = 0; functionNodesIndex < functionNodesArray.size(); functionNodesIndex++) {
+                JsonObject currentNodeObject = functionNodesArray.get(functionNodesIndex).getAsJsonObject();
+
+            }
+        }
+    }
+
     public int getNextFreeNodeIndex(int functionIndex) {
         if(functionIndex == -1) {
             if(this.logicNodes.isEmpty()) return 0;
@@ -84,7 +116,8 @@ public class NodeControl implements Serializable {
         } else {
             LogicFunction currentFunction = this.findFunction(functionIndex);
             if(currentFunction.getLogicNodes().isEmpty()) return 0;
-            return currentFunction.getLogicNodes().get(currentFunction.getLogicNodes().size() - 1).getNodeIndex() + 1;
+            LogicNode lastNode = currentFunction.getLogicNodes().get(currentFunction.getLogicNodes().size() - 1);
+            return lastNode.getNodeIndex() + 1;
         }
     }
     public int getNextFreeFunctionIndex() {
@@ -92,8 +125,9 @@ public class NodeControl implements Serializable {
         return this.logicFunctions.get(this.logicFunctions.size() -1).getFunctionIndex() + 1;
     }
 
-    public void addNode(int functionIndex, NodeType nodeType, int newNodeIndex, Object[] extraParameters) {
+    public void addNode(int functionIndex, NodeType nodeType, Object[] extraParameters) {
         LogicNode newNode = null;
+        int newNodeIndex = this.getNextFreeNodeIndex(functionIndex);
 
         Class[] parameterClasses = new Class[extraParameters.length + 1];
         Object[] newParameters = new Object[parameterClasses.length];
@@ -105,19 +139,72 @@ public class NodeControl implements Serializable {
             parameterClasses[i + 1] = extraParameters[i].getClass();
             newParameters[i + 1] = extraParameters[i];
         }
-        try {
-            newNode = (LogicNode) nodeType.getNodeClass().getDeclaredConstructor(parameterClasses).newInstance(newParameters);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-
-        if(functionIndex == -1) {
-            this.logicNodes.add(newNode);
+        if(nodeType.getNodeClass() != null) {
+            String specificNodeName = "";
+            try {
+                newNode = (LogicNode) nodeType.getNodeClass().getDeclaredConstructor(parameterClasses).newInstance(newParameters);
+                specificNodeName = !newNode.getSpecificName().equals("") ? newNode.getSpecificName() : nodeType.getName();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            if(functionIndex == -1) {
+                this.logicNodes.add(newNode);
+                this.nodeGraphicUnit.addGraphicNode(functionIndex, newNodeIndex, nodeType, specificNodeName);
+            } else {
+                this.findFunction(functionIndex).getLogicNodes().add(newNode);
+                this.functionGraphicUnits.get(functionIndex).addGraphicNode(functionIndex, newNodeIndex, nodeType, specificNodeName);
+            }
         } else {
-            this.findFunction(functionIndex).getLogicNodes().add(newNode);
+            switch(nodeType) {
+                case _FUNCTION_NODE -> {
+                    int funcIndex = (int)extraParameters[0];
+                    LogicFunction function = this.findFunction(funcIndex);
+                    if(function != null) {
+                        this.addFunctionNode(funcIndex, (int)extraParameters[1]);
+                    }
+                }
+                case _INPUT_PARAMETER_NODE -> {
+                    int funcIndex = (int)extraParameters[0];
+                    LogicFunction logicFunction = this.findFunction(funcIndex);
+                    JointType jointType = (JointType) extraParameters[1];
+                    InputJoint inputJoint = new InputJoint(JointType.getCopyOfDataTypeByJointType(jointType), (String) extraParameters[2]);
+
+                    newNodeIndex = this.getNextFreeNodeIndex(funcIndex);
+                    logicFunction.addInputParameter(inputJoint);
+
+                    String nodeName = this.findNode(funcIndex, newNodeIndex).getSpecificName();
+                    if(funcIndex == -1) {
+                        this.nodeGraphicUnit.addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName);
+                    } else {
+                        this.functionGraphicUnits.get(funcIndex).addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName);
+                    }
+                }
+                case _OUTPUT_PARAMETER_NODE -> {
+                    int funcIndex = (int)extraParameters[0];
+                    LogicFunction logicFunction = this.findFunction(funcIndex);
+                    JointType jointType = (JointType) extraParameters[1];
+                    OutputJoint outputJoint = new OutputJoint(JointType.getCopyOfDataTypeByJointType(jointType), (String) extraParameters[2]);
+
+                    newNodeIndex = this.getNextFreeNodeIndex(funcIndex);
+                    logicFunction.addOutputParameter(outputJoint);
+
+                    String nodeName = this.findNode(funcIndex, newNodeIndex).getSpecificName();
+                    if(funcIndex == -1) {
+                        this.nodeGraphicUnit.addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName);
+                    } else {
+                        this.functionGraphicUnits.get(funcIndex).addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName);
+                    }
+                }
+                case _TRACK_NODE -> {
+                    int trackIndex = (int)extraParameters[0];
+                    this.addTrackNode(trackIndex);
+                }
+                case _LAYER_NODE -> {
+                }
+            }
         }
     }
-    public void addFunction(int newFunctionIndex, String[] inputNames, JointType[] inputTypes, String[] outputNames, JointType[] outputTypes) {
+    public void addFunction(int newFunctionIndex, String functionName, String[] inputNames, JointType[] inputTypes, String[] outputNames, JointType[] outputTypes) {
         InputJoint[] inputJoints = new InputJoint[inputNames.length];
         for(int i = 0; i < inputJoints.length; i++) {
             JointDataType inputJointDataType = null;
@@ -128,7 +215,6 @@ public class NodeControl implements Serializable {
                 e.printStackTrace();
             }
         }
-
         OutputJoint[] outputJoints = new OutputJoint[outputNames.length];
         for(int i = 0; i < outputJoints.length; i++) {
             JointDataType outputJointDataType = null;
@@ -140,19 +226,35 @@ public class NodeControl implements Serializable {
             }
         }
 
-        this.logicFunctions.add(new LogicFunction(newFunctionIndex, inputJoints, outputJoints));
-    }
-    public void addFunctionNode(int functionIndexOrigin, int functionIndexGoal, int newNodeIndex, String functionName) {
-        LogicNode logicNodeToAdd = this.findFunction(functionIndexOrigin).bakeNode(newNodeIndex, functionName);
-        if(functionIndexGoal == -1) {
-            this.logicNodes.add(logicNodeToAdd);
-        } else {
-            this.findFunction(functionIndexGoal).getLogicNodes().add(logicNodeToAdd);
+        LogicFunction newFunction = new LogicFunction(newFunctionIndex, functionName, inputJoints, outputJoints);
+        this.logicFunctions.add(newFunction);
+
+        int[] nodeIndexes = this.getNodeIndexesOfFunctionIndex(newFunctionIndex);
+        for(int index : nodeIndexes) {
+            NodeType nodeType = this.getNodeType(newFunctionIndex, index);
+            String nodeName = nodeType == null ? this.getSpecificNodeName(newFunctionIndex, index) : nodeType.getName();
+            this.functionGraphicUnits.get(newFunctionIndex).addGraphicNode(newFunctionIndex, index, nodeType, nodeName);
         }
     }
 
-    public void addTrackNode(int trackIndex, int newNodeIndex, String trackName) {
+    public void addFunctionNode(int functionIndexOrigin, int functionIndexGoal) {
+        int newNodeIndex = this.getNextFreeNodeIndex(functionIndexGoal);
+        LogicFunction logicFunction = this.findFunction(functionIndexOrigin);
+        LogicNode logicNodeToAdd = logicFunction.bakeNode(newNodeIndex, functionIndexGoal);
+        if(functionIndexGoal == -1) {
+            this.logicNodes.add(logicNodeToAdd);
+            this.nodeGraphicUnit.addGraphicNode(functionIndexGoal, newNodeIndex, NodeType._FUNCTION_NODE, logicFunction.getFunctionName());
+        } else {
+            this.findFunction(functionIndexGoal).getLogicNodes().add(logicNodeToAdd);
+            this.functionGraphicUnits.get(functionIndexGoal).addGraphicNode(functionIndexGoal, newNodeIndex, NodeType._FUNCTION_NODE, logicFunction.getFunctionName());
+        }
 
+    }
+
+    public void addTrackNode(int trackIndex) {
+
+        String nodeName = "Track " + (trackIndex + 1);
+        int newNodeIndex = this.getNextFreeNodeIndex(-1);
         this.trackNodeIndexes.add(new ThreeCoordinatePoint(-1, newNodeIndex, trackIndex));
         LogicNode trackNode = new LogicNode(
                 newNodeIndex,
@@ -160,7 +262,7 @@ public class NodeControl implements Serializable {
                 new OutputJoint[] {
                         new OutputJoint(new UnitNumberJointDataType(), "Intensity")
                 },
-                trackName,
+                nodeName,
                 NodeType._TRACK_NODE,
                 new Object[] { trackIndex }
         ) {
@@ -174,9 +276,11 @@ public class NodeControl implements Serializable {
             }
         };
         this.logicNodes.add(trackNode);
+        this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._TRACK_NODE, nodeName);
     }
 
-    public void addLayerNode(int newNodeIndex, SerializableFunction<Object, Integer> setMaskFunction, SerializableFunction<Color, Integer> setColorFunction, String layerName) {
+    public void addLayerNode(SerializableFunction<Object, Integer> setMaskFunction, SerializableFunction<Color, Integer> setColorFunction, String layerName) {
+        int newNodeIndex = this.getNextFreeNodeIndex(-1);
         LogicNode layerNode = new LogicNode(
                 newNodeIndex,
                 new InputJoint[] {
@@ -199,42 +303,6 @@ public class NodeControl implements Serializable {
         this.logicNodes.add(layerNode);
     }
 
-    public int[] getNodeIndexArray(int functionIndex) {
-        ArrayList<LogicNode> logicNodes;
-        if(functionIndex == -1) {
-            logicNodes = this.logicNodes;
-        } else {
-            logicNodes = this.findFunction(functionIndex).getLogicNodes();
-        }
-        int[] nodeIndexArray = new int[logicNodes.size()];
-        for(int i = 0; i < nodeIndexArray.length; i++) {
-            nodeIndexArray[i] = logicNodes.get(i).getNodeIndex();
-        }
-        return nodeIndexArray;
-    }
-
-
-    public SerializableFunction<Integer, Double[][]> getMaskValuesFunctionForNode(int functionIndex, int nodeIndex) {
-        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
-        return logicNode::getMaskValues;
-    }
-
-    public String[] getInputJointNames(int functionIndex, int nodeIndex) {
-        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
-        String[] outputString = new String[currentNode.getInputJoints().length];
-        for(int i = 0; i < outputString.length; i++) {
-            outputString[i] = currentNode.getInputJoints()[i].getName();
-        }
-        return outputString;
-    }
-    public String[] getOutputJointNames(int functionIndex, int nodeIndex) {
-        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
-        String[] outputString = new String[currentNode.getOutputJoints().length];
-        for(int i = 0; i < outputString.length; i++) {
-            outputString[i] = currentNode.getOutputJoints()[i].getName();
-        }
-        return outputString;
-    }
 
     public LogicNode findNode(int functionIndex, int nodeIndex) {
         if(functionIndex == -1) {
@@ -286,119 +354,40 @@ public class NodeControl implements Serializable {
         }
         return functionIndexArray;
     }
-    public int[] getNodeIndexesOfFunctionIndex(int functionIndex) {
-        ArrayList<LogicNode> logicNodes = this.findFunction(functionIndex).getLogicNodes();
-        int[] indexes = new int[logicNodes.size()];
-        for(int i = 0; i < indexes.length; i++) {
-            indexes[i] = logicNodes.get(i).getNodeIndex();
-        }
-        return indexes;
-    }
 
-    public NodeType getNodeType(int functionIndex, int nodeIndex) {
-        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
-        return NodeType.getNodeTypeByTypeClass(currentNode.getClass());
-    }
-    public JointType getJointType(boolean input, int functionIndex, int nodeIndex, int jointIndex) {
-        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
-        JointDataType jointDataType;
-        if(input) {
-            jointDataType = currentNode.getInputJoints()[jointIndex].getJointDataType();
-        } else {
-            jointDataType = currentNode.getOutputJoints()[jointIndex].getJointDataType();
-        }
-        return JointType.getJointTypeByTypeClass(jointDataType.getClass());
-    }
-
-    public ArrayList<NodeConnection> getNodeConnections(int functionIndex) {
-        if(functionIndex == -1) {
-            return this.nodeConnections;
-        } else {
-            return this.findFunction(functionIndex).getNodeConnections();
-        }
-    }
-
-    public void updateInputJointHovered(int functionIndex, int nodeIndex, int inputJointIndex) {
-        if(functionIndex == -1) {
-            this.jointHoveredNodeIndex = nodeIndex;
-            this.jointHoveredJointIndex = inputJointIndex;
-        } else {
-            this.findFunction(functionIndex).setJointHoveredNodeIndex(nodeIndex);
-            this.findFunction(functionIndex).setJointHoveredJointIndex(inputJointIndex);
-        }
-    }
-    public void updateOutputJointReleased(int functionIndex, int nodeIndex, int outputJointIndex) {
-        if(functionIndex == -1) {
-            if(this.jointHoveredNodeIndex != -1 && this.jointHoveredJointIndex != -1) {
-                try {
-                    this.findNode(functionIndex, this.jointHoveredNodeIndex).getInputJoints()[this.jointHoveredJointIndex]
-                            .tryJointConnection(this.findNode(functionIndex, nodeIndex).getOutputJoints()[outputJointIndex]);
-                    this.nodeConnections.add(new NodeConnection(
-                            new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
-                            new ThreeCoordinatePoint(functionIndex, this.jointHoveredNodeIndex, this.jointHoveredJointIndex))
-                    );
-                } catch (JointConnectionFailedException e) {
-                    e.printStackTrace();
-                }
+    private boolean functionNodeInUse(int functionIndex) {
+        for(LogicNode logicNode : this.logicNodes) {
+            if(logicNode.getNodeType() == NodeType._FUNCTION_NODE
+            && (int)logicNode.getExtraParameters()[0] == functionIndex) {
+                return true;
             }
-        } else {
-            LogicFunction currentFunction = this.findFunction(functionIndex);
-            if(currentFunction.getJointHoveredNodeIndex() != -1 && currentFunction.getJointHoveredJointIndex() != -1) {
-                try {
-                    this.findNode(functionIndex, currentFunction.getJointHoveredNodeIndex()).getInputJoints()[currentFunction.getJointHoveredJointIndex()]
-                            .tryJointConnection(this.findNode(functionIndex, nodeIndex).getOutputJoints()[outputJointIndex]);
-                    currentFunction.getNodeConnections().add(
-                            new NodeConnection(
-                                    new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
-                                    new ThreeCoordinatePoint(functionIndex, currentFunction.getJointHoveredNodeIndex(), currentFunction.getJointHoveredJointIndex())
-                            )
-                    );
-                } catch (JointConnectionFailedException e) {
-                    e.printStackTrace();
+        }
+        for(LogicFunction logicFunction : this.logicFunctions) {
+            for(LogicNode logicNode : logicFunction.getLogicNodes()) {
+                if(logicNode.getNodeType() == NodeType._FUNCTION_NODE
+                        && (int)logicNode.getExtraParameters()[0] == functionIndex) {
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    public void deleteJointConnection(int functionIndex, int nodeIndex, int inputJointIndex) {
-        ArrayList<NodeConnection> connections = (functionIndex == -1 ? this.nodeConnections : this.findFunction(functionIndex).getNodeConnections());
-        int indexToDelete = -1;
-        for(NodeConnection nodeConnection : connections) {
-            if(
-                    (int)nodeConnection.getInputCoordinates().getX() == functionIndex
-                    && (int)nodeConnection.getInputCoordinates().getY() == nodeIndex
-                    && (int)nodeConnection.getInputCoordinates().getZ() == inputJointIndex
-            ) {
-                this.findNode(functionIndex, nodeIndex).getInputJoints()[inputJointIndex].deleteJointConnection();
-                indexToDelete = connections.indexOf(nodeConnection);
+    public void tick(int ms, double[] updatedTrackIntensities) {
+        this.currentSongMs = ms;
+        for(int i = 0; i < updatedTrackIntensities.length; i++) {
+            if(i < this.trackIntensities.size()) {
+                this.trackIntensities.set(i, updatedTrackIntensities[i]);
+            } else {
+                this.trackIntensities.add(updatedTrackIntensities[i]);
             }
         }
-        if(indexToDelete != -1) connections.remove(indexToDelete);
-    }
-    public void deleteNode(int functionIndex, int nodeIndex) throws CannotDeleteNodeException {
-        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
-
-        String stillConnectedMessage = "Node still connected to other Nodes!";
-        for(InputJoint inputJoint : logicNode.getInputJoints()) {
-            if(inputJoint.getConnectedOutputJoint() != null) {
-                throw new CannotDeleteNodeException(stillConnectedMessage);
+        for(ThreeCoordinatePoint trackNodeIndex : this.trackNodeIndexes) {
+            LogicNode currentTrackNode = this.findNode(trackNodeIndex.getX(), trackNodeIndex.getY());
+            if(currentTrackNode != null) {
+                currentTrackNode.onInputChangeEvent();
             }
         }
-        for(OutputJoint outputJoint : logicNode.getOutputJoints()) {
-            if(!outputJoint.getConnectedInputJoints().isEmpty()) {
-                throw new CannotDeleteNodeException(stillConnectedMessage);
-            }
-        }
-
-        if(functionIndex == -1) {
-            this.logicNodes.remove(logicNode);
-        } else {
-            this.findFunction(functionIndex).getLogicNodes().remove(logicNode);
-        }
-    }
-
-    public String getSpecificNodeName(int functionIndex, int nodeIndex) {
-        return this.findNode(functionIndex, nodeIndex).getSpecificName();
     }
 
     public static ArrayList<LogicNode> getCopyOfLogicNodeList(int startIndex, ArrayList<LogicNode> logicNodes) {
@@ -489,22 +478,6 @@ public class NodeControl implements Serializable {
         return copy;
     }
 
-    public void tick(int ms, double[] updatedTrackIntensities) {
-        this.currentSongMs = ms;
-        for(int i = 0; i < updatedTrackIntensities.length; i++) {
-            if(i < this.trackIntensities.size()) {
-                this.trackIntensities.set(i, updatedTrackIntensities[i]);
-            } else {
-                this.trackIntensities.add(updatedTrackIntensities[i]);
-            }
-        }
-        for(ThreeCoordinatePoint trackNodeIndex : this.trackNodeIndexes) {
-            LogicNode currentTrackNode = this.findNode(trackNodeIndex.getX(), trackNodeIndex.getY());
-            if(currentTrackNode != null) {
-                currentTrackNode.onInputChangeEvent();
-            }
-        }
-    }
 
     public NodeSaveUnit createNodeSaveUnit() {
         return new NodeSaveUnit(
@@ -513,5 +486,182 @@ public class NodeControl implements Serializable {
                 this.logicFunctions,
                 this.trackNodeIndexes
         );
+    }
+
+    @Override
+    public void setNodeGraphicUnit(NodeGraphicUnit nodeGraphicUnit) {
+        this.nodeGraphicUnit = nodeGraphicUnit;
+    }
+
+    @Override
+    public void addFunctionGraphicUnit(NodeGraphicUnit nodeGraphicUnit) {
+        this.functionGraphicUnits.add(nodeGraphicUnit);
+    }
+
+    @Override
+    public ArrayList<NodeConnection> getNodeConnections(int functionIndex) {
+        if(functionIndex == -1) {
+            return this.nodeConnections;
+        } else {
+            return this.findFunction(functionIndex).getNodeConnections();
+        }
+    }
+
+    @Override
+    public String[] getInputJointNames(int functionIndex, int nodeIndex) {
+        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
+        String[] outputString = new String[currentNode.getInputJoints().length];
+        for(int i = 0; i < outputString.length; i++) {
+            outputString[i] = currentNode.getInputJoints()[i].getName();
+        }
+        return outputString;
+    }
+
+    @Override
+    public String[] getOutputJointNames(int functionIndex, int nodeIndex) {
+        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
+        String[] outputString = new String[currentNode.getOutputJoints().length];
+        for(int i = 0; i < outputString.length; i++) {
+            outputString[i] = currentNode.getOutputJoints()[i].getName();
+        }
+        return outputString;
+    }
+
+    @Override
+    public SerializableFunction<Integer, Double[][]> getMaskValuesFunctionForNode(int functionIndex, int nodeIndex) {
+        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
+        return logicNode::getMaskValues;
+    }
+
+    @Override
+    public void updateInputJointHovered(int functionIndex, int nodeIndex, int inputJointIndex) {
+        if(functionIndex == -1) {
+            this.jointHoveredNodeIndex = nodeIndex;
+            this.jointHoveredJointIndex = inputJointIndex;
+        } else {
+            this.findFunction(functionIndex).setJointHoveredNodeIndex(nodeIndex);
+            this.findFunction(functionIndex).setJointHoveredJointIndex(inputJointIndex);
+        }
+    }
+
+    @Override
+    public void updateOutputJointReleased(int functionIndex, int nodeIndex, int outputJointIndex) throws FunctionNodeInUseException, JointConnectionFailedException{
+        if(functionIndex == -1) {
+            if(this.jointHoveredNodeIndex != -1 && this.jointHoveredJointIndex != -1) {
+                this.findNode(functionIndex, this.jointHoveredNodeIndex).getInputJoints()[this.jointHoveredJointIndex]
+                        .tryJointConnection(this.findNode(functionIndex, nodeIndex).getOutputJoints()[outputJointIndex]);
+                this.nodeConnections.add(new NodeConnection(
+                        new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
+                        new ThreeCoordinatePoint(functionIndex, this.jointHoveredNodeIndex, this.jointHoveredJointIndex))
+                );
+            }
+        } else {
+            LogicFunction currentFunction = this.findFunction(functionIndex);
+            if(currentFunction.getJointHoveredNodeIndex() != -1 && currentFunction.getJointHoveredJointIndex() != -1) {
+                if(this.functionNodeInUse(functionIndex)) {
+                    throw new FunctionNodeInUseException();
+                }
+                this.findNode(functionIndex, currentFunction.getJointHoveredNodeIndex()).getInputJoints()[currentFunction.getJointHoveredJointIndex()]
+                        .tryJointConnection(this.findNode(functionIndex, nodeIndex).getOutputJoints()[outputJointIndex]);
+                currentFunction.getNodeConnections().add(
+                        new NodeConnection(
+                                new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
+                                new ThreeCoordinatePoint(functionIndex, currentFunction.getJointHoveredNodeIndex(), currentFunction.getJointHoveredJointIndex())
+                        )
+                );
+            }
+        }
+    }
+
+    @Override
+    public void deleteJointConnectionRequest(int functionIndex, int nodeIndex, int inputJointIndex) throws FunctionNodeInUseException {
+        ArrayList<NodeConnection> connections = (functionIndex == -1 ? this.nodeConnections : this.findFunction(functionIndex).getNodeConnections());
+        int indexToDelete = -1;
+        for(NodeConnection nodeConnection : connections) {
+            if(
+                    (int)nodeConnection.getInputCoordinates().getX() == functionIndex
+                            && (int)nodeConnection.getInputCoordinates().getY() == nodeIndex
+                            && (int)nodeConnection.getInputCoordinates().getZ() == inputJointIndex
+            ) {
+                if(functionIndex != -1 && this.functionNodeInUse(functionIndex)) {
+                    throw new FunctionNodeInUseException();
+                }
+                this.findNode(functionIndex, nodeIndex).getInputJoints()[inputJointIndex].deleteJointConnection();
+                indexToDelete = connections.indexOf(nodeConnection);
+            }
+        }
+        if(indexToDelete != -1) connections.remove(indexToDelete);
+    }
+
+    @Override
+    public void deleteNodeRequest(int functionIndex, int nodeIndex) throws CannotDeleteNodeException, FunctionNodeInUseException {
+        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
+
+        String stillConnectedMessage = "Node still connected to other Nodes!";
+        for(InputJoint inputJoint : logicNode.getInputJoints()) {
+            if(inputJoint.getConnectedOutputJoint() != null) {
+                throw new CannotDeleteNodeException(stillConnectedMessage);
+            }
+        }
+        for(OutputJoint outputJoint : logicNode.getOutputJoints()) {
+            if(!outputJoint.getConnectedInputJoints().isEmpty()) {
+                throw new CannotDeleteNodeException(stillConnectedMessage);
+            }
+        }
+
+        if(functionIndex == -1) {
+            this.logicNodes.remove(logicNode);
+        } else {
+            if(this.functionNodeInUse(functionIndex)) {
+                throw new FunctionNodeInUseException();
+            }
+            this.findFunction(functionIndex).getLogicNodes().remove(logicNode);
+        }
+    }
+    @Override
+    public NodeType getNodeType(int functionIndex, int nodeIndex) {
+        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
+        return NodeType.getNodeTypeByTypeClass(currentNode.getClass());
+    }
+    @Override
+    public JointType getJointType(boolean input, int functionIndex, int nodeIndex, int jointIndex) {
+        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
+        JointDataType jointDataType;
+        if(input) {
+            jointDataType = currentNode.getInputJoints()[jointIndex].getJointDataType();
+        } else {
+            jointDataType = currentNode.getOutputJoints()[jointIndex].getJointDataType();
+        }
+        return JointType.getJointTypeByTypeClass(jointDataType.getClass());
+    }
+
+    @Override
+    public int[] getNodeIndexArray(int functionIndex) {
+        ArrayList<LogicNode> logicNodes;
+        if(functionIndex == -1) {
+            logicNodes = this.logicNodes;
+        } else {
+            logicNodes = this.findFunction(functionIndex).getLogicNodes();
+        }
+        int[] nodeIndexArray = new int[logicNodes.size()];
+        for(int i = 0; i < nodeIndexArray.length; i++) {
+            nodeIndexArray[i] = logicNodes.get(i).getNodeIndex();
+        }
+        return nodeIndexArray;
+    }
+    @Override
+    public int[] getNodeIndexesOfFunctionIndex(int functionIndex) {
+        ArrayList<LogicNode> logicNodes = this.findFunction(functionIndex).getLogicNodes();
+        int[] indexes = new int[logicNodes.size()];
+        for(int i = 0; i < indexes.length; i++) {
+            indexes[i] = logicNodes.get(i).getNodeIndex();
+        }
+        return indexes;
+    }
+
+    @Override
+    public String getSpecificNodeName(int functionIndex, int nodeIndex) {
+        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
+        return logicNode == null ? "" : logicNode.getSpecificName();
     }
 }

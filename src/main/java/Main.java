@@ -49,7 +49,7 @@ public class Main {
                         nodeControl.tick(updatedMS, songControl.getTrackIntensitiesAt(updatedMS));
                     }
                 }
-                mainWindow.repaintWindows(songControl);
+                mainWindow.repaintWindows(songControl, nodeControl);
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -75,7 +75,7 @@ public class Main {
 
                         songControl.tick(correctMS);
                         nodeControl.tick(correctMS, songControl.getTrackIntensitiesAt(correctMS));
-                        mainWindow.repaintWindows(songControl);
+                        mainWindow.repaintWindows(songControl, nodeControl);
 
                     } else {
                         currentMs.set((int)System.currentTimeMillis());

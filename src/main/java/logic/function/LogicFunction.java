@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public class LogicFunction extends LogicComponent implements Serializable {
 
     private final int functionIndex;
+    private final String functionName;
     private ArrayList<LogicNode> logicNodes;
     private ArrayList<LogicNode> hiddenCopiedNodes;
     private ArrayList<Integer> inputParameterIndexes, outputParameterIndexes;
@@ -23,17 +24,10 @@ public class LogicFunction extends LogicComponent implements Serializable {
     private ArrayList<NodeConnection> nodeConnections;
     private int jointHoveredNodeIndex, jointHoveredJointIndex;
 
-    /**
-     * @param functionIndex neuer globaler Index, alle Parameter-Nodes werden startend ab dieser Zahl
-     *                      durchnummeriert
-     * @param inputJoints Array von InputJoints, die der Funktion zuerst nur dazu dient, die richtige
-     *                    Anzahl von Parameter-Nodes mit richtigen Datentypen zu erstellen, beim
-     *                    BakeNode-Vorgang jedoch wieder bedeutend werden
-     * @param outputJoints Array von OutputJoints, selbes wie für die InputJoints
-     */
-    public LogicFunction(int functionIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints) {
-        super(inputJoints, outputJoints);
+    public LogicFunction(int functionIndex, String functionName, InputJoint[] inputJoints, OutputJoint[] outputJoints) {
+        super(new InputJoint[0], new OutputJoint[0]);
         this.functionIndex = functionIndex;
+        this.functionName = functionName;
         this.logicNodes = new ArrayList<>();
         this.hiddenCopiedNodes = new ArrayList<>();
 
@@ -44,36 +38,19 @@ public class LogicFunction extends LogicComponent implements Serializable {
         this.jointHoveredNodeIndex = -1;
         this.jointHoveredJointIndex = -1;
 
-        for(int i = 0; i < inputJoints.length; i++) {
-            int finalI = i;
-            this.logicNodes.add(new LogicNode(
-                    finalI,
-                    new InputJoint[0],
-                    new OutputJoint[] { new OutputJoint(inputJoints[i].getJointDataType(), inputJoints[i].getName()) },
-                    "Input Parameter",
-                    NodeType._INPUT_PARAMETER_NODE,
-                    new Object[] {JointType.getJointTypeByTypeClass(inputJoints[i].getJointDataType().getClass())}
-            ) {});
-            this.inputParameterIndexes.add(i);
+        for (InputJoint inputJoint : inputJoints) {
+            this.addInputParameter(inputJoint);
         }
-
-        int logicNodesSize = logicNodes.size();
-        for(int i = 0; i < outputJoints.length; i++) {
-            int finalI = i;
-            this.logicNodes.add(new LogicNode(
-                    finalI + logicNodesSize,
-                    new InputJoint[] { new InputJoint(outputJoints[finalI].getJointDataType(), outputJoints[finalI].getName()) },
-                    new OutputJoint[0],
-                    "Output Parameter",
-                    NodeType._OUTPUT_PARAMETER_NODE,
-                    new Object[] { JointType.getJointTypeByTypeClass(outputJoints[i].getJointDataType().getClass()) }
-            ) {});
-            this.outputParameterIndexes.add(i + logicNodesSize);
+        for (OutputJoint outputJoint : outputJoints) {
+            this.addOutputParameter(outputJoint);
         }
     }
 
     public int getFunctionIndex() {
         return this.functionIndex;
+    }
+    public String getFunctionName() {
+        return this.functionName;
     }
 
     public ArrayList<LogicNode> getLogicNodes() {
@@ -96,7 +73,43 @@ public class LogicFunction extends LogicComponent implements Serializable {
         this.jointHoveredJointIndex = jointHoveredJointIndex;
     }
 
-    public LogicNode bakeNode(int nodeIndex, String functionName) {
+    public void addInputParameter(InputJoint inputJoint) {
+        this.addInputJoint(inputJoint);
+        int nextFreeIndex = this.logicNodes.isEmpty() ? 0 : this.logicNodes.get(this.logicNodes.size() - 1).getNodeIndex() + 1;
+        this.logicNodes.add(new LogicNode(
+                nextFreeIndex,
+                new InputJoint[0],
+                new OutputJoint[] { new OutputJoint(inputJoint.getJointDataType(), inputJoint.getName()) },
+                "Input Parameter",
+                NodeType._INPUT_PARAMETER_NODE,
+                new Object[] {
+                        this.functionIndex,
+                        JointType.getJointTypeByTypeClass(inputJoint.getJointDataType().getClass()),
+                        inputJoint.getName()
+                }
+        ) {});
+        this.inputParameterIndexes.add(this.logicNodes.size() - 1);
+    }
+
+    public void addOutputParameter(OutputJoint outputJoint) {
+        this.addOuptputJoint(outputJoint);
+        int nextFreeIndex = this.logicNodes.isEmpty() ? 0 : this.logicNodes.get(this.logicNodes.size() - 1).getNodeIndex() + 1;
+        this.logicNodes.add(new LogicNode(
+                nextFreeIndex,
+                new InputJoint[] { new InputJoint(outputJoint.getJointDataType(), outputJoint.getName()) },
+                new OutputJoint[0],
+                "Output Parameter",
+                NodeType._OUTPUT_PARAMETER_NODE,
+                new Object[] {
+                        this.functionIndex,
+                        JointType.getJointTypeByTypeClass(outputJoint.getJointDataType().getClass()),
+                        outputJoint.getName()
+                }
+        ) {});
+        this.outputParameterIndexes.add(this.logicNodes.size() - 1);
+    }
+
+    public LogicNode bakeNode(int nodeIndex, int goalIndex) {
 
         //Alle Nodes der Funktion werden kopiert (inklusive der Verbindungen)
         //dabei werden alle neu erstellten Nodes mit neuem Index versehen, startend ab dem Index der zu
@@ -110,13 +123,13 @@ public class LogicFunction extends LogicComponent implements Serializable {
         OutputJoint[] newOutputJoints = NodeControl.getCopyOfOutputJointArray(this.getOutputJoints());
 
 
-        for(int inputParameterIndex : inputParameterIndexes) {
-            int finalI = inputParameterIndex - inputParameterIndexes.get(0);
-            LogicNode oldNode = hiddenNodes.get(inputParameterIndex);
-            hiddenNodes.set(inputParameterIndex, new LogicNode(
+        for(int i = 0; i < this.inputParameterIndexes.size(); i++) {
+            int finalI = i;
+            LogicNode oldNode = hiddenNodes.get(this.inputParameterIndexes.get(i));
+            hiddenNodes.set(this.inputParameterIndexes.get(i), new LogicNode(
                     oldNode.getNodeIndex(),
                     oldNode.getInputJoints(),
-                    new OutputJoint[] { new OutputJoint(newInputJoints[finalI].getJointDataType(), newInputJoints[finalI].getName()) },
+                    new OutputJoint[] { new OutputJoint(newInputJoints[i].getJointDataType(), newInputJoints[i].getName()) },
                     oldNode.getSpecificName(),
                     oldNode.getNodeType(),
                     oldNode.getExtraParameters()
@@ -137,7 +150,7 @@ public class LogicFunction extends LogicComponent implements Serializable {
                 InputJoint connectedInputJoint = oldNode.getOutputJoints()[0].getConnectedInputJoints().get(0);
                 try {
                     connectedInputJoint.deleteJointConnection();
-                    connectedInputJoint.tryJointConnection(hiddenNodes.get(inputParameterIndex).getOutputJoints()[0]);
+                    connectedInputJoint.tryJointConnection(hiddenNodes.get(this.inputParameterIndexes.get(i)).getOutputJoints()[0]);
                 } catch (JointConnectionFailedException e) {
                     e.printStackTrace();
                 }
@@ -145,11 +158,10 @@ public class LogicFunction extends LogicComponent implements Serializable {
         }
 
         for(int i = 0; i < outputParameterIndexes.size(); i++) {
-            int finalI = outputParameterIndexes.get(i) - outputParameterIndexes.get(0);
             LogicNode oldNode = hiddenNodes.get(outputParameterIndexes.get(i));
             hiddenNodes.set(outputParameterIndexes.get(i), new LogicNode(
                     oldNode.getNodeIndex(),
-                    new InputJoint[] { new InputJoint(newOutputJoints[finalI].getJointDataType(), newOutputJoints[finalI].getName()) },
+                    new InputJoint[] { new InputJoint(newOutputJoints[i].getJointDataType(), newOutputJoints[i].getName()) },
                     oldNode.getOutputJoints(),
                     oldNode.getSpecificName(),
                     oldNode.getNodeType(),
@@ -168,15 +180,15 @@ public class LogicFunction extends LogicComponent implements Serializable {
                 nodeIndex,
                 newInputJoints,
                 newOutputJoints,
-                "Function: " + functionName,
+                "Function: " + this.functionName,
                 NodeType._FUNCTION_NODE,
-                new Object[] { functionIndex }
+                new Object[] { functionIndex, goalIndex }
         ) {
 
             @Override
             public JointDataType[] function(InputJoint[] inputJoints) {
 
-                for (int inputParameterIndex : inputParameterIndexes) {
+                for(Integer inputParameterIndex : inputParameterIndexes) {
                     hiddenNodes.get(inputParameterIndex).onInputChangeEvent();
                 }
 

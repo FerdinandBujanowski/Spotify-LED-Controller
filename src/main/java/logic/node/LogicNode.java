@@ -12,7 +12,7 @@ import java.util.Objects;
 public abstract class LogicNode extends LogicComponent {
 
     private final int nodeIndex;
-    private String specificName;
+    private final String specificName;
 
     private NodeType nodeType;
     Object[] extraParameters;

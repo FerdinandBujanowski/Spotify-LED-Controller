@@ -1,12 +1,17 @@
 package gui.main_panels;
 
 import control.SerializableFunction;
+import control.exceptions.FunctionNodeInUseException;
+import control.exceptions.JointConnectionFailedException;
+import control.node.NodeRequestAcceptor;
 import control.node.ThreeCoordinatePoint;
 import control.exceptions.CannotDeleteNodeException;
 import control.node.NodeConnection;
 import control.node.NodeControl;
+import control.type_enums.JointType;
 import control.type_enums.NodeType;
 import control.math_functions.MathFunctions;
+import gui.main_panels.node_panel.NodeGraphicUnit;
 import gui.node_components.GraphicJoint;
 import gui.node_components.GraphicNode;
 import gui.node_components.MaskPanel;
@@ -20,9 +25,9 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-public abstract class ParentNodePanel extends JPanel implements Serializable {
+public abstract class ParentNodePanel extends JPanel implements Serializable, NodeGraphicUnit {
 
-    private NodeControl nodeControl;
+    private NodeRequestAcceptor nodeControl;
     private ArrayList<GraphicNode> graphicNodes;
     private Point windowLocation;
     private int functionIndex;
@@ -34,10 +39,11 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
     private JButton zoomOutButton, zoomInButton;
     private JLabel zoomLabel;
 
-    public ParentNodePanel(NodeControl nodeControl, int functionIndex, Color backgroundColor) {
+    public ParentNodePanel(NodeRequestAcceptor nodeControl, int functionIndex, Color backgroundColor) {
         super(null);
 
         this.nodeControl = nodeControl;
+
         this.functionIndex = functionIndex;
         this.graphicNodes = new ArrayList<>();
         this.windowLocation = new Point();
@@ -104,38 +110,6 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         });
     }
 
-    public void setNodeControl(NodeControl nodeControl) {
-        this.nodeControl = nodeControl;
-    }
-
-    public void addLogicNodeToNodeControl(NodeType nodeType, int x, int y, Object[] extraParameters) {
-        int nextFreeIndex = this.getNodeControl().getNextFreeNodeIndex(this.functionIndex);
-        this.getNodeControl().addNode(this.functionIndex, nodeType, nextFreeIndex, extraParameters);
-
-        this.addGraphicNode(this.functionIndex, nextFreeIndex, nodeType, nodeType.getName(), x, y);
-    }
-
-    public void addFunctionNode(int functionIndexOrigin, String functionName, int x, int y) {
-        int nextFreeIndex = this.getNodeControl().getNextFreeNodeIndex(this.functionIndex);
-        this.getNodeControl().addFunctionNode(functionIndexOrigin, this.getFunctionIndex(), nextFreeIndex, functionName);
-
-        this.addGraphicNode(this.functionIndex, nextFreeIndex, null, this.nodeControl.getSpecificNodeName(this.functionIndex, nextFreeIndex), x, y);
-    }
-
-    public void addTrackNode(int trackIndex, String trackName, int x, int y) {
-        int nextFreeIndex = this.getNodeControl().getNextFreeNodeIndex(this.functionIndex);
-        this.getNodeControl().addTrackNode(trackIndex, nextFreeIndex, trackName);
-
-        this.addGraphicNode(this.functionIndex, nextFreeIndex, null, trackName, x, y);
-    }
-
-    public void addLayerNode(SerializableFunction<Object, Integer> setMaskFunction, SerializableFunction<Color, Integer> setColorFunction, String layerName, int x, int y) {
-        int nextFreeIndex = this.getNodeControl().getNextFreeNodeIndex(this.functionIndex);
-        this.getNodeControl().addLayerNode(nextFreeIndex, setMaskFunction, setColorFunction, layerName);
-
-        this.addGraphicNode(this.functionIndex, nextFreeIndex, null, layerName, x, y);
-    }
-
     public void updateGraphicNodes(Point[] positions) {
         int[] nodeIndexArray = nodeControl.getNodeIndexArray(this.functionIndex);
         for(int i = 0; i < nodeIndexArray.length; i++) {
@@ -149,7 +123,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
                 } else {
                     nodeName = nodeType.getName();
                 }
-                this.addGraphicNode(this.functionIndex, nodeIndex, nodeType, nodeName, position.x, position.y);
+                this.addGraphicNode(this.functionIndex, nodeIndex, nodeType, nodeName);
             }
         }
     }
@@ -171,7 +145,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         }
     }
 
-    public NodeControl getNodeControl() {
+    public NodeRequestAcceptor getNodeControl() {
         return this.nodeControl;
     }
 
@@ -183,9 +157,6 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         return this.graphicNodes;
     }
 
-    public Color getJointTypeColor(boolean input, int nodeIndex, int jointIndex) {
-        return null;
-    }
 
     @Override
     public void paintComponent(Graphics g) {
@@ -301,7 +272,40 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         return null;
     }
 
-    public void addGraphicNode(int functionIndex, int nodeIndex, NodeType nodeType, String nodeName, int x, int y) {
+
+    public void onOutputNodeReleased(int nodeIndex, int outputJointIndex) throws FunctionNodeInUseException, JointConnectionFailedException {
+        this.getNodeControl().updateOutputJointReleased(this.functionIndex, nodeIndex, outputJointIndex);
+    }
+
+    public void onInputNodeHovered(int nodeIndex, int inputJointIndex) {
+        this.getNodeControl().updateInputJointHovered(this.functionIndex, nodeIndex, inputJointIndex);
+    }
+
+    public void onInputConnectionDelete(int nodeIndex, int inputJointIndex) throws FunctionNodeInUseException {
+        this.getNodeControl().deleteJointConnectionRequest(this.functionIndex, nodeIndex, inputJointIndex);
+        this.repaint();
+    }
+
+    public void onNodeDelete(int nodeIndex) throws CannotDeleteNodeException, FunctionNodeInUseException {
+        this.getNodeControl().deleteNodeRequest(this.functionIndex, nodeIndex);
+        GraphicNode graphicNode = this.findGraphicNode(this.functionIndex, nodeIndex);
+        this.graphicNodes.remove(graphicNode);
+
+        this.remove(graphicNode);
+        for(GraphicJoint inputJoint : graphicNode.getGraphicInputJoints()) {
+            this.remove(inputJoint);
+        }
+        for(GraphicJoint outputJoint : graphicNode.getGraphicOutputJoints()) {
+            this.remove(outputJoint);
+        }
+        if(graphicNode.getMaskPanel() != null) {
+            this.remove(graphicNode.getMaskPanel());
+        }
+        this.repaint();
+    }
+
+    @Override
+    public void addGraphicNode(int functionIndex, int nodeIndex, NodeType nodeType, String nodeName) {
 
         String[] inputJointNames = this.getNodeControl().getInputJointNames(functionIndex, nodeIndex);
         String[] outputJointNames = this.getNodeControl().getOutputJointNames(functionIndex, nodeIndex);
@@ -320,40 +324,18 @@ public abstract class ParentNodePanel extends JPanel implements Serializable {
         );
         this.add(newGraphicNode);
         newGraphicNode.setTotalSize(this.zoomFactor);
-        newGraphicNode.setTotalLocation(x, y, this.zoomFactor);
+        newGraphicNode.setTotalLocation(10, 10, this.zoomFactor);
 
         this.graphicNodes.add(newGraphicNode);
         this.repaint();
     }
-
-    public void onOutputNodeReleased(int nodeIndex, int outputJointIndex) {
-        this.getNodeControl().updateOutputJointReleased(this.functionIndex, nodeIndex, outputJointIndex);
-    }
-
-    public void onInputNodeHovered(int nodeIndex, int inputJointIndex) {
-        this.getNodeControl().updateInputJointHovered(this.functionIndex, nodeIndex, inputJointIndex);
-    }
-
-    public void onInputConnectionDelete(int nodeIndex, int inputJointIndex) {
-        this.getNodeControl().deleteJointConnection(this.functionIndex, nodeIndex, inputJointIndex);
-        this.repaint();
-    }
-
-    public void onNodeDelete(int nodeIndex) throws CannotDeleteNodeException {
-        this.getNodeControl().deleteNode(this.functionIndex, nodeIndex);
-        GraphicNode graphicNode = this.findGraphicNode(this.functionIndex, nodeIndex);
-        this.graphicNodes.remove(graphicNode);
-
-        this.remove(graphicNode);
-        for(GraphicJoint inputJoint : graphicNode.getGraphicInputJoints()) {
-            this.remove(inputJoint);
+    
+    public Color getJointTypeColor(boolean input, int nodeIndex, int jointIndex) {
+        JointType jointType = this.getNodeControl().getJointType(input, this.functionIndex, nodeIndex, jointIndex);
+        if(jointType == null) {
+            return Color.WHITE;
+        } else {
+            return jointType.getColor();
         }
-        for(GraphicJoint outputJoint : graphicNode.getGraphicOutputJoints()) {
-            this.remove(outputJoint);
-        }
-        if(graphicNode.getMaskPanel() != null) {
-            this.remove(graphicNode.getMaskPanel());
-        }
-        this.repaint();
     }
 }

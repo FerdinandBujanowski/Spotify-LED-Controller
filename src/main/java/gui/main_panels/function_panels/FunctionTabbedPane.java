@@ -22,14 +22,6 @@ public class FunctionTabbedPane extends JTabbedPane {
         return this.functionEditWindows;
     }
 
-    public void setNodeControl(NodeControl nodeControl) {
-        this.nodeControl = nodeControl;
-        for(FunctionEditWindow functionEditWindow : this.functionEditWindows) {
-            functionEditWindow.setNodeControl(nodeControl);
-        }
-
-    }
-
     public int addPanel(String panelName) {
         int functionIndex = this.nodeControl.getNextFreeFunctionIndex();
         FunctionEditWindow newFunctionEditWindow = new FunctionEditWindow(this.nodeControl, functionIndex);
@@ -39,8 +31,8 @@ public class FunctionTabbedPane extends JTabbedPane {
         return functionIndex;
     }
 
-    public void onFunctionCreated(int panelIndex, String[] inputNames, JointType[] inputTypes, String[] outputNames, JointType[] outputTypes) {
-        this.functionEditWindows.get(panelIndex).addFunction(inputNames, inputTypes, outputNames, outputTypes);
+    public void onFunctionCreated(int panelIndex, String functionName, String[] inputNames, JointType[] inputTypes, String[] outputNames, JointType[] outputTypes) {
+        this.nodeControl.addFunction(panelIndex, functionName, inputNames, inputTypes, outputNames, outputTypes);
     }
 
     public void updateFunctions(Point[][] functionEditGraphicNodePositions) {

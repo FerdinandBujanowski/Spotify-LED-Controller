@@ -4,27 +4,23 @@ import java.awt.*;
 
 public enum InputDialogType {
 
-    JOINT_TYPE_INPUT("Please enter Joint Type", JointType.class),
-    NUMBER_TYPE_INPUT("Please enter number", Double.class),
-    INTEGER_TYPE_INPUT("Please enter integer", Integer.class),
-    UNIT_NUMBER_TYPE_INPUT("Please enter unit number", Double.class),
-    COLOR_TYPE_INPUT("Please pick color", Color.class),
-    ROUND_PIXEL_INPUT("Please select rounding algorithm", PixelAlgorithmType.class),
-    ROUND_INPUT("Please select rounding algorithm", RoundAlgorithmType.class);
+    JOINT_TYPE_INPUT("Please enter Joint Type"),
+    NUMBER_TYPE_INPUT("Please enter number"),
+    INTEGER_TYPE_INPUT("Please enter integer"),
+    UNIT_NUMBER_TYPE_INPUT("Please enter unit number"),
+    STRING_TYPE_INPUT("Please enter string"),
+    COLOR_TYPE_INPUT("Please pick color"),
+    ROUND_PIXEL_INPUT("Please select rounding algorithm"),
+    ROUND_INPUT("Please select rounding algorithm");
 
     private final String message;
-    private final Class inputClass;
 
-    InputDialogType(String message, Class inputClass) {
+    InputDialogType(String message) {
         this.message = message;
-        this.inputClass = inputClass;
     }
 
     public String getMessage() {
         return this.message;
-    }
-    public Class getInputClass() {
-        return this.inputClass;
     }
 
     public static String valueToString(InputDialogType inputDialogType, Object value) {

@@ -33,6 +33,7 @@ public abstract class JsonWriter {
         for(LogicFunction logicFunction : nodeSaveUnit.getLogicFunctions()) {
             JsonObject functionObject = new JsonObject();
             functionObject.addProperty("function_index", logicFunction.getFunctionIndex());
+            functionObject.addProperty("function_name", logicFunction.getFunctionName());
 
             JsonArray functionNodesArray = new JsonArray();
             for(LogicNode logicNode : logicFunction.getLogicNodes()) {

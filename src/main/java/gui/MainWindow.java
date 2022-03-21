@@ -125,7 +125,7 @@ public class MainWindow extends JFrame {
                 songControl.onAddTrackRequest();
                 if(trackCount < songControl.getTrackCount()) {
                     String trackName = "Track " + songControl.getTrackCount();
-                    JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, trackCount, songControl);
+                    JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, trackCount, nodeControl);
                     createTrackNodeMenu.add(newTrackNodeItem);
                 }
             }
@@ -143,8 +143,7 @@ public class MainWindow extends JFrame {
             }
         }
         JMenu[] subMenus = new JMenu[nodeCategories.size()];
-        //TODO : "Commands" wird noch rausgelassen, da noch nicht funktioniert
-        for(int i = 0; i < subMenus.length - 1; i++) {
+        for(int i = 0; i < subMenus.length; i++) {
             subMenus[i] = new JMenu(nodeCategories.get(i));
             this.nodeMenu.add(subMenus[i]);
         }
@@ -161,7 +160,7 @@ public class MainWindow extends JFrame {
                     for(int i = 0; i < inputDialogTypes.length; i++) {
                         switch(inputDialogTypes[i]) {
                             case JOINT_TYPE_INPUT -> {
-                                JComboBox jointTypeComboBox = new JComboBox(JointType.values());
+                                JComboBox jointTypeComboBox = new JComboBox(JointType.getNames());
                                 JOptionPane.showOptionDialog(
                                         null, jointTypeComboBox, inputDialogTypes[i].getMessage(),
                                         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
@@ -215,6 +214,10 @@ public class MainWindow extends JFrame {
 
                                 extraParameters[i] = value;
                             }
+                            case STRING_TYPE_INPUT -> {
+                                String name = JOptionPane.showInputDialog("Enter name");
+                                extraParameters[i] = name;
+                            }
                             case ROUND_PIXEL_INPUT -> {
                                 JComboBox algorithmComboBox = new JComboBox(PixelAlgorithmType.values());
                                 JOptionPane.showOptionDialog(
@@ -234,15 +237,13 @@ public class MainWindow extends JFrame {
                         }
                     }
                     if(tabbedPane.getSelectedComponent() == nodeEditWindow) {
-                        nodeEditWindow.addLogicNodeToNodeControl(nodeType, 10, 10, extraParameters);
+                        nodeControl.addNode(-1, nodeType, extraParameters);
                     } else if(tabbedPane.getSelectedComponent() == functionTabbedPane) {
-                        functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).addLogicNodeToNodeControl(nodeType, 10, 10, extraParameters);
+                        nodeControl.addNode(functionTabbedPane.getSelectedIndex(), nodeType, extraParameters);
                     }
                 }
             });
-            if(nodeType.toString().charAt(0) != '_') {
-                subMenus[nodeCategories.indexOf(currentCategory)].add(currentNodeMenuItem);
-            }
+            subMenus[nodeCategories.indexOf(currentCategory)].add(currentNodeMenuItem);
         }
         jMenuBar.add(this.nodeMenu);
         this.nodeMenu.setEnabled(false);
@@ -287,7 +288,7 @@ public class MainWindow extends JFrame {
                     }
 
                     int newPanelIndex = functionTabbedPane.addPanel(functionName);
-                    functionTabbedPane.onFunctionCreated(newPanelIndex, inputNames, inputTypes, outputNames, outputTypes);
+                    functionTabbedPane.onFunctionCreated(newPanelIndex, functionName, inputNames, inputTypes, outputNames, outputTypes);
                     tabbedPane.setSelectedComponent(functionTabbedPane);
                     functionTabbedPane.setSelectedIndex(functionTabbedPane.getTabCount() - 1);
                     JMenuItem addNewFunctionItem = new JMenuItem(functionName);
@@ -298,10 +299,10 @@ public class MainWindow extends JFrame {
                         public void actionPerformed(ActionEvent e) {
                             int currentFunctionIndex = functionItemList.indexOf(addNewFunctionItem);
                             if(tabbedPane.getSelectedIndex() == 2) {
-                                nodeEditWindow.addFunctionNode(currentFunctionIndex, functionName, 10, 10);
+                                nodeControl.addFunctionNode(currentFunctionIndex, -1);
                             } else if(tabbedPane.getSelectedIndex() == 3) {
                                 int selectedFunctionIndex = functionTabbedPane.getSelectedIndex();
-                                functionTabbedPane.getFunctionEditWindows().get(selectedFunctionIndex).addFunctionNode(currentFunctionIndex, functionName, 10, 10);
+                                nodeControl.addFunctionNode(currentFunctionIndex, selectedFunctionIndex);
                             }
                         }
                     });
@@ -321,11 +322,10 @@ public class MainWindow extends JFrame {
                 int currentLayerCount = ledControl.getLayerCount();
                 ledControl.onAddLayerRequest();
                 if(currentLayerCount < ledControl.getLayerCount()) {
-                    nodeEditWindow.addLayerNode(
+                    nodeControl.addLayerNode(
                             ledControl.getUpdateMaskFunctionForLayer(currentLayerCount),
                             ledControl.getUpdateColorFunctionForLayer(currentLayerCount),
-                            "Layer " + (currentLayerCount + 1),
-                            0, 0
+                            "Layer " + (currentLayerCount + 1)
                     );
                 }
             }
@@ -489,18 +489,14 @@ public class MainWindow extends JFrame {
         this.enableTabs();
     }
 
-    private JMenuItem createTrackToNodeItem(String trackName, int trackIndex, SongControl songControl) {
+    private JMenuItem createTrackToNodeItem(String trackName, int trackIndex, NodeControl nodeControl) {
         JMenuItem trackToNodeItem = new JMenuItem(trackName);
         trackToNodeItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO : Track Node wird "gebacken"
                 if(tabbedPane.getSelectedComponent() == nodeEditWindow) {
-                    nodeEditWindow.addTrackNode(
-                            trackIndex,
-                            trackName,
-                            0, 0
-                    );
+                    nodeControl.addTrackNode(trackIndex);
                 } else if(tabbedPane.getSelectedComponent() == functionTabbedPane) {
                     JOptionPane.showMessageDialog(
                             null,
@@ -579,7 +575,7 @@ public class MainWindow extends JFrame {
         };
     }
 
-    public void repaintWindows(SongControl songControl) {
+    public void repaintWindows(SongControl songControl, NodeControl nodeControl) {
         if(this.spotifyPlayerPanel != null) this.spotifyPlayerPanel.repaint();
         if(this.eventEditWindow != null) this.eventEditWindow.repaint();
         if(this.nodeEditWindow != null) this.nodeEditWindow.repaint();
@@ -591,7 +587,7 @@ public class MainWindow extends JFrame {
             }
             for(int i = 0; i < songControl.getTrackCount(); i++) {
                 String trackName = "Track " + (i + 1);
-                JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, i, songControl);
+                JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, i, nodeControl);
                 this.createTrackNodeMenu.add(newTrackNodeItem);
             }
         }

@@ -1,5 +1,7 @@
 package gui.node_components;
 
+import control.exceptions.FunctionNodeInUseException;
+import control.exceptions.JointConnectionFailedException;
 import control.node.NodeControl;
 import control.exceptions.CannotDeleteNodeException;
 import gui.main_panels.ParentNodePanel;
@@ -95,7 +97,11 @@ public class GraphicNode extends JPanel {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if(e.getClickCount() >= 2) {
-                        parentNodePanel.onInputConnectionDelete(indexes.y, currentNumber);
+                        try {
+                            parentNodePanel.onInputConnectionDelete(indexes.y, currentNumber);
+                        } catch (FunctionNodeInUseException ex) {
+                            JOptionPane.showMessageDialog(parentNodePanel, ex.getMessage(), "Connection delete failed!", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
                 @Override
@@ -122,7 +128,11 @@ public class GraphicNode extends JPanel {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     //System.out.println("Output Joint " + currentNumber + " released.");
-                    parentNodePanel.onOutputNodeReleased(indexes.y, currentNumber);
+                    try {
+                        parentNodePanel.onOutputNodeReleased(indexes.y, currentNumber);
+                    } catch (FunctionNodeInUseException | JointConnectionFailedException ex) {
+                        JOptionPane.showMessageDialog(parentNodePanel, ex.getMessage(), "Connection failed!", JOptionPane.ERROR_MESSAGE);
+                    }
                     parentNodePanel.repaint();
                 }
             });
@@ -156,7 +166,7 @@ public class GraphicNode extends JPanel {
                         public void actionPerformed(ActionEvent e) {
                             try {
                                 parentNodePanel.onNodeDelete(indexes.y);
-                            } catch (CannotDeleteNodeException ex) {
+                            } catch (CannotDeleteNodeException | FunctionNodeInUseException ex) {
                                 JOptionPane.showMessageDialog(parentNodePanel, ex.getMessage(), "Delete failed!", JOptionPane.ERROR_MESSAGE);
                             }
                         }

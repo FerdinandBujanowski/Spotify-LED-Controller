@@ -1,0 +1,111 @@
+    public ArrayList<NodeConnection> getNodeConnections(int functionIndex) {
+        if(functionIndex == -1) {
+            return this.nodeConnections;
+        } else {
+            return this.findFunction(functionIndex).getNodeConnections();
+        }
+    }
+
+    public String[] getInputJointNames(int functionIndex, int nodeIndex) {
+        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
+        String[] outputString = new String[currentNode.getInputJoints().length];
+        for(int i = 0; i < outputString.length; i++) {
+            outputString[i] = currentNode.getInputJoints()[i].getName();
+        }
+        return outputString;
+    }
+    public String[] getOutputJointNames(int functionIndex, int nodeIndex) {
+        LogicNode currentNode = this.findNode(functionIndex, nodeIndex);
+        String[] outputString = new String[currentNode.getOutputJoints().length];
+        for(int i = 0; i < outputString.length; i++) {
+            outputString[i] = currentNode.getOutputJoints()[i].getName();
+        }
+        return outputString;
+    }
+
+    public SerializableFunction<Integer, Double[][]> getMaskValuesFunctionForNode(int functionIndex, int nodeIndex) {
+        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
+        return logicNode::getMaskValues;
+    }
+
+    public void updateInputJointHovered(int functionIndex, int nodeIndex, int inputJointIndex) {
+        if(functionIndex == -1) {
+            this.jointHoveredNodeIndex = nodeIndex;
+            this.jointHoveredJointIndex = inputJointIndex;
+        } else {
+            this.findFunction(functionIndex).setJointHoveredNodeIndex(nodeIndex);
+            this.findFunction(functionIndex).setJointHoveredJointIndex(inputJointIndex);
+        }
+    }
+
+    public void updateOutputJointReleased(int functionIndex, int nodeIndex, int outputJointIndex) throws FunctionNodeInUseException, JointConnectionFailedException {
+        if(functionIndex == -1) {
+            if(this.jointHoveredNodeIndex != -1 && this.jointHoveredJointIndex != -1) {
+                this.findNode(functionIndex, this.jointHoveredNodeIndex).getInputJoints()[this.jointHoveredJointIndex]
+                        .tryJointConnection(this.findNode(functionIndex, nodeIndex).getOutputJoints()[outputJointIndex]);
+                this.nodeConnections.add(new NodeConnection(
+                        new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
+                        new ThreeCoordinatePoint(functionIndex, this.jointHoveredNodeIndex, this.jointHoveredJointIndex))
+                );
+            }
+        } else {
+            LogicFunction currentFunction = this.findFunction(functionIndex);
+            if(currentFunction.getJointHoveredNodeIndex() != -1 && currentFunction.getJointHoveredJointIndex() != -1) {
+                if(this.functionNodeInUse(functionIndex)) {
+                    throw new FunctionNodeInUseException();
+                }
+                this.findNode(functionIndex, currentFunction.getJointHoveredNodeIndex()).getInputJoints()[currentFunction.getJointHoveredJointIndex()]
+                        .tryJointConnection(this.findNode(functionIndex, nodeIndex).getOutputJoints()[outputJointIndex]);
+                currentFunction.getNodeConnections().add(
+                        new NodeConnection(
+                                new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
+                                new ThreeCoordinatePoint(functionIndex, currentFunction.getJointHoveredNodeIndex(), currentFunction.getJointHoveredJointIndex())
+                        )
+                );
+            }
+        }
+    }
+
+    public void deleteJointConnection(int functionIndex, int nodeIndex, int inputJointIndex) throws FunctionNodeInUseException {
+        ArrayList<NodeConnection> connections = (functionIndex == -1 ? this.nodeConnections : this.findFunction(functionIndex).getNodeConnections());
+        int indexToDelete = -1;
+        for(NodeConnection nodeConnection : connections) {
+            if(
+                    (int)nodeConnection.getInputCoordinates().getX() == functionIndex
+                    && (int)nodeConnection.getInputCoordinates().getY() == nodeIndex
+                    && (int)nodeConnection.getInputCoordinates().getZ() == inputJointIndex
+            ) {
+                if(functionIndex != -1 && this.functionNodeInUse(functionIndex)) {
+                    throw new FunctionNodeInUseException();
+                }
+                this.findNode(functionIndex, nodeIndex).getInputJoints()[inputJointIndex].deleteJointConnection();
+                indexToDelete = connections.indexOf(nodeConnection);
+            }
+        }
+        if(indexToDelete != -1) connections.remove(indexToDelete);
+    }
+
+    public void deleteNode(int functionIndex, int nodeIndex) throws CannotDeleteNodeException, FunctionNodeInUseException {
+        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
+
+        String stillConnectedMessage = "Node still connected to other Nodes!";
+        for(InputJoint inputJoint : logicNode.getInputJoints()) {
+            if(inputJoint.getConnectedOutputJoint() != null) {
+                throw new CannotDeleteNodeException(stillConnectedMessage);
+            }
+        }
+        for(OutputJoint outputJoint : logicNode.getOutputJoints()) {
+            if(!outputJoint.getConnectedInputJoints().isEmpty()) {
+                throw new CannotDeleteNodeException(stillConnectedMessage);
+            }
+        }
+
+        if(functionIndex == -1) {
+            this.logicNodes.remove(logicNode);
+        } else {
+            if(this.functionNodeInUse(functionIndex)) {
+                throw new FunctionNodeInUseException();
+            }
+            this.findFunction(functionIndex).getLogicNodes().remove(logicNode);
+        }
+    }

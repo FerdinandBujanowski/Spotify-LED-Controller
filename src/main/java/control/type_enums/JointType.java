@@ -27,9 +27,9 @@ public enum JointType {
     COLOR_TYPE(new Color(248, 163, 90), ColorJointDataType.class, "Color"),
     MASK_TYPE(new Color(255, 255, 255), MaskJointDataType.class, "Mask");
 
-    private Color color;
-    private Class typeClass;
-    String name;
+    private final Color color;
+    private final Class typeClass;
+    private final String name;
 
     JointType(Color color, Class typeClass, String name) {
         this.color = color;
@@ -40,9 +40,11 @@ public enum JointType {
     public Color getColor() {
         return this.color;
     }
-
     public Class getTypeClass() {
         return this.typeClass;
+    }
+    public String getName() {
+        return this.name;
     }
 
     public static JointType getJointTypeByTypeClass(Class typeClass) {
@@ -66,7 +68,11 @@ public enum JointType {
         return jointDataType;
     }
 
-    public String getName() {
-        return this.name;
+    public static String[] getNames() {
+        String[] names = new String[JointType.values().length];
+        for(int i = 0; i < names.length; i++) {
+            names[i] = JointType.values()[i].getName();
+        }
+        return names;
     }
 }
