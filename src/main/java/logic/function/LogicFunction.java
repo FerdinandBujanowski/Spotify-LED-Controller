@@ -3,6 +3,7 @@ package logic.function;
 import control.node.NodeConnection;
 import control.node.NodeControl;
 import control.exceptions.JointConnectionFailedException;
+import control.node.ThreeCoordinatePoint;
 import control.type_enums.JointType;
 import control.type_enums.NodeType;
 import logic.LogicComponent;
@@ -150,7 +151,8 @@ public class LogicFunction extends LogicComponent implements Serializable {
                 InputJoint connectedInputJoint = oldNode.getOutputJoints()[0].getConnectedInputJoints().get(0);
                 try {
                     connectedInputJoint.deleteJointConnection();
-                    connectedInputJoint.tryJointConnection(hiddenNodes.get(this.inputParameterIndexes.get(i)).getOutputJoints()[0]);
+                    NodeConnection nodeConnection = new NodeConnection(new ThreeCoordinatePoint(0, 0, 0), new ThreeCoordinatePoint(0, 0, 0));
+                    connectedInputJoint.tryJointConnection(hiddenNodes.get(this.inputParameterIndexes.get(i)).getOutputJoints()[0], nodeConnection);
                 } catch (JointConnectionFailedException e) {
                     e.printStackTrace();
                 }
@@ -168,7 +170,8 @@ public class LogicFunction extends LogicComponent implements Serializable {
                     oldNode.getExtraParameters()
             ) {});
             try {
-                hiddenNodes.get(outputParameterIndexes.get(i)).getInputJoints()[0].tryJointConnection(oldNode.getInputJoints()[0].getConnectedOutputJoint());
+                NodeConnection nodeConnection = new NodeConnection(new ThreeCoordinatePoint(0, 0, 0), new ThreeCoordinatePoint(0, 0, 0));
+                hiddenNodes.get(outputParameterIndexes.get(i)).getInputJoints()[0].tryJointConnection(oldNode.getInputJoints()[0].getConnectedOutputJoint(), nodeConnection);
             } catch (JointConnectionFailedException e) {
                 e.printStackTrace();
             }

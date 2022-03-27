@@ -1,6 +1,8 @@
 package logic.node.joint;
 
 import control.exceptions.JointConnectionFailedException;
+import control.node.NodeConnection;
+import control.node.ThreeCoordinatePoint;
 import logic.node.LogicNode;
 import logic.node.joint.joint_types.JointDataType;
 
@@ -29,7 +31,7 @@ public class InputJoint implements Serializable {
         this.index = index;
     }
 
-    public void tryJointConnection(OutputJoint outputJoint) throws JointConnectionFailedException {
+    public void tryJointConnection(OutputJoint outputJoint, NodeConnection nodeConnection) throws JointConnectionFailedException {
         if(
                 this.jointDataType.getClass() == outputJoint.getJointDataType().getClass()
                 && this.connectedOutputJoint == null
@@ -40,11 +42,11 @@ public class InputJoint implements Serializable {
             this.connectedOutputJoint.getParentNode().onInputChangeEvent();
         } else {
             if(this.jointDataType.getClass() != outputJoint.getJointDataType().getClass()) {
-                throw new JointConnectionFailedException("Joint Connection failed! Joint data types don't match!");
+                throw new JointConnectionFailedException("Joint Connection failed! Joint data types don't match!", nodeConnection);
             } else if(this.connectedOutputJoint != null) {
-                throw new JointConnectionFailedException("Joint Connection failed! Input joint already connected!");
+                throw new JointConnectionFailedException("Joint Connection failed! Input joint already connected!", nodeConnection);
             } else {
-                throw new JointConnectionFailedException("Input Joint and Output Joint belong to the same Node!");
+                throw new JointConnectionFailedException("Input Joint and Output Joint belong to the same Node!", nodeConnection);
             }
         }
     }

@@ -421,7 +421,7 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
 
             try {
                 outputList.get(inputCoordinates.getY()).getInputJoints()[inputCoordinates.getZ()]
-                        .tryJointConnection(outputList.get(outputCoordinates.getY()).getOutputJoints()[outputCoordinates.getZ()]);
+                        .tryJointConnection(outputList.get(outputCoordinates.getY()).getOutputJoints()[outputCoordinates.getZ()], connection);
             } catch (JointConnectionFailedException e) {
                 e.printStackTrace();
             }
@@ -463,6 +463,19 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
                 this.logicFunctions,
                 this.trackNodeIndexes
         );
+    }
+
+    public void makeNodeConnection(NodeConnection nodeConnection) throws JointConnectionFailedException {
+        ThreeCoordinatePoint output = nodeConnection.getOutputCoordinates();
+        ThreeCoordinatePoint input = nodeConnection.getInputCoordinates();
+
+        this.findNode(input.getX(), input.getY()).getInputJoints()[input.getZ()]
+                .tryJointConnection(this.findNode(output.getX(), output.getY()).getOutputJoints()[output.getZ()], nodeConnection);
+        if(input.getX() == -1) {
+            this.nodeConnections.add(nodeConnection);
+        } else {
+            this.findFunction(input.getX()).getNodeConnections().add(nodeConnection);
+        }
     }
 
     @Override
@@ -525,12 +538,10 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
     public void updateOutputJointReleased(int functionIndex, int nodeIndex, int outputJointIndex) throws FunctionNodeInUseException, JointConnectionFailedException{
         if(functionIndex == -1) {
             if(this.jointHoveredNodeIndex != -1 && this.jointHoveredJointIndex != -1) {
-                this.findNode(functionIndex, this.jointHoveredNodeIndex).getInputJoints()[this.jointHoveredJointIndex]
-                        .tryJointConnection(this.findNode(functionIndex, nodeIndex).getOutputJoints()[outputJointIndex]);
-                this.nodeConnections.add(new NodeConnection(
+                this.makeNodeConnection(new NodeConnection(
                         new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
-                        new ThreeCoordinatePoint(functionIndex, this.jointHoveredNodeIndex, this.jointHoveredJointIndex))
-                );
+                        new ThreeCoordinatePoint(functionIndex, this.jointHoveredNodeIndex, this.jointHoveredJointIndex)
+                ));
             }
         } else {
             LogicFunction currentFunction = this.findFunction(functionIndex);
@@ -538,14 +549,10 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
                 if(this.functionNodeInUse(functionIndex)) {
                     throw new FunctionNodeInUseException();
                 }
-                this.findNode(functionIndex, currentFunction.getJointHoveredNodeIndex()).getInputJoints()[currentFunction.getJointHoveredJointIndex()]
-                        .tryJointConnection(this.findNode(functionIndex, nodeIndex).getOutputJoints()[outputJointIndex]);
-                currentFunction.getNodeConnections().add(
-                        new NodeConnection(
-                                new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
-                                new ThreeCoordinatePoint(functionIndex, currentFunction.getJointHoveredNodeIndex(), currentFunction.getJointHoveredJointIndex())
-                        )
-                );
+                this.makeNodeConnection(new NodeConnection(
+                        new ThreeCoordinatePoint(functionIndex, nodeIndex, outputJointIndex),
+                        new ThreeCoordinatePoint(functionIndex, currentFunction.getJointHoveredNodeIndex(), currentFunction.getJointHoveredJointIndex())
+                ));
             }
         }
     }

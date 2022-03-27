@@ -31,4 +31,10 @@ public class NodeConnection implements Serializable {
     public int hashCode() {
         return Objects.hash(outputCoordinates, inputCoordinates);
     }
+
+    @Override
+    public String toString() {
+        return "[" + this.outputCoordinates.getX() + ", " + this.outputCoordinates.getY() + ", " + this.outputCoordinates.getZ()
+        + "] -> [" + this.inputCoordinates.getX() + ", " + this.inputCoordinates.getY() + ", " + this.inputCoordinates.getZ() + "]";
+    }
 }
