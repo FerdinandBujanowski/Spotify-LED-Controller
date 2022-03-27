@@ -14,4 +14,13 @@ public enum PixelAlgorithmType {
         return this.name;
     }
 
+    public static PixelAlgorithmType getTypeByString(String string) {
+        for(PixelAlgorithmType pixelAlgorithmType : PixelAlgorithmType.values()) {
+            if(pixelAlgorithmType.toString().equals(string)) {
+                return pixelAlgorithmType;
+            }
+        }
+        return null;
+    }
+
 }

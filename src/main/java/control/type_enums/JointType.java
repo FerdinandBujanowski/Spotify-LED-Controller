@@ -75,4 +75,13 @@ public enum JointType {
         }
         return names;
     }
+
+    public static JointType getTypeByString(String string) {
+        for(JointType jointType : JointType.values()) {
+            if(jointType.toString().equals(string)) {
+                return jointType;
+            }
+        }
+        return null;
+    }
 }

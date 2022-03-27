@@ -1,8 +1,5 @@
 package control.node;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import control.SerializableFunction;
 import control.exceptions.CannotDeleteNodeException;
 import control.exceptions.FunctionNodeInUseException;
@@ -19,6 +16,7 @@ import java.awt.*;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.function.Function;
 
 public class NodeControl implements Serializable, NodeRequestAcceptor {
 
@@ -83,28 +81,6 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
                 } else {
                     this.findFunction(trackNodeIndex.getY()).getLogicNodes().set(indexInArrayList, newNode);
                 }
-            }
-        }
-    }
-
-    public void addNodesFromFile(JsonObject nodesObject) {
-        //FIRST : functions
-        TwoIntegerCorrespondence functionCorrespondence = new TwoIntegerCorrespondence();
-        int nextFreeFunctionIndex = this.getNextFreeFunctionIndex();
-        JsonArray functionArray = nodesObject.getAsJsonArray("functions");
-        for(int i = 0; i < functionArray.size(); i++) {
-            JsonObject functionObject = functionArray.get(i).getAsJsonObject();
-            int oldFunctionIndex = functionObject.get("node_index").getAsInt();
-            int newFunctionIndex = nextFreeFunctionIndex + oldFunctionIndex;
-            functionCorrespondence.addValue(oldFunctionIndex, newFunctionIndex);
-            JsonArray functionNodesArray = functionObject.getAsJsonArray("nodes");
-
-            ArrayList<InputJoint> functionInputJointArray = new ArrayList<>();
-            ArrayList<OutputJoint> functionOutputJointArray = new ArrayList<>();
-            ArrayList<LogicNode> remainingFunctionNodes = new ArrayList<>();
-            for(int functionNodesIndex = 0; functionNodesIndex < functionNodesArray.size(); functionNodesIndex++) {
-                JsonObject currentNodeObject = functionNodesArray.get(functionNodesIndex).getAsJsonObject();
-
             }
         }
     }
@@ -205,6 +181,7 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
         }
     }
     public void addFunction(int newFunctionIndex, String functionName, String[] inputNames, JointType[] inputTypes, String[] outputNames, JointType[] outputTypes) {
+
         InputJoint[] inputJoints = new InputJoint[inputNames.length];
         for(int i = 0; i < inputJoints.length; i++) {
             JointDataType inputJointDataType = null;

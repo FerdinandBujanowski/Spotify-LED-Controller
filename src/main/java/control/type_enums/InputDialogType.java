@@ -1,6 +1,7 @@
 package control.type_enums;
 
 import java.awt.*;
+import java.util.Objects;
 
 public enum InputDialogType {
 
@@ -30,6 +31,28 @@ public enum InputDialogType {
         } else {
             return value.toString();
         }
+    }
+
+    public static InputDialogType getTypeByString(String string) {
+        for(InputDialogType inputDialogType : InputDialogType.values()) {
+            if(inputDialogType.toString().equals(string)) {
+                return inputDialogType;
+            }
+        }
+        return null;
+    }
+
+    public static Object getValueByString(String inputDialogTypeString, String objectString) {
+        InputDialogType inputDialogType = InputDialogType.getTypeByString(inputDialogTypeString);
+        return switch (Objects.requireNonNull(inputDialogType)) {
+            case NUMBER_TYPE_INPUT, UNIT_NUMBER_TYPE_INPUT -> Double.valueOf(objectString);
+            case INTEGER_TYPE_INPUT -> Integer.valueOf(objectString);
+            case STRING_TYPE_INPUT -> objectString;
+            case JOINT_TYPE_INPUT -> JointType.getTypeByString(objectString);
+            case COLOR_TYPE_INPUT -> new Color(Integer.parseInt(objectString));
+            case ROUND_PIXEL_INPUT -> PixelAlgorithmType.getTypeByString(objectString);
+            case ROUND_INPUT -> RoundAlgorithmType.getTypeByString(objectString);
+        };
     }
 
 }

@@ -22,3 +22,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 .idea/runConfigurations.xml
+.idea/libraries/Maven__com_googlecode_json_simple_json_simple_1_1_1.xml
+.idea/libraries/Maven__com_googlecode_json_simple_json_simple_1_1_1.xml
+.idea/libraries/Maven__junit_junit_4_10.xml
+.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_1.xml

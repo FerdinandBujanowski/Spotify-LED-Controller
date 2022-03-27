@@ -149,4 +149,13 @@ public enum NodeType {
         }
         return null;
     }
+
+    public static NodeType getNodeTypeByString(String nodeTypeString) {
+        for(NodeType nodeType : NodeType.values()) {
+            if(nodeType.toString().equals(nodeTypeString)) {
+                return nodeType;
+            }
+        }
+        return null;
+    }
 }

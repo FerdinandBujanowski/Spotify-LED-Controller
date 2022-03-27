@@ -13,4 +13,13 @@ public enum RoundAlgorithmType {
     public String getName() {
         return this.name;
     }
+
+    public static RoundAlgorithmType getTypeByString(String string) {
+        for(RoundAlgorithmType roundAlgorithmType : RoundAlgorithmType.values()) {
+            if(roundAlgorithmType.toString().equals(string)) {
+                return roundAlgorithmType;
+            }
+        }
+        return null;
+    }
 }

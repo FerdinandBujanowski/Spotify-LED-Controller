@@ -41,6 +41,9 @@ public class MainWindow extends JFrame {
     JSplitPane splitPane;
 
     private JMenu songMenu, nodeMenu, functionMenu, ledMenu;
+    private JMenu addFunctionMenu;
+    private JMenuItem createFunctionMenuItem;
+    private ArrayList<JMenuItem> functionItemList;
     private JMenu createTrackNodeMenu;
 
     private boolean bProjectOpen;
@@ -87,12 +90,14 @@ public class MainWindow extends JFrame {
         JMenuItem openProject = new JMenuItem("Open Project");
         JMenuItem saveProject = new JMenuItem("Save Project");
         JMenuItem exportNodes = new JMenuItem("Export Nodes");
+        JMenuItem loadNodes = new JMenuItem("Load Nodes");
         fileMenu.add(newProject);
         fileMenu.add(openProject);
         fileMenu.add(new JSeparator());
         fileMenu.add(saveProject);
         fileMenu.add(new JSeparator());
         fileMenu.add(exportNodes);
+        fileMenu.add(loadNodes);
         this.jMenuBar.add(fileMenu);
         this.setJMenuBar(jMenuBar);
         this.songMenu = new JMenu("Song");
@@ -248,11 +253,11 @@ public class MainWindow extends JFrame {
         jMenuBar.add(this.nodeMenu);
         this.nodeMenu.setEnabled(false);
         this.functionMenu = new JMenu("Function");
-        JMenuItem createFunctionMenuItem = new JMenuItem("Create Function");
-        JMenu addFunctionMenu = new JMenu("Add Function");
-        ArrayList<JMenuItem> functionItemList = new ArrayList<>();
+        this.createFunctionMenuItem = new JMenuItem("Create Function");
+        this.addFunctionMenu = new JMenu("Add Function");
+        this.functionItemList = new ArrayList<>();
 
-        createFunctionMenuItem.addActionListener(new ActionListener() {
+        this.createFunctionMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String functionName = JOptionPane.showInputDialog("Create Function");
@@ -287,25 +292,8 @@ public class MainWindow extends JFrame {
                         outputTypes[i] = JointType.values()[jointTypeComboBox.getSelectedIndex()];
                     }
 
-                    int newPanelIndex = functionTabbedPane.addPanel(functionName);
-                    functionTabbedPane.onFunctionCreated(newPanelIndex, functionName, inputNames, inputTypes, outputNames, outputTypes);
-                    tabbedPane.setSelectedComponent(functionTabbedPane);
-                    functionTabbedPane.setSelectedIndex(functionTabbedPane.getTabCount() - 1);
-                    JMenuItem addNewFunctionItem = new JMenuItem(functionName);
-                    addFunctionMenu.add(addNewFunctionItem);
-                    functionItemList.add(addNewFunctionItem);
-                    addNewFunctionItem.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            int currentFunctionIndex = functionItemList.indexOf(addNewFunctionItem);
-                            if(tabbedPane.getSelectedIndex() == 2) {
-                                nodeControl.addFunctionNode(currentFunctionIndex, -1);
-                            } else if(tabbedPane.getSelectedIndex() == 3) {
-                                int selectedFunctionIndex = functionTabbedPane.getSelectedIndex();
-                                nodeControl.addFunctionNode(currentFunctionIndex, selectedFunctionIndex);
-                            }
-                        }
-                    });
+                    //TODO : FUNCTION FUNCTION
+                    createFunction(functionName, inputNames, inputTypes, outputNames, outputTypes, nodeControl);
                 }
             }
         });
@@ -452,6 +440,42 @@ public class MainWindow extends JFrame {
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     JsonWriter.writeNodesToFile(nodeSaveUnit, fileSaveChooser.getSelectedFile().getPath());
+                }
+            }
+        });
+
+        MainWindow thisWindow = this;
+        loadNodes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileOpenChooser = new JFileChooser();
+                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+                fileOpenChooser.setFileFilter(serializedFilter);
+                int returnValue = fileOpenChooser.showOpenDialog(getParent());
+                if(returnValue == JFileChooser.APPROVE_OPTION) {
+                    JsonWriter.addNodesFromFile(fileOpenChooser.getSelectedFile().getPath(), nodeControl, thisWindow);
+                }
+            }
+        });
+    }
+
+    public void createFunction(String functionName, String[] inputNames, JointType[] inputTypes, String[] outputNames, JointType[] outputTypes, NodeControl nodeControl) {
+        int newPanelIndex = this.functionTabbedPane.addPanel(functionName);
+        this.functionTabbedPane.onFunctionCreated(newPanelIndex, functionName, inputNames, inputTypes, outputNames, outputTypes);
+        this.tabbedPane.setSelectedComponent(this.functionTabbedPane);
+        this.functionTabbedPane.setSelectedIndex(this.functionTabbedPane.getTabCount() - 1);
+        JMenuItem addNewFunctionItem = new JMenuItem(functionName);
+        this.addFunctionMenu.add(addNewFunctionItem);
+        this.functionItemList.add(addNewFunctionItem);
+        addNewFunctionItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int currentFunctionIndex = functionItemList.indexOf(addNewFunctionItem);
+                if(tabbedPane.getSelectedIndex() == 2) {
+                    nodeControl.addFunctionNode(currentFunctionIndex, -1);
+                } else if(tabbedPane.getSelectedIndex() == 3) {
+                    int selectedFunctionIndex = functionTabbedPane.getSelectedIndex();
+                    nodeControl.addFunctionNode(currentFunctionIndex, selectedFunctionIndex);
                 }
             }
         });
