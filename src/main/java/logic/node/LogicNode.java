@@ -7,6 +7,7 @@ import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.JointDataType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 public abstract class LogicNode extends LogicComponent {
@@ -128,6 +129,7 @@ public abstract class LogicNode extends LogicComponent {
         }
         return -1;
     }
+
     public int getOutputJointIndex(OutputJoint outputJoint) {
         for(int i = 0; i < this.getOutputJoints().length; i++) {
             if(this.getOutputJoints()[i].equals(outputJoint)) return i;
@@ -137,5 +139,75 @@ public abstract class LogicNode extends LogicComponent {
 
     public Double[][] getMaskValues(Integer nullInteger) {
         return new Double[0][0];
+    }
+
+    public boolean isConnectedTo(LogicNode otherNode, ArrayList<LogicNode> alreadyCheckedNodes) {
+        ArrayList<LogicNode> connectedNodes = new ArrayList<>(alreadyCheckedNodes);
+        connectedNodes.add(this);
+        ArrayList<LogicNode> nodesNotChecked = new ArrayList<>();
+
+        for(InputJoint inputJoint : this.getInputJoints()) {
+            LogicNode connectedNode = inputJoint.getConnectedOutputJoint() == null ? null : inputJoint.getConnectedOutputJoint().getParentNode();
+            if(connectedNode != null && !connectedNodes.contains(connectedNode)) {
+                nodesNotChecked.add(connectedNode);
+            }
+        }
+        for(OutputJoint outputJoint : this.getOutputJoints()) {
+            for(InputJoint inputJoint : outputJoint.getConnectedInputJoints()) {
+                LogicNode connectedNode = inputJoint.getParentNode();
+                if(connectedNode != null && !connectedNodes.contains(connectedNode)) {
+                    nodesNotChecked.add(connectedNode);
+                }
+            }
+        }
+
+        if(nodesNotChecked.isEmpty()) {
+            return false;
+        }
+        if(nodesNotChecked.contains(otherNode)) {
+            return true;
+        }
+
+        ArrayList<Boolean> booleans = new ArrayList<>();
+        connectedNodes.addAll(nodesNotChecked);
+        for(LogicNode connectedNode : nodesNotChecked) {
+            booleans.add(connectedNode.isConnectedTo(otherNode, connectedNodes));
+        }
+        return booleans.contains(true);
+    }
+
+    public int getMaxNodesConnected(boolean right) {
+        ArrayList<LogicNode> connectedNodes = new ArrayList<>();
+        if(right) {
+            OutputJoint[] outputJoints = this.getOutputJoints();
+            for(OutputJoint outputJoint : outputJoints) {
+                for(InputJoint connectedJoint : outputJoint.getConnectedInputJoints()) {
+                    LogicNode connectedNode = connectedJoint.getParentNode();
+                    if(!connectedNodes.contains(connectedNode)) {
+                        connectedNodes.add(connectedNode);
+                    }
+                }
+            }
+        } else {
+            InputJoint[] inputJoints = this.getInputJoints();
+            for(InputJoint inputJoint : inputJoints) {
+                OutputJoint connectedOutput = inputJoint.getConnectedOutputJoint();
+                if(connectedOutput != null) {
+                    LogicNode connectedNode = connectedOutput.getParentNode();
+                    if(!connectedNodes.contains(connectedNode)) {
+                        connectedNodes.add(connectedNode);
+                    }
+                }
+            }
+        }
+        if(connectedNodes.isEmpty()) {
+            return 0;
+        } else {
+            ArrayList<Integer> maxValues = new ArrayList<>();
+            for(LogicNode connectedNode : connectedNodes) {
+                maxValues.add(1 + connectedNode.getMaxNodesConnected(right));
+            }
+            return Collections.max(maxValues);
+        }
     }
 }

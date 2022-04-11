@@ -147,6 +147,7 @@ public class GraphicNode extends JPanel {
                 currentlyMoving = true;
                 lastClickedAt.x = e.getX();
                 lastClickedAt.y = e.getY();
+                parentNodePanel.onSelectionEvent(indexes.y);
             }
 
             @Override
@@ -171,6 +172,9 @@ public class GraphicNode extends JPanel {
                             }
                         }
                     });
+                }
+                if(e.getButton() == MouseEvent.BUTTON1) {
+                    parentNodePanel.onSelectionEvent(indexes.y);
                 }
             }
         });
@@ -201,6 +205,7 @@ public class GraphicNode extends JPanel {
     public MaskPanel getMaskPanel() {
         return this.maskPanel;
     }
+
 
     public void setLastClickedAt(Point lastClickedAt) {
         this.lastClickedAt = lastClickedAt;

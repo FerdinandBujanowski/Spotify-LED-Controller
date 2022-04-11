@@ -6,9 +6,6 @@ import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
 import control.type_enums.JointType;
 import control.type_enums.NodeType;
-import gui.main_panels.node_panel.NodeGraphicUnit;
-import logic.node.LogicNode;
-import logic.node.joint.joint_types.JointDataType;
 
 import java.util.ArrayList;
 
@@ -33,4 +30,8 @@ public interface NodeRequestAcceptor {
     int[] getNodeIndexesOfFunctionIndex(int functionIndex);
 
     String getSpecificNodeName(int functionIndex, int nodeIndex);
+
+    ArrayList<Integer> getOffsetIndexes(int functionIndex);
+    ArrayList<ArrayList<Integer>> getNodeSets(int functionIndex);
+    int getNodeRank(int functionIndex, int nodeIndex);
 }

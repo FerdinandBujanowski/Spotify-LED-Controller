@@ -6,7 +6,6 @@ import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
 import control.save.NodeSaveUnit;
 import control.type_enums.*;
-import gui.main_panels.node_panel.NodeGraphicUnit;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 import logic.node.joint.*;
@@ -16,7 +15,6 @@ import java.awt.*;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.function.Function;
 
 public class NodeControl implements Serializable, NodeRequestAcceptor {
 
@@ -648,4 +646,38 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
         LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
         return logicNode == null ? "" : logicNode.getSpecificName();
     }
+
+    @Override
+    public ArrayList<Integer> getOffsetIndexes(int functionIndex) {
+        return null;
+    }
+
+    @Override
+    public ArrayList<ArrayList<Integer>> getNodeSets(int functionIndex) {
+        ArrayList<LogicNode> nodesCopy = functionIndex == -1 ? this.logicNodes : this.findFunction(functionIndex).getLogicNodes();
+        ArrayList<ArrayList<Integer>> nodeSets = new ArrayList<>();
+        for(LogicNode logicNode : nodesCopy) {
+            int nodeSetIndex = -1;
+            for(int i = 0; i < nodeSets.size(); i++) {
+                LogicNode testNode = this.findNode(functionIndex, nodeSets.get(i).get(0));
+                if(testNode.isConnectedTo(logicNode, new ArrayList<>())) {
+                    nodeSetIndex = i;
+                }
+            }
+            if(nodeSetIndex == -1) {
+                nodeSets.add(new ArrayList<>());
+                nodeSetIndex = nodeSets.size() - 1;
+            }
+            nodeSets.get(nodeSetIndex).add(logicNode.getNodeIndex());
+        }
+        return nodeSets;
+    }
+
+    @Override
+    public int getNodeRank(int functionIndex, int nodeIndex) {
+        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
+        return logicNode.getMaxNodesConnected(false) - logicNode.getMaxNodesConnected(true);
+    }
+
+
 }

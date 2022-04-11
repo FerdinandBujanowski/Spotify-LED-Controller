@@ -18,8 +18,7 @@ import gui.node_components.GraphicNode;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class MainWindow extends JFrame {
 
         this.setIconImage(new ImageIcon("images\\icon\\icon.png").getImage());
         this.bProjectOpen = false;
-        this.setResizable(false);
+        this.setResizable(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.getContentPane().setPreferredSize(dimension);
         this.splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {
@@ -255,6 +254,7 @@ public class MainWindow extends JFrame {
         this.functionMenu = new JMenu("Function");
         this.createFunctionMenuItem = new JMenuItem("Create Function");
         this.addFunctionMenu = new JMenu("Add Function");
+        JMenuItem cleanUpCanvas = new JMenuItem("Clean up Canvas");
         this.functionItemList = new ArrayList<>();
 
         this.createFunctionMenuItem.addActionListener(new ActionListener() {
@@ -292,13 +292,24 @@ public class MainWindow extends JFrame {
                         outputTypes[i] = JointType.values()[jointTypeComboBox.getSelectedIndex()];
                     }
 
-                    //TODO : FUNCTION FUNCTION
                     createFunction(functionName, inputNames, inputTypes, outputNames, outputTypes, nodeControl);
+                }
+            }
+        });
+        cleanUpCanvas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(tabbedPane.getSelectedIndex() == 2) {
+                    nodeEditWindow.cleanUpCanvas();
+                } else if(tabbedPane.getSelectedIndex() == 3) {
+                    functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).cleanUpCanvas();
                 }
             }
         });
         this.functionMenu.add(createFunctionMenuItem);
         this.functionMenu.add(addFunctionMenu);
+        this.functionMenu.add(new JSeparator());
+        this.functionMenu.add(cleanUpCanvas);
         jMenuBar.add(this.functionMenu);
         this.functionMenu.setEnabled(false);
         this.ledMenu = new JMenu("LED");
@@ -454,6 +465,39 @@ public class MainWindow extends JFrame {
                 int returnValue = fileOpenChooser.showOpenDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     JsonWriter.addNodesFromFile(fileOpenChooser.getSelectedFile().getPath(), nodeControl, thisWindow);
+                }
+            }
+        });
+
+        this.setFocusable(true);
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch(tabbedPane.getSelectedIndex()) {
+                    case 1 -> {
+                        //TODO : eventPanel key input
+                    }
+                    case 2 -> {
+                        nodeEditWindow.onKeyPressed(e);
+                    }
+                    case 3 -> {
+                        functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).onKeyPressed(e);
+                    }
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                switch(tabbedPane.getSelectedIndex()) {
+                    case 1 -> {
+                        //TODO : eventPanel key input
+                    }
+                    case 2 -> {
+                        nodeEditWindow.onKeyReleased(e);
+                    }
+                    case 3 -> {
+                        functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).onKeyReleased(e);
+                    }
                 }
             }
         });

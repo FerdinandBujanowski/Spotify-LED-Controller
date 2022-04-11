@@ -26,7 +26,6 @@ public abstract class JsonWriter {
     private final static String NODES = "nodes";
     private final static String NODE_CONNECTIONS = "node_connections";
     private final static String FUNCTIONS = "functions";
-    private final static String TRACK_NODE_INDEXES = "track_node_indexes";
 
     private final static String NODE_INDEX = "node_index";
     private final static String NODE_TYPE = "node_type";
@@ -41,7 +40,7 @@ public abstract class JsonWriter {
 
     private final static String INPUT = "input";
     private final static String OUTPUT = "output";
-    private final static String C_1 = "c_1", C_2 = "c_2", C_3 = "c_3";
+    private final static String C_1 = "function_index", C_2 = "node_index", C_3 = "joint_index";
 
 
     public static void writeNodesToFile(NodeSaveUnit nodeSaveUnit, String path) {
@@ -80,12 +79,6 @@ public abstract class JsonWriter {
             functionArray.add(functionObject);
         }
         finalObject.add(FUNCTIONS, functionArray);
-
-        JsonArray trackNodeIndexArray = new JsonArray();
-        for(ThreeCoordinatePoint coordinatePoint : nodeSaveUnit.getTrackNodeIndexes()) {
-            trackNodeIndexArray.add(JsonWriter.getThreeCoordinateJsonObject(coordinatePoint));
-        }
-        finalObject.add(TRACK_NODE_INDEXES, trackNodeIndexArray);
 
         try {
             FileWriter file = new FileWriter(path);
@@ -237,7 +230,6 @@ public abstract class JsonWriter {
                 e.printStackTrace();
             }
         }
-
     }
 
     private static NodeConnection getNodeConnection(JsonObject connectionObject, TwoIntegerCorrespondence funcCor, TwoIntegerCorrespondence nodeCor) {
