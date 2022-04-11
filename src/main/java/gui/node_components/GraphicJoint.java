@@ -1,18 +1,20 @@
 package gui.node_components;
 
 import control.node.NodeControl;
+import gui.main_panels.ParentNodePanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 
 public class GraphicJoint extends JPanel {
 
     private Color color;
     private boolean hover;
 
-    public GraphicJoint(Color color) {
+    public GraphicJoint(Color color, GraphicNode parentNode) {
         this.setSize(NodeControl.JOINT_WIDTH, NodeControl.JOINT_WIDTH);
         this.color = color;
         this.hover = false;
@@ -30,6 +32,13 @@ public class GraphicJoint extends JPanel {
                 hover = false;
                 repaint();
                 getParent().repaint();
+            }
+        });
+
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                ((ParentNodePanel)getParent()).onMouseMoved(new Point(getX() + e.getX(), getY() + e.getY()));
             }
         });
         this.repaint();

@@ -33,6 +33,8 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
     private JButton zoomOutButton, zoomInButton;
     private JLabel zoomLabel;
 
+    private MouseMotionAdapter mouseMotionAdapter;
+
     private ArrayList<Integer> selectedNodeIndexes;
     private boolean toggleShift, toggleCtrl, toggleG;
 
@@ -94,9 +96,11 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
                 currentlyMoving = false;
             }
         });
-        this.addMouseMotionListener(new MouseMotionAdapter() {
+
+        this.mouseMotionAdapter = new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+
                 if(currentlyMoving) {
                     Point relativeMovement = new Point(
                             e.getX() - lastClickedX,
@@ -110,9 +114,10 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
 
             @Override
             public void mouseMoved(MouseEvent e) {
-                onMouseMoved(e);
+                onMouseMoved(new Point(e.getX(), e.getY()));
             }
-        });
+        };
+        this.addMouseMotionListener(this.mouseMotionAdapter);
 
         this.selectedNodeIndexes = new ArrayList<>();
         this.toggleShift = false;
@@ -421,13 +426,16 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         this.repaint();
     }
 
-    public void onMouseMoved(MouseEvent e) {
-        if(this.toggleG) {
+    public void onMouseMoved(Point location) {
+        int locX = location.x;
+        int locY = location.y;
+
+        if(toggleG) {
             Point relativeMovement = new Point(
-                    e.getX() - this.lastClickedX,
-                    e.getY() - this.lastClickedY
+                    locX - lastClickedX,
+                    locY - lastClickedY
             );
-            for(int i : this.selectedNodeIndexes) {
+            for(int i : selectedNodeIndexes) {
                 GraphicNode graphicNode = findGraphicNode(getFunctionIndex(), i);
                 if(graphicNode != null) {
                     moveGraphicNode(graphicNode, relativeMovement);
@@ -435,8 +443,8 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             }
             repaint();
         }
-        this.lastClickedX = e.getX();
-        this.lastClickedY = e.getY();
+        lastClickedX = locX;
+        lastClickedY = locY;
     }
 
     public Color getJointTypeColor(boolean input, int nodeIndex, int jointIndex) {
