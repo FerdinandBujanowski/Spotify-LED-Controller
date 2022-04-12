@@ -92,7 +92,7 @@ public class GraphicNode extends JPanel {
         this.graphicInputJoints = new GraphicJoint[this.numberInputJoints];
         for (int i = 0; i < graphicInputJoints.length; i++) {
             int currentNumber = i;
-            this.graphicInputJoints[i] = new GraphicJoint(parentNodePanel.getJointTypeColor(true, this.indexes.y, currentNumber), this);
+            this.graphicInputJoints[i] = new GraphicJoint(parentNodePanel.getJointTypeColor(true, this.indexes.y, currentNumber));
             this.graphicInputJoints[i].addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -123,7 +123,7 @@ public class GraphicNode extends JPanel {
         this.graphicOutputJoints = new GraphicJoint[this.numberOutputJoints];
         for (int i = 0; i < graphicOutputJoints.length; i++) {
             int currentNumber = i;
-            this.graphicOutputJoints[i] = new GraphicJoint(parentNodePanel.getJointTypeColor(false, this.indexes.y, currentNumber), this);
+            this.graphicOutputJoints[i] = new GraphicJoint(parentNodePanel.getJointTypeColor(false, this.indexes.y, currentNumber));
             this.graphicOutputJoints[i].addMouseListener(new MouseAdapter() {
 
                 @Override

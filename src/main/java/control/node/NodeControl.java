@@ -6,6 +6,7 @@ import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
 import control.save.NodeSaveUnit;
 import control.type_enums.*;
+import gui.node_components.GraphicNode;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 import logic.node.joint.*;
@@ -653,6 +654,42 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
     }
 
     @Override
+    public ArrayList<Integer> copyNodes(ArrayList<Integer> nodeIndexes, int functionIndex) {
+        ArrayList<Integer> newNodeIndexes = new ArrayList<>();
+        ArrayList<LogicNode> templateNodes = new ArrayList<>();
+        ArrayList<NodeConnection> templateConnections = new ArrayList<>();
+        TwoIntegerCorrespondence newIndexCorrespondence = new TwoIntegerCorrespondence();
+
+        for(int nodeIndex : nodeIndexes) {
+            LogicNode templateNode = this.findNode(functionIndex, nodeIndex);
+            if (templateNode != null) {
+                templateNodes.add(templateNode);
+            }
+        }
+        for(LogicNode logicNode : templateNodes) {
+            int newNodeIndex = this.getNextFreeNodeIndex(functionIndex);
+            newIndexCorrespondence.addValue(logicNode.getNodeIndex(), newNodeIndex);
+            this.addNode(functionIndex, logicNode.getNodeType(), logicNode.getExtraParameters());
+            newNodeIndexes.add(newNodeIndex);
+
+            GraphicNode oldGraphicNode;
+            GraphicNode newGraphicNode;
+            if(functionIndex == -1) {
+                oldGraphicNode = this.nodeGraphicUnit.findGraphicNode(logicNode.getNodeIndex());
+                newGraphicNode = this.nodeGraphicUnit.findGraphicNode(newNodeIndex);
+                this.nodeGraphicUnit.moveGraphicNode(newGraphicNode, new Point(oldGraphicNode.getX() - 50, oldGraphicNode.getY() - 50));
+            } else {
+                oldGraphicNode = this.functionGraphicUnits.get(functionIndex).findGraphicNode(logicNode.getNodeIndex());
+                newGraphicNode = this.functionGraphicUnits.get(functionIndex).findGraphicNode(newNodeIndex);
+                this.functionGraphicUnits.get(functionIndex).moveGraphicNode(newGraphicNode, new Point(oldGraphicNode.getX() - 50, oldGraphicNode.getY() - 50));
+            }
+            //TODO : connections
+        }
+
+        return newNodeIndexes;
+    }
+
+    @Override
     public ArrayList<ArrayList<Integer>> getNodeSets(int functionIndex) {
         ArrayList<LogicNode> nodesCopy = functionIndex == -1 ? this.logicNodes : this.findFunction(functionIndex).getLogicNodes();
         ArrayList<ArrayList<Integer>> nodeSets = new ArrayList<>();
@@ -678,6 +715,4 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
         LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
         return logicNode.getMaxNodesConnected(false) - logicNode.getMaxNodesConnected(true);
     }
-
-
 }

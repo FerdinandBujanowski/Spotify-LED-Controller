@@ -32,6 +32,7 @@ public interface NodeRequestAcceptor {
     String getSpecificNodeName(int functionIndex, int nodeIndex);
 
     ArrayList<Integer> getOffsetIndexes(int functionIndex);
+    ArrayList<Integer> copyNodes(ArrayList<Integer> nodeIndexes, int functionIndex);
     ArrayList<ArrayList<Integer>> getNodeSets(int functionIndex);
     int getNodeRank(int functionIndex, int nodeIndex);
 }

@@ -30,12 +30,11 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
     private int lastClickedX, lastClickedY;
 
     private double zoomFactor;
-    private JButton zoomOutButton, zoomInButton;
     private JLabel zoomLabel;
 
     private MouseMotionAdapter mouseMotionAdapter;
 
-    private ArrayList<Integer> selectedNodeIndexes;
+    private ArrayList<Integer> selectedNodeIndexes, copiedNodeIndexes;
     private boolean toggleShift, toggleCtrl, toggleG;
 
     public ParentNodePanel(NodeRequestAcceptor nodeControl, int functionIndex, Color backgroundColor) {
@@ -52,30 +51,10 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         this.lastClickedY = 0;
 
         this.zoomFactor = 1;
-        this.zoomOutButton = new JButton("-");
-        this.zoomOutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                zoom(false);
-            }
-        });
-        this.zoomInButton = new JButton("+");
-        this.zoomInButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                zoom(true);
-            }
-        });
-
         this.zoomLabel = new JLabel();
         this.zoomLabel.setFont(new Font("Times New Roman", Font.PLAIN, 20));
         this.add(this.zoomLabel);
         this.zoomLabel.setSize(50, 50);
-
-        this.add(this.zoomOutButton);
-        this.zoomOutButton.setSize(50, 50);
-        this.add(this.zoomInButton);
-        this.zoomInButton.setSize(50, 50);
 
         this.setOpaque(true);
         this.setBackground(backgroundColor);
@@ -120,6 +99,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         this.addMouseMotionListener(this.mouseMotionAdapter);
 
         this.selectedNodeIndexes = new ArrayList<>();
+        this.copiedNodeIndexes = new ArrayList<>();
         this.toggleShift = false;
         this.toggleCtrl = false;
         this.toggleG = false;
@@ -177,13 +157,11 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Dimension size = this.getSize();
-        this.zoomOutButton.setLocation(size.width - 50, size.height - 50);
-        this.zoomInButton.setLocation(size.width - 100, size.height - 50);
-        this.zoomLabel.setLocation(size.width - 150, size.height - 50);
+        this.zoomLabel.setLocation(size.width - 50, size.height - 50);
         this.zoomLabel.setText("x" + this.zoomFactor);
 
         for(int nodeIndex : this.selectedNodeIndexes) {
-            GraphicNode graphicNode = this.findGraphicNode(this.getFunctionIndex(), nodeIndex);
+            GraphicNode graphicNode = this.findGraphicNode(nodeIndex);
             if(graphicNode != null) {
                 g.setColor(Color.BLUE);
                 Dimension ovalDimension = new Dimension(graphicNode.getWidth() / 5, graphicNode.getWidth() / 5);
@@ -209,31 +187,6 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             this.moveGraphicNode(graphicNode, relativeMovement);
         }
         this.repaint();
-    }
-
-    private void moveGraphicNode(GraphicNode graphicNode, Point relativeMovement) {
-        graphicNode.setLocation(
-                graphicNode.getX() + relativeMovement.x,
-                graphicNode.getY() + relativeMovement.y
-        );
-        for(GraphicJoint graphicJoint : graphicNode.getGraphicInputJoints()) {
-            graphicJoint.setLocation(
-                    graphicJoint.getX() + relativeMovement.x,
-                    graphicJoint.getY() + relativeMovement.y
-            );
-        }
-        for(GraphicJoint graphicJoint : graphicNode.getGraphicOutputJoints()) {
-            graphicJoint.setLocation(
-                    graphicJoint.getX() + relativeMovement.x,
-                    graphicJoint.getY() + relativeMovement.y
-            );
-        }
-        if(graphicNode.getMaskPanel() != null) {
-            graphicNode.getMaskPanel().setLocation(
-                    graphicNode.getMaskPanel().getX() + relativeMovement.x,
-                    graphicNode.getMaskPanel().getY() + relativeMovement.y
-            );
-        }
     }
 
     public double getZoomFactor() {
@@ -275,9 +228,9 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             ThreeCoordinatePoint outputCoordinates = nodeConnection.getOutputCoordinates();
             ThreeCoordinatePoint inputCoordinates = nodeConnection.getInputCoordinates();
             GraphicJoint currentOutputGraphicJoint =
-                    this.findGraphicNode(outputCoordinates.getX(), outputCoordinates.getY()).getOutputJoint(outputCoordinates.getZ());
+                    this.findGraphicNode(outputCoordinates.getY()).getOutputJoint(outputCoordinates.getZ());
             GraphicJoint currentInputGraphicJoint =
-                    this.findGraphicNode(inputCoordinates.getX(), inputCoordinates.getY()).getInputJoint(inputCoordinates.getZ());
+                    this.findGraphicNode(inputCoordinates.getY()).getInputJoint(inputCoordinates.getZ());
 
             int jointWidth = (int)Math.round(NodeControl.JOINT_WIDTH * this.getZoomFactor());
             int halfJointWidth = jointWidth / 2;
@@ -304,15 +257,6 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         }
     }
 
-    private GraphicNode findGraphicNode(int connectionX, int connectionY) {
-        for(GraphicNode graphicNode : graphicNodes) {
-            if(graphicNode.getIndexes().x == connectionX && graphicNode.getIndexes().y == connectionY) {
-                return graphicNode;
-            }
-        }
-        return null;
-    }
-
 
     public void onOutputNodeReleased(int nodeIndex, int outputJointIndex) throws FunctionNodeInUseException, JointConnectionFailedException {
         this.getNodeControl().updateOutputJointReleased(this.functionIndex, nodeIndex, outputJointIndex);
@@ -329,7 +273,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
 
     public void onNodeDelete(int nodeIndex) throws CannotDeleteNodeException, FunctionNodeInUseException {
         this.getNodeControl().deleteNodeRequest(this.functionIndex, nodeIndex);
-        GraphicNode graphicNode = this.findGraphicNode(this.functionIndex, nodeIndex);
+        GraphicNode graphicNode = this.findGraphicNode(nodeIndex);
         this.graphicNodes.remove(graphicNode);
 
         this.remove(graphicNode);
@@ -362,14 +306,16 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             }
             case KeyEvent.VK_C -> {
                 if(this.toggleCtrl) {
-                    //TODO : COPY
-                    System.out.println("COPY");
+                    this.copiedNodeIndexes.removeAll(this.copiedNodeIndexes);
+                    this.copiedNodeIndexes.addAll(this.selectedNodeIndexes);
                 }
             }
             case KeyEvent.VK_V -> {
                 if(this.toggleCtrl) {
-                    //TODO : PASTE
-                    System.out.println("PASTE");
+                    ArrayList<Integer> newNodeIndexes = this.nodeControl.copyNodes(this.copiedNodeIndexes, this.getFunctionIndex());
+                    this.selectedNodeIndexes.removeAll(this.selectedNodeIndexes);
+                    this.selectedNodeIndexes.addAll(newNodeIndexes);
+                    this.toggleG = true;
                 }
             }
             case KeyEvent.VK_A -> {
@@ -396,6 +342,16 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
                     this.selectedNodeIndexes.removeAll(this.selectedNodeIndexes);
                     this.selectedNodeIndexes.addAll(nodeSets.get(nodeSetIndexes.get(0)));
                     repaint();
+                }
+            }
+            case KeyEvent.VK_PLUS -> {
+                if(this.toggleCtrl) {
+                    this.zoom(true);
+                }
+            }
+            case KeyEvent.VK_MINUS -> {
+                if(this.toggleCtrl) {
+                    this.zoom(false);
                 }
             }
         }
@@ -436,7 +392,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
                     locY - lastClickedY
             );
             for(int i : selectedNodeIndexes) {
-                GraphicNode graphicNode = findGraphicNode(getFunctionIndex(), i);
+                GraphicNode graphicNode = findGraphicNode(i);
                 if(graphicNode != null) {
                     moveGraphicNode(graphicNode, relativeMovement);
                 }
@@ -483,6 +439,42 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
     }
 
     @Override
+    public GraphicNode findGraphicNode(int nodeIndex) {
+        for(GraphicNode graphicNode : graphicNodes) {
+            if(graphicNode.getIndexes().x == this.functionIndex && graphicNode.getIndexes().y == nodeIndex) {
+                return graphicNode;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void moveGraphicNode(GraphicNode graphicNode, Point relativeMovement) {
+        graphicNode.setLocation(
+                graphicNode.getX() + relativeMovement.x,
+                graphicNode.getY() + relativeMovement.y
+        );
+        for(GraphicJoint graphicJoint : graphicNode.getGraphicInputJoints()) {
+            graphicJoint.setLocation(
+                    graphicJoint.getX() + relativeMovement.x,
+                    graphicJoint.getY() + relativeMovement.y
+            );
+        }
+        for(GraphicJoint graphicJoint : graphicNode.getGraphicOutputJoints()) {
+            graphicJoint.setLocation(
+                    graphicJoint.getX() + relativeMovement.x,
+                    graphicJoint.getY() + relativeMovement.y
+            );
+        }
+        if(graphicNode.getMaskPanel() != null) {
+            graphicNode.getMaskPanel().setLocation(
+                    graphicNode.getMaskPanel().getX() + relativeMovement.x,
+                    graphicNode.getMaskPanel().getY() + relativeMovement.y
+            );
+        }
+    }
+
+    @Override
     public void cleanUpCanvas() {
         ArrayList<ArrayList<Integer>> nodeSets = this.nodeControl.getNodeSets(this.getFunctionIndex());
 
@@ -494,7 +486,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
                     oldBounds[0].y + ((oldBounds[1].y - oldBounds[0].y) / 2)
             );
             for(int nodeIndex : nodeSet) {
-                GraphicNode graphicNode = this.findGraphicNode(this.getFunctionIndex(), nodeIndex);
+                GraphicNode graphicNode = this.findGraphicNode(nodeIndex);
                 if(graphicNode != null) {
                     graphicNode.setTotalLocation(centerPoint.x, centerPoint.y, this.zoomFactor);
 
@@ -512,7 +504,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         Point bottomRight = new Point();
 
         for(int nodeIndex : nodeSet) {
-            GraphicNode graphicNode = this.findGraphicNode(this.getFunctionIndex(), nodeIndex);
+            GraphicNode graphicNode = this.findGraphicNode(nodeIndex);
             if(graphicNode != null) {
                 Point nodeUpperLeft = graphicNode.getLocation();
                 Point nodeBottomRight = new Point(nodeUpperLeft.x + graphicNode.getWidth(), nodeUpperLeft.y + graphicNode.getHeight());

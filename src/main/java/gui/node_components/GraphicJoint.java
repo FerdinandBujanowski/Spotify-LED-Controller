@@ -14,7 +14,7 @@ public class GraphicJoint extends JPanel {
     private Color color;
     private boolean hover;
 
-    public GraphicJoint(Color color, GraphicNode parentNode) {
+    public GraphicJoint(Color color) {
         this.setSize(NodeControl.JOINT_WIDTH, NodeControl.JOINT_WIDTH);
         this.color = color;
         this.hover = false;
