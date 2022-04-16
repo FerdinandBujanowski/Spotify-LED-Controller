@@ -683,7 +683,35 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
                 newGraphicNode = this.functionGraphicUnits.get(functionIndex).findGraphicNode(newNodeIndex);
                 this.functionGraphicUnits.get(functionIndex).moveGraphicNode(newGraphicNode, new Point(oldGraphicNode.getX() - 50, oldGraphicNode.getY() - 50));
             }
-            //TODO : connections
+        }
+        for(LogicNode logicNode : templateNodes) {
+            for(InputJoint inputJoint : logicNode.getInputJoints()) {
+                OutputJoint connectedOutputJoint = inputJoint.getConnectedOutputJoint();
+                if(connectedOutputJoint != null) {
+                    LogicNode parentNode = connectedOutputJoint.getParentNode();
+                    if(nodeIndexes.contains(parentNode.getNodeIndex())) {
+                        templateConnections.add(new NodeConnection(
+                                new ThreeCoordinatePoint(
+                                        functionIndex,
+                                        newIndexCorrespondence.getCorrespondingValue(parentNode.getNodeIndex()),
+                                        parentNode.getOutputJointIndex(connectedOutputJoint)
+                                ),
+                                new ThreeCoordinatePoint
+                                        (functionIndex,
+                                                newIndexCorrespondence.getCorrespondingValue(logicNode.getNodeIndex()),
+                                                logicNode.getInputJointIndex(inputJoint)
+                                        )
+                        ));
+                    }
+                }
+            }
+        }
+        for(NodeConnection nodeConnection : templateConnections) {
+            try {
+                this.makeNodeConnection(nodeConnection);
+            } catch (JointConnectionFailedException e) {
+                e.printStackTrace();
+            }
         }
 
         return newNodeIndexes;
