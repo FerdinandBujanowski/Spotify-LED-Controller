@@ -1,6 +1,5 @@
 package control.type_enums;
 
-import logic.node.joint.InputJoint;
 import logic.node.nodes.basic_operations.*;
 import logic.node.nodes.branch.ConditionalBranchNode;
 import logic.node.nodes.branch.ProbabilityBranchNode;
@@ -42,9 +41,9 @@ public enum NodeType {
     LESS_NODE("Less Than", "Compare", LessNode.class),
 
     //Constant
-    CONSTANT_INTEGER_NODE("Constant Integer", "Constant", ConstantIntegerNode.class, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
-    CONSTANT_NUMBER_NODE("Constant Number", "Constant", ConstantNumberNode.class, new InputDialogType[] { InputDialogType.NUMBER_TYPE_INPUT }),
-    CONSTANT_UNIT_NUMBER_NODE("Constant Unit Number", "Constant", ConstantUnitNumberNode.class, new InputDialogType[] {InputDialogType.UNIT_NUMBER_TYPE_INPUT }),
+    CONSTANT_INTEGER_NODE("CONST Integer", "Constant", ConstantIntegerNode.class, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
+    CONSTANT_NUMBER_NODE("CONST Number", "Constant", ConstantNumberNode.class, new InputDialogType[] { InputDialogType.NUMBER_TYPE_INPUT }),
+    CONSTANT_UNIT_NUMBER_NODE("CONST Unit Number", "Constant", ConstantUnitNumberNode.class, new InputDialogType[] {InputDialogType.UNIT_NUMBER_TYPE_INPUT }),
     PI_NODE("PI", "Constant", PiNode.class),
 
     //DEBUG
@@ -59,11 +58,12 @@ public enum NodeType {
     LOGICAL_NOT_NODE("NOT", "Logical Operators", LogicalNotNode.class),
 
     //MASK
-    PLAIN_MASK_NODE("_PLAIN_MASK_", "Mask", MaskNode.class, true),
+    SQUARE_MASK_NODE("Square Mask", "Mask", SquareMaskNode.class, true),
+    CIRCLE_MASK_NODE("Circle Mask", "Mask", CircleMaskNode.class, true),
     MASK_ADDITION_NODE("Mask Addition", "Mask", MaskAdditionNode.class, true),
     MASK_SUBTRACTION_NODE("Mask Subtraction", "Mask", MaskSubtractionNode.class, true),
     MASK_DIFFERENCE_NODE("Mask Difference", "Mask", MaskDifferenceNode.class, true),
-    MASK_UNION_NODE("Mask Union", "Mask", MaskUnionNode.class, true),
+    MASK_INTERSECTION_NODE("Mask Intersection", "Mask", MaskIntersectionNode.class, true),
     MASK_X_MASK_NODE("Mask X Mask", "Mask", MultiplyMaskWithMaskNode.class, true),
     MASK_X_NUMBER_NODE("Mask X Number", "Mask", MultiplyMaskWithUnitNode.class, true),
     INVERTED_MASK_NODE("Inverted Mask", "Mask", InvertedMaskNode.class, true),

@@ -9,7 +9,7 @@ import logic.node.joint.joint_types.MaskJointDataType;
 
 import java.awt.*;
 
-public class MoveMaskNode extends MaskNode {
+public class MoveMaskNode extends SquareMaskNode {
 
     public MoveMaskNode(int nodeIndex) {
         super(

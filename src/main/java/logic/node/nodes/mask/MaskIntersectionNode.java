@@ -6,9 +6,9 @@ import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.MaskJointDataType;
 
-public class MaskUnionNode extends MaskNode {
+public class MaskIntersectionNode extends SquareMaskNode {
 
-    public MaskUnionNode(int nodeIndex) {
+    public MaskIntersectionNode(int nodeIndex) {
         super(
                 nodeIndex,
                 new InputJoint[] {
@@ -18,7 +18,7 @@ public class MaskUnionNode extends MaskNode {
                 new OutputJoint[] {
                         new OutputJoint(new MaskJointDataType(), "Output")
                 },
-                NodeType.MASK_UNION_NODE
+                NodeType.MASK_INTERSECTION_NODE
         );
     }
 
@@ -26,6 +26,6 @@ public class MaskUnionNode extends MaskNode {
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
         LogicMask maskA = (LogicMask) inputJoints[0].getJointDataType().getData();
         LogicMask maskB = (LogicMask) inputJoints[1].getJointDataType().getData();
-        return new MaskJointDataType[] { new MaskJointDataType(LogicMask.getJoinedMask_Union(maskA, maskB)) };
+        return new MaskJointDataType[] { new MaskJointDataType(LogicMask.getJoinedMask_Intersection(maskA, maskB)) };
     }
 }

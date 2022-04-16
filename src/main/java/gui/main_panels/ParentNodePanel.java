@@ -15,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -62,11 +63,10 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                lastClickedX = e.getX();
-                lastClickedY = e.getY();
                 currentlyMoving = true;
                 toggleG = false;
                 selectedNodeIndexes.removeAll(selectedNodeIndexes);
+                requestFocus();
                 repaint();
             }
 
@@ -98,11 +98,24 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         };
         this.addMouseMotionListener(this.mouseMotionAdapter);
 
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                onKeyPressed(e);
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                onKeyReleased(e);
+            }
+        });
+
         this.selectedNodeIndexes = new ArrayList<>();
         this.copiedNodeIndexes = new ArrayList<>();
         this.toggleShift = false;
         this.toggleCtrl = false;
         this.toggleG = false;
+
+        this.requestFocus();
     }
 
     public void updateGraphicNodes(Point[] positions) {
@@ -178,6 +191,15 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
                 Dimension halfOval = new Dimension(ovalDimension.width / 2, ovalDimension.height / 2);
                 g.fillRect(topLeft.x, topLeft.y + halfOval.height, graphicNode.getWidth() + 4, graphicNode.getHeight() - (2 * halfOval.height));
                 g.fillRect(topLeft.x + halfOval.width, topLeft.y, graphicNode.getWidth() - (2 * halfOval.width), graphicNode.getHeight() + 4);
+            }
+        }
+
+        if(this.toggleCtrl) {
+            ArrayList<ArrayList<Integer>> nodeSets = this.nodeControl.getNodeSets(this.getFunctionIndex());
+            for(ArrayList<Integer> nodeSet : nodeSets) {
+                Point[] bounds = this.getNodeSetBounds(nodeSet);
+                g.setColor(Color.GRAY);
+                g.drawRect(bounds[0].x, bounds[0].y, bounds[1].x - bounds[0].x, bounds[1].y - bounds[0].y);
             }
         }
     }
@@ -299,6 +321,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             case KeyEvent.VK_CONTROL -> {
                 if(!this.toggleShift) {
                     this.toggleCtrl = true;
+                    this.repaint();
                 }
             }
             case KeyEvent.VK_G -> {
@@ -363,6 +386,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         }
         if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
             this.toggleCtrl = false;
+            this.repaint();
         }
     }
 
@@ -482,26 +506,36 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             TwoIntegerCorrespondence rankCorresponence = new TwoIntegerCorrespondence();
             Point[] oldBounds = this.getNodeSetBounds(nodeSet);
             Point centerPoint = new Point(
-                    oldBounds[0].x + ((oldBounds[1].x + oldBounds[0].x) / 2),
+                    oldBounds[0].x + ((oldBounds[1].x - oldBounds[0].x) / 2),
                     oldBounds[0].y + ((oldBounds[1].y - oldBounds[0].y) / 2)
             );
             for(int nodeIndex : nodeSet) {
                 GraphicNode graphicNode = this.findGraphicNode(nodeIndex);
                 if(graphicNode != null) {
-                    graphicNode.setTotalLocation(centerPoint.x, centerPoint.y, this.zoomFactor);
+                    Point newLocation = new Point(centerPoint.x - (int)(0.5 * graphicNode.getWidth()), centerPoint.y - (int)(0.5 * graphicNode.getHeight()));
+                    this.moveGraphicNode(graphicNode, new Point(newLocation.x - graphicNode.getX(), newLocation.y - graphicNode.getY()));
 
                     int rank = this.nodeControl.getNodeRank(this.getFunctionIndex(), nodeIndex);
                     rankCorresponence.addValue(nodeIndex, rank);
-                    graphicNode.setTotalLocation(graphicNode.getX() + rank * 200, graphicNode.getY(), this.zoomFactor);
+                    newLocation.x = graphicNode.getX() + rank * graphicNode.getWidth();
+                    newLocation.y = graphicNode.getY();
+                    this.moveGraphicNode(graphicNode, new Point(newLocation.x - graphicNode.getX(), newLocation.y - graphicNode.getY()));
                 }
             }
         }
+        this.repaint();
     }
 
     private Point[] getNodeSetBounds(ArrayList<Integer> nodeSet) {
         Point[] bounds = new Point[2];
         Point upperLeft = new Point();
         Point bottomRight = new Point();
+
+        GraphicNode firstNode = this.findGraphicNode(nodeSet.get(0));
+        if(firstNode != null) {
+            upperLeft.x = firstNode.getX();
+            upperLeft.y = firstNode.getY();
+        }
 
         for(int nodeIndex : nodeSet) {
             GraphicNode graphicNode = this.findGraphicNode(nodeIndex);

@@ -8,7 +8,7 @@ import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.MaskJointDataType;
 import logic.node.joint.joint_types.NumberJointDataType;
 
-public class ScaleMaskNode extends MaskNode {
+public class ScaleMaskNode extends SquareMaskNode {
 
     private final PixelAlgorithmType pixelAlgorithmType;
 

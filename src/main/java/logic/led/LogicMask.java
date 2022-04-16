@@ -120,7 +120,7 @@ public class LogicMask implements Serializable {
         );
     }
 
-    public static LogicMask getJoinedMask_Union(LogicMask maskA, LogicMask maskB) {
+    public static LogicMask getJoinedMask_Intersection(LogicMask maskA, LogicMask maskB) {
         return LogicMask.getJoinedMask(
                 maskA,
                 maskB,
@@ -273,7 +273,7 @@ public class LogicMask implements Serializable {
         return newMask;
     }
 
-    private static double[] rotateCoordinates(double x, double y, double radians) {
+    public static double[] rotateCoordinates(double x, double y, double radians) {
         return new double[] {
                 Math.cos(radians) * x - Math.sin(radians) * y,
                 Math.sin(radians) * x + Math.cos(radians) * y

@@ -6,7 +6,7 @@ import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.MaskJointDataType;
 
-public class MaskAdditionNode extends MaskNode {
+public class MaskAdditionNode extends SquareMaskNode {
 
     public MaskAdditionNode(int nodeIndex) {
         super(

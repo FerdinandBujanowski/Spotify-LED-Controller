@@ -7,7 +7,7 @@ import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.MaskJointDataType;
 import logic.node.joint.joint_types.UnitNumberJointDataType;
 
-public class MultiplyMaskWithUnitNode extends MaskNode {
+public class MultiplyMaskWithUnitNode extends SquareMaskNode {
 
     public MultiplyMaskWithUnitNode(int nodeIndex) {
         super(

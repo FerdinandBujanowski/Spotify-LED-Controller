@@ -7,7 +7,7 @@ import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.IntegerJointDataType;
 import logic.node.joint.joint_types.MaskJointDataType;
 
-public class InvertedMaskNode extends MaskNode {
+public class InvertedMaskNode extends SquareMaskNode {
 
     public InvertedMaskNode(int nodeIndex) {
         super(
