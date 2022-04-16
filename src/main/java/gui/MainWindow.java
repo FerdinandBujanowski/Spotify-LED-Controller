@@ -25,6 +25,8 @@ import java.util.ArrayList;
 
 public class MainWindow extends JFrame {
 
+    private Dimension dimension;
+
     private SpotifyPlayerPanel spotifyPlayerPanel;
 
     private NodeEditWindow nodeEditWindow;
@@ -50,11 +52,12 @@ public class MainWindow extends JFrame {
     public MainWindow(Dimension dimension, String title, SongControl songControl, NodeControl nodeControl, LedControl ledControl) {
         super(title);
 
+        this.dimension = dimension;
         this.setIconImage(new ImageIcon("images\\icon\\icon.png").getImage());
         this.bProjectOpen = false;
         this.setResizable(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.getContentPane().setPreferredSize(dimension);
+        this.getContentPane().setPreferredSize(this.dimension);
         this.splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {
             @Override
             public int getDividerLocation() {
@@ -72,11 +75,9 @@ public class MainWindow extends JFrame {
         JSlider songSlider = new JSlider(0, 1000, 0);
 
         this.playButton = new PlayButton(songControl);
-        buttonPanel.add(playButton);
-        playButton.setSize(100, 20);
-        playButton.setLocation((dimension.width - playButton.getSize().width) / 2, 0);
+        buttonPanel.add(this.playButton);
+        this.playButton.setSize(100, 20);
         buttonPanel.add(songSlider);
-        songSlider.setSize(dimension.width, 20);
         songSlider.setLocation(0, 20);
         songSlider.setMinorTickSpacing(1);
         this.splitPane.add(this.tabbedPane, JSplitPane.BOTTOM);
@@ -499,6 +500,21 @@ public class MainWindow extends JFrame {
                         functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).onKeyReleased(e);
                     }
                 }
+            }
+        });
+
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Dimension newSize = getContentPane().getSize();
+                playButton.setLocation((newSize.width - playButton.getSize().width) / 2, 0);
+                songSlider.setSize(newSize.width, 20);
+
+                if(spotifyPlayerPanel != null) spotifyPlayerPanel.resizeComponents(newSize);
+                repaint();
+                repaintWindows(songControl, nodeControl);
+
+                //TODO : other tabs
             }
         });
     }
