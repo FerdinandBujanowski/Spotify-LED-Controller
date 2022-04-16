@@ -43,7 +43,6 @@ public class SpotifyPlayerPanel extends JPanel {
         //Connected Label
         this.connectedLabel = new JLabel("", SwingConstants.CENTER);
         this.connectedLabel.setForeground(Color.WHITE);
-        this.connectedLabel.setBounds((windowDimension.width - 200) / 2, 5, 200, 20);
 
         this.add(this.connectedLabel);
 
@@ -56,7 +55,6 @@ public class SpotifyPlayerPanel extends JPanel {
                 repaint();
             }
         });
-        this.connectToSpotifyButton.setBounds((windowDimension.width - 200) / 2, 30, 200, 20);
 
         this.add(this.connectToSpotifyButton);
 
@@ -80,14 +78,12 @@ public class SpotifyPlayerPanel extends JPanel {
 
         //Search Song Field
         this.searchSongField = new JTextField();
-        this.searchSongField.setBounds((windowDimension.width / 2) - 150, 60, 200, 20);
         this.searchSongField.setEnabled(false);
 
         this.add(this.searchSongField);
 
         //Search Song Button
         this.searchSongButton = new JButton("Search");
-        this.searchSongButton.setBounds((windowDimension.width / 2) + 51, 60, 100, 20);
         this.searchSongButton.setEnabled(false);
 
         this.searchSongButton.addActionListener(new ActionListener() {
@@ -103,14 +99,12 @@ public class SpotifyPlayerPanel extends JPanel {
 
         //Select Song Box
         this.selectSongBox = new JComboBox<>();
-        this.selectSongBox.setBounds((windowDimension.width / 2) - 150, 85, 200, 20);
         this.selectSongBox.setEnabled(false);
 
         this.add(selectSongBox);
 
         //Select Song Button
         this.selectSongButton = new JButton("Select");
-        this.selectSongButton.setBounds((windowDimension.width / 2) + 51, 85, 100, 20);
         this.selectSongButton.setEnabled(false);
 
         this.selectSongButton.addActionListener(new ActionListener() {
@@ -124,19 +118,16 @@ public class SpotifyPlayerPanel extends JPanel {
 
         //Song Image Label
         this.songImageLabel = new JLabel();
-        this.songImageLabel.setBounds((windowDimension.width - 300) / 2, 120, 300, 300);
 
         this.add(this.songImageLabel);
 
         //Synced Label
         this.songConnectedLabel = new JLabel("", SwingConstants.CENTER);
-        this.songConnectedLabel.setBounds(windowDimension.width / 2 - 150, 430, 150, 20);
         this.songConnectedLabel.setForeground(Color.WHITE);
         this.add(this.songConnectedLabel);
 
         //Sync Button
         this.songConnectButton = new JButton("Connect Song");
-        this.songConnectButton.setBounds(windowDimension.width / 2, 430, 150, 20);
         this.songConnectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -147,6 +138,21 @@ public class SpotifyPlayerPanel extends JPanel {
 
         //Current Devices Text
         this.currentDevicesText = new JLabel();
+
+        this.resizeComponents(windowDimension);
+    }
+
+    public void resizeComponents(Dimension dimension) {
+        this.searchSongButton.setBounds((dimension.width / 2) + 51, 60, 100, 20);
+        this.searchSongField.setBounds((dimension.width / 2) - 150, 60, 200, 20);
+        this.connectToSpotifyButton.setBounds((dimension.width - 200) / 2, 30, 200, 20);
+        this.connectedLabel.setBounds((dimension.width - 200) / 2, 5, 200, 20);
+        this.selectSongBox.setBounds((dimension.width / 2) - 150, 85, 200, 20);
+        this.selectSongButton.setBounds((dimension.width / 2) + 51, 85, 100, 20);
+        this.songImageLabel.setBounds((dimension.width - 300) / 2, 120, 300, 300);
+        this.songConnectedLabel.setBounds(dimension.width / 2 - 150, 430, 150, 20);
+        this.songConnectButton.setBounds(dimension.width / 2, 430, 150, 20);
+
     }
 
     @Override
