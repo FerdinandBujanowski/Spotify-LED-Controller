@@ -1,7 +1,7 @@
 package control.node;
 
 import control.type_enums.NodeType;
-import gui.node_components.GraphicNode;
+import gui.main_panels.node_panel.GraphicNode;
 
 import java.awt.*;
 

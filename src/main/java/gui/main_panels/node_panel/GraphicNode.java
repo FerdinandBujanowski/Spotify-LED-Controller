@@ -1,4 +1,4 @@
-package gui.node_components;
+package gui.main_panels.node_panel;
 
 import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.function.Function;
 
 public class GraphicNode extends JPanel {
 

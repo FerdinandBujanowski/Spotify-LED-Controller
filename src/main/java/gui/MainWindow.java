@@ -13,7 +13,6 @@ import gui.main_panels.led_panel.LedEditWindow;
 import gui.main_panels.node_panel.NodeEditWindow;
 import gui.main_panels.player_panel.PlayButton;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
-import gui.node_components.GraphicNode;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

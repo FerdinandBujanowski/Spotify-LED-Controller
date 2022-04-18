@@ -1,4 +1,4 @@
-package gui.node_components;
+package gui.main_panels.node_panel;
 
 import javax.swing.*;
 import java.awt.*;

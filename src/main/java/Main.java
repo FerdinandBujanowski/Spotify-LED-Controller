@@ -39,7 +39,6 @@ public class Main {
 
         Thread asyncThreadA = new Thread(() -> {
             while(true) {
-                //TODO: every 500ms or so, update Song playing status
                 if(songControl.isSongSelected()) {
                     songControl.updatePlayingState();
                     if(songControl.isSongPlaying() && songControl.isSongPaused()) {
@@ -63,7 +62,6 @@ public class Main {
 
         Thread asyncThreadB = new Thread(() -> {
             while(true) {
-                //TODO: as long as Spotify and SongControl are still synchronized, update the GUI accordingly
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {

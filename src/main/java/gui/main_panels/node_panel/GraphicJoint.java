@@ -1,4 +1,4 @@
-package gui.node_components;
+package gui.main_panels.node_panel;
 
 import control.node.NodeControl;
 import gui.main_panels.ParentNodePanel;

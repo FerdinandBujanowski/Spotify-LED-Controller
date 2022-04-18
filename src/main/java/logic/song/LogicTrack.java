@@ -3,6 +3,7 @@ package logic.song;
 import control.exceptions.EventTimeNegativeException;
 import control.type_enums.CurveType;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -14,7 +15,7 @@ public class LogicTrack implements Serializable {
         this.eventArrayList = new ArrayList<>();
     }
 
-    public void addEventToTrack(int msStart, int msEnd, CurveType curveType) {
+    public void addEventToTrack(int msStart, int msEnd, CurveType curveType, int eventIndex) {
         int msDuration = msEnd - msStart;
         try {
             LogicEvent event = new LogicEvent(msStart, msEnd);
@@ -28,7 +29,11 @@ public class LogicTrack implements Serializable {
                 overlappingEvent = this.getOverlappingEvent(event);
             }
             event.setCurveType(curveType);
-            this.eventArrayList.add(event);
+            if(eventIndex == -1) {
+                this.eventArrayList.add(event);
+            } else {
+                this.eventArrayList.add(eventIndex, event);
+            }
         } catch (EventTimeNegativeException e) {
             e.printStackTrace();
         }
@@ -90,5 +95,10 @@ public class LogicTrack implements Serializable {
             curveTypeCopy[i] = this.eventArrayList.get(i).getCurveType();
         }
         return curveTypeCopy;
+    }
+
+    public Point getEventTime(int eventIndex) {
+        LogicEvent logicEvent = this.eventArrayList.get(eventIndex);
+        return new Point(logicEvent.getMsStart(), logicEvent.getMsDuration());
     }
 }

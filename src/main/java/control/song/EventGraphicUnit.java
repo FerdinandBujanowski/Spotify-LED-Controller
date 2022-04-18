@@ -17,4 +17,7 @@ public interface EventGraphicUnit {
     //...
     void tick(int ms);
 
+    double getEventWidthDivision();
+    Point getClosestEventTime(int pixelInPanel);
+    void onSelectRequest(int trackIndex, int msStart);
 }

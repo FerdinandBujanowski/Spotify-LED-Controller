@@ -6,7 +6,7 @@ import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
 import control.save.NodeSaveUnit;
 import control.type_enums.*;
-import gui.node_components.GraphicNode;
+import gui.main_panels.node_panel.GraphicNode;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 import logic.node.joint.*;

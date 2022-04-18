@@ -7,15 +7,14 @@ import control.exceptions.CannotDeleteNodeException;
 import control.type_enums.JointType;
 import control.type_enums.NodeType;
 import control.math_functions.MathFunctions;
-import gui.node_components.GraphicJoint;
-import gui.node_components.GraphicNode;
-import gui.node_components.MaskPanel;
+import gui.main_panels.node_panel.GraphicJoint;
+import gui.main_panels.node_panel.GraphicNode;
+import gui.main_panels.node_panel.MaskPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
