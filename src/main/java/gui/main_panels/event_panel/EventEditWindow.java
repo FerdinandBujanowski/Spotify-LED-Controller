@@ -207,6 +207,14 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
+    public void editEvent(int trackIndex, int msStartOld, int msStartNew, int msDurationNew, CurveType curveTypeNew) {
+        GraphicEvent graphicEvent = this.findGraphicEvent(trackIndex, msStartOld);
+        graphicEvent.updateEventTime(msStartNew, msDurationNew);
+        graphicEvent.setCurveType(curveTypeNew);
+        graphicEvent.updateBounds();
+    }
+
+    @Override
     public void tick(int ms) {
 
         this.cursorLabel.setBounds(

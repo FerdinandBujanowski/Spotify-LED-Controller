@@ -7,27 +7,24 @@ import java.io.Serializable;
 
 public class LogicEvent implements Serializable {
 
-    private int msStart, msDuration, msEnd;
+    private int msStart, msDuration;
 
     private CurveType curveType;
 
-    public LogicEvent(int msStart, int msEnd) throws EventTimeNegativeException {
-        this.updateEventTime(msStart, msEnd);
+    public LogicEvent(int msStart, int msDuration) throws EventTimeNegativeException {
+        this.updateEventTime(msStart, msDuration);
 
         this.curveType = CurveType.CONSTANT;
     }
 
-    public void updateEventTime(int newStart, int newEnd) throws EventTimeNegativeException {
+    public void updateEventTime(int newStart, int newDuration) throws EventTimeNegativeException {
         if(newStart < 0) {
             throw new EventTimeNegativeException("Event start time < 0");
-        } else if (newEnd < 0) {
+        } else if (newDuration < 0) {
             throw new EventTimeNegativeException("Event end time < 0");
-        } else if(newEnd <= newStart) {
-            throw new EventTimeNegativeException("Event duration negative");
         } else {
             this.msStart = newStart;
-            this.msEnd = newEnd;
-            this.msDuration = msEnd - msStart;
+            this.msDuration = newDuration;
         }
     }
 
@@ -36,9 +33,6 @@ public class LogicEvent implements Serializable {
     }
     public int getMsDuration() {
         return this.msDuration;
-    }
-    public int getMsEnd() {
-        return this.msEnd;
     }
 
     public CurveType getCurveType() {

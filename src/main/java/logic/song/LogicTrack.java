@@ -15,14 +15,13 @@ public class LogicTrack implements Serializable {
         this.eventArrayList = new ArrayList<>();
     }
 
-    public void addEventToTrack(int msStart, int msEnd, CurveType curveType, int eventIndex) {
-        int msDuration = msEnd - msStart;
+    public void addEventToTrack(int msStart, int msDuration, CurveType curveType, int eventIndex) {
         try {
-            LogicEvent event = new LogicEvent(msStart, msEnd);
+            LogicEvent event = new LogicEvent(msStart, msDuration);
             LogicEvent overlappingEvent = this.getOverlappingEvent(event);
             while(overlappingEvent != null) {
                 if(event.getMsStart() >= overlappingEvent.getMsStart()) {
-                    event.updateEventTime(overlappingEvent.getMsEnd(), overlappingEvent.getMsEnd() + msDuration);
+                    event.updateEventTime(overlappingEvent.getMsStart(), overlappingEvent.getMsDuration());
                 } else {
                     event.updateEventTime(event.getMsStart(), overlappingEvent.getMsStart());
                 }
@@ -49,13 +48,13 @@ public class LogicTrack implements Serializable {
     }
 
     public boolean eventOverlap(LogicEvent eventA, LogicEvent eventE) {
-        return eventA.getMsStart() < eventE.getMsStart() && eventA.getMsEnd() > eventE.getMsStart();
+        return eventA.getMsStart() < eventE.getMsStart() && (eventA.getMsStart() + eventA.getMsDuration()) > eventE.getMsStart();
     }
 
     public int getEventIndex(int ms) {
         for(int i = 0; i < this.eventArrayList.size(); i++) {
             LogicEvent event = this.eventArrayList.get(i);
-            if(ms >= event.getMsStart() && ms < event.getMsEnd()) {
+            if(ms >= event.getMsStart() && ms < (event.getMsStart() + event.getMsDuration())) {
                 return i;
             }
         }

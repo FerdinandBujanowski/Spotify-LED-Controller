@@ -20,7 +20,8 @@ public class GraphicEvent extends JLabel {
     private Point eventTime;
 
     private boolean selected;
-    private boolean leftHovered, rightHovered, leftMoved, rightMoved;
+    private boolean leftHovered, rightHovered;
+    private int lastMovement;
 
     public GraphicEvent(int trackIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, TrackRequestAcceptor songControl) {
         this.trackIndex = trackIndex;
@@ -32,22 +33,25 @@ public class GraphicEvent extends JLabel {
         this.selected = false;
         this.leftHovered = false;
         this.rightHovered = false;
-        this.leftMoved = false;
-        this.rightMoved = false;
+        this.lastMovement = 0;
 
         this.setOpaque(true);
         this.setBackground(curveType.getColor());
 
         this.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
 
+            @Override
+            public void mousePressed(MouseEvent e) {
                 if(leftHovered) {
-                    leftMoved = true;
+                    lastMovement = -1;
                 }
                 if(rightHovered) {
-                    rightMoved = true;
+                    lastMovement = 1;
                 }
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
 
                 //eventGraphicUnit.onSelectRequest(trackIndex, eventTime.x);
 
@@ -60,17 +64,17 @@ public class GraphicEvent extends JLabel {
 
                     songControl.onUpdateEventRequest(
                             trackIndex,
-                            msStart,
+                            eventTime.x,
                             false,
                             newCurveType,
-                            msStart,
-                            msDuration
+                            eventTime.x,
+                            eventTime.y
                     );
                 } else if(e.getButton() == MouseEvent.BUTTON1) {
                     if(e.getClickCount() == 2) {
                         songControl.onUpdateEventRequest(
                                 trackIndex,
-                                msStart,
+                                eventTime.x,
                                 true,
                                 curveType,
                                 0,
@@ -79,18 +83,15 @@ public class GraphicEvent extends JLabel {
                     }
                 }
             }
-
             @Override
             public void mouseExited(MouseEvent e) {
                 leftHovered = false;
                 rightHovered = false;
                 repaint();
             }
-
             @Override
             public void mouseReleased(MouseEvent e) {
-                leftMoved = false;
-                rightMoved = false;
+                lastMovement = 0;
                 repaint();
             }
         });
@@ -100,22 +101,26 @@ public class GraphicEvent extends JLabel {
             public void mouseDragged(MouseEvent e) {
 
                 int x = getX() + e.getX();
-                System.out.println("test");
                 Point newTime = eventGraphicUnit.getClosestEventTime(x);
-                int eventIndex = songControl.getCorrespondingEventIndex(trackIndex, eventTime.x);
 
-                if(leftMoved && newTime.x <= eventTime.x) {
+                if(lastMovement == -1 && newTime.x < (eventTime.x + eventTime.y) && eventTime.x != newTime.x) {
                     songControl.onUpdateEventRequest(
                             trackIndex,
-                            msStart,
+                            eventTime.x,
                             false,
                             curveType,
                             newTime.x,
-                            (eventTime.x - newTime.x) + newTime.y
+                            (eventTime.x - newTime.x) + eventTime.y
                     );
-                    Point updateTimeRequest = songControl.getUpdatedEventTime(trackIndex, eventIndex);
-                    updateEventTime(updateTimeRequest.x, updateTimeRequest.y);
-                    updateBounds();
+                } else if(lastMovement == 1 && (newTime.x + newTime.y) > eventTime.x && newTime.x != (eventTime.x + eventTime.y - newTime.y)) {
+                    songControl.onUpdateEventRequest(
+                            trackIndex,
+                            eventTime.x,
+                            false,
+                            curveType,
+                            eventTime.x,
+                            (newTime.x + newTime.y) - eventTime.x
+                    );
                 }
             }
 
@@ -166,7 +171,6 @@ public class GraphicEvent extends JLabel {
                 (int) Math.round(this.eventTime.y / eventGraphicUnit.getEventWidthDivision()),
                 30
         );
-        repaint();
     }
 
     public CurveType getCurveType() {
@@ -197,11 +201,11 @@ public class GraphicEvent extends JLabel {
             );
         }
 
-        if(this.rightHovered || this.rightMoved) {
+        if(this.rightHovered || this.lastMovement == 1) {
             g.setColor(Color.BLUE);
             g.fillRect(this.getWidth() - 2, 0, 2, this.getHeight());
         }
-        if(this.leftHovered || this.leftMoved) {
+        if(this.leftHovered || this.lastMovement == -1) {
             g.setColor(Color.BLUE);
             g.fillRect(0, 0, 2, this.getHeight());
         }

@@ -147,7 +147,7 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
                 for(AudioAnalysisMeasure bar : this.selectedSongAnalysis.getBars()) {
                     this.logicTracks.get(0).addEventToTrack(
                             (int)(bar.getStart() * 1000),
-                            (int)((bar.getStart() + bar.getDuration()) * 1000),
+                            (int)((bar.getDuration()) * 1000),
                             CurveType.CONSTANT,
                             -1
                     );
@@ -159,7 +159,7 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
                     beatDurationSum += beat.getDuration();
                     this.logicTracks.get(1).addEventToTrack(
                             (int)(beat.getStart() * 1000),
-                            (int)((beat.getStart() + beat.getDuration()) * 1000),
+                            (int)(beat.getDuration() * 1000),
                             CurveType.CONSTANT,
                             -1
                     );
@@ -401,7 +401,7 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
     public void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration) {
         if(this.logicTracks.get(trackIndex) != null) {
             int oldLength = this.logicTracks.get(trackIndex).getEventsCopyArray().length;
-            this.logicTracks.get(trackIndex).addEventToTrack(msStart, msStart + msDuration, CurveType.CONSTANT, -1);
+            this.logicTracks.get(trackIndex).addEventToTrack(msStart, msDuration, CurveType.CONSTANT, -1);
 
             //TODO: Prüfen nach Overlaps klappt anscheinend noch nicht
             LogicEvent[] events = this.logicTracks.get(trackIndex).getEventsCopyArray();
@@ -418,11 +418,13 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
         if(eventIndex == -1) return;
 
         this.logicTracks.get(trackIndex).removeEventAtIndex(eventIndex);
-        this.eventWindow.deleteEvent(trackIndex, eventIndex);
-
-        if(!deleted) {
-            this.logicTracks.get(trackIndex).addEventToTrack(msStartNew, msStartNew + msDurationNew, curveType, eventIndex);
-            this.eventWindow.addEventToTrack(trackIndex, msStartNew, msDurationNew, curveType);
+        if(deleted) {
+            this.eventWindow.deleteEvent(trackIndex, eventIndex);
+        }
+        else {
+            this.logicTracks.get(trackIndex).addEventToTrack(msStartNew, msDurationNew, curveType, eventIndex);
+            Point updatedEventTime = this.getUpdatedEventTime(trackIndex, eventIndex);
+            this.eventWindow.editEvent(trackIndex, msStartOld, updatedEventTime.x, updatedEventTime.y, curveType);
         }
     }
 
