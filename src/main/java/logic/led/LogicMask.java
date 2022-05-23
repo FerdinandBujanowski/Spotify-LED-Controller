@@ -50,8 +50,8 @@ public class LogicMask implements Serializable {
     public int getDegree() {
         int degree = 0;
         for(LogicPixel pixel : this.pixels) {
-            if(pixel.x > Math.abs(degree)) degree = Math.abs(pixel.x);
-            if(pixel.y > Math.abs(degree)) degree = Math.abs(pixel.y);
+            if(Math.abs(pixel.x) > Math.abs(degree)) degree = Math.abs(pixel.x);
+            if(Math.abs(pixel.y) > Math.abs(degree)) degree = Math.abs(pixel.y);
         }
         return degree;
     }

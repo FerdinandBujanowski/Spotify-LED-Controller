@@ -1,6 +1,8 @@
 package control.song;
 
+import com.google.gson.JsonParser;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
+import com.wrapper.spotify.exceptions.detailed.NotFoundException;
 import com.wrapper.spotify.model_objects.miscellaneous.*;
 import com.wrapper.spotify.model_objects.specification.AudioFeatures;
 import com.wrapper.spotify.model_objects.specification.Track;
@@ -148,7 +150,7 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
                     this.logicTracks.get(0).addEventToTrack(
                             (int)(bar.getStart() * 1000),
                             (int)((bar.getDuration()) * 1000),
-                            CurveType.CONSTANT,
+                            eventWindow.getDefaultCurveType(),
                             -1
                     );
                 }
@@ -160,7 +162,7 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
                     this.logicTracks.get(1).addEventToTrack(
                             (int)(beat.getStart() * 1000),
                             (int)(beat.getDuration() * 1000),
-                            CurveType.CONSTANT,
+                            eventWindow.getDefaultCurveType(),
                             -1
                     );
                 }
@@ -200,7 +202,11 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
             try {
                 CurrentlyPlayingContext currentlyPlayingContext = currentPlaybackRequest.execute();
 
-                this.songPlaying = currentlyPlayingContext.getItem().getId().equals(this.songId);
+                if(currentlyPlayingContext == null) {
+                    this.songPlaying = false;
+                } else {
+                    this.songPlaying = currentlyPlayingContext.getItem().getId().equals(this.songId);
+                }
                 if(this.songPlaying) {
                     this.songPaused = !currentlyPlayingContext.getIs_playing();
                 } else {
@@ -251,15 +257,13 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
         return false;
     }
 
-    public String[] getDeviceNameList() {
-        if(this.currentAvailableDevices.length == 0) {
-            return null;
+    public String getDeviceNameList() {
+        String output = "";
+        for(Device device : this.currentAvailableDevices) {
+            output += ("<br/>" + device.getName());
         }
-        return Arrays.copyOf(
-                Arrays.stream(this.currentAvailableDevices).map(Device::getName).toArray(),
-                this.currentAvailableDevices.length,
-                String[].class
-        );
+        if(output.equals("")) return "[no devices]";
+        else return output;
     }
 
     public CurrentlyPlayingContext onGetCurrentPlayingTrack() {
@@ -272,10 +276,6 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
             e.printStackTrace();
         }
         return currentlyPlayingContext;
-    }
-
-    public void onStartPlayback() {
-
     }
 
     public double[] getTrackIntensitiesAt(int ms) {
@@ -291,6 +291,18 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
         try {
             pauseUsersPlaybackRequest.execute();
             this.songPaused = true;
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onStartPlayback() throws NotFoundException {
+        StartResumeUsersPlaybackRequest startUsersPlayback = this.spotifyWebHandler.getSpotifyApi().startResumeUsersPlayback()
+                .uris(JsonParser.parseString("[\"spotify:track:" + this.songId + "\"]").getAsJsonArray())
+                .position_ms(0).build();
+        try {
+            startUsersPlayback.execute();
+            this.updatePlayingState();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
@@ -318,6 +330,7 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
         }
     }
 
+    @Override
     public void onSkipTo(int ms) {
         SeekToPositionInCurrentlyPlayingTrackRequest request =
                 this.spotifyWebHandler.getSpotifyApi().seekToPositionInCurrentlyPlayingTrack(ms).build();
@@ -398,10 +411,10 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
     }
 
     @Override
-    public void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration) {
+    public void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType) {
         if(this.logicTracks.get(trackIndex) != null) {
             int oldLength = this.logicTracks.get(trackIndex).getEventsCopyArray().length;
-            this.logicTracks.get(trackIndex).addEventToTrack(msStart, msDuration, CurveType.CONSTANT, -1);
+            this.logicTracks.get(trackIndex).addEventToTrack(msStart, msDuration, curveType, -1);
 
             //TODO: Prüfen nach Overlaps klappt anscheinend noch nicht
             LogicEvent[] events = this.logicTracks.get(trackIndex).getEventsCopyArray();

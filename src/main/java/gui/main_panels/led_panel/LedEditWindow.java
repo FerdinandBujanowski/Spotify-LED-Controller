@@ -35,16 +35,16 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
                 Point[] pixels = ledControl.getPixels();
                 int finalDegree = ledControl.getFinalDegree();
                 int pixelLength = (finalDegree * 2) + 1;
-                int step = (int)Math.round(this.getWidth() / (double)pixelLength);
+                double step = this.getWidth() / (double)pixelLength;
 
                 if(!drawOnlyLedPixels) {
                     for(int i = -finalDegree; i <= finalDegree; i++) {
                         for(int j = -finalDegree; j <= finalDegree; j++) {
                             g.setColor(ledControl.getColorAt(i, j));
                             g.fillRect(
-                                    (i + finalDegree) * step,
-                                    (j + finalDegree) * step,
-                                    step, step
+                                    (int)Math.round((i + finalDegree) * step),
+                                    (int)Math.round((j + finalDegree) * step),
+                                    (int)Math.round(step), (int)Math.round(step)
                             );
                         }
                     }
@@ -53,16 +53,16 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
                     if(drawOnlyLedPixels) {
                         g.setColor(ledControl.getColorAt(pixel.x, pixel.y));
                         g.fillRect(
-                                (pixel.x + finalDegree) * step,
-                                (pixel.y + finalDegree) * step,
-                                step, step
+                                (int)Math.round((pixel.x + finalDegree) * step),
+                                (int)Math.round((pixel.y + finalDegree) * step),
+                                (int)Math.round(step) - 1, (int)Math.round(step) - 1
                         );
                     }
                     g.setColor(Color.WHITE);
                     g.drawRect(
-                            (pixel.x + finalDegree) * step,
-                            (pixel.y + finalDegree) * step,
-                            step, step
+                            (int)Math.round((pixel.x + finalDegree) * step),
+                            (int)Math.round((pixel.y + finalDegree) * step),
+                            (int)Math.round(step) - 1, (int)Math.round(step) - 1
                     );
                 }
             }

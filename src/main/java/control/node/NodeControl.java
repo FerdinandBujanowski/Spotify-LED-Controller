@@ -29,6 +29,7 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
     private ArrayList<NodeConnection> nodeConnections;
     private ArrayList<LogicFunction> logicFunctions;
     private ArrayList<ThreeCoordinatePoint> trackNodeIndexes;
+    private ArrayList<ThreeCoordinatePoint> ledNodeIndexes;
 
     private int currentSongMs;
     private ArrayList<Double> trackIntensities;
@@ -41,6 +42,7 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
         this.nodeConnections = new ArrayList<>();
         this.logicFunctions = new ArrayList<>();
         this.trackNodeIndexes = new ArrayList<>();
+        this.ledNodeIndexes = new ArrayList<>();
 
         this.currentSongMs = 0;
         this.trackIntensities = new ArrayList<>();
@@ -175,6 +177,7 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
                     this.addTrackNode(trackIndex);
                 }
                 case _LAYER_NODE -> {
+                    this.addLayerNode(null, null, "[Prototype Layer]");
                 }
             }
         }
@@ -271,12 +274,13 @@ public class NodeControl implements Serializable, NodeRequestAcceptor {
             @Override
             public void onInputChangeEvent() {
                 super.onInputChangeEvent();
-                setMaskFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
-                setColorFunction.apply((Color)this.getInputJoints()[1].getJointDataType().getData());
+                if(setMaskFunction != null) setMaskFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
+                if(setColorFunction != null) setColorFunction.apply((Color)this.getInputJoints()[1].getJointDataType().getData());
             }
         };
 
         this.logicNodes.add(layerNode);
+        this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._LAYER_NODE, layerName);
     }
 
 

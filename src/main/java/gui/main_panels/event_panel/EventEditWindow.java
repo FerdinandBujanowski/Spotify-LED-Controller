@@ -6,6 +6,8 @@ import control.type_enums.TimeSignature;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -20,6 +22,11 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
     private double eventWidthDivision = 20;
     private TimeSignature barRoster;
+
+    private boolean toggleCtrl;
+
+    private CurveType defaultCurveType;
+    private boolean curveBrush;
 
     public EventEditWindow(TrackRequestAcceptor songControl) {
         super(null);
@@ -39,8 +46,39 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
         this.barRoster = TimeSignature.ONE_FOUR;
 
+        this.toggleCtrl = false;
+
+        this.defaultCurveType = CurveType.CONSTANT;
+        this.curveBrush = false;
+
         this.setOpaque(true);
         this.setBackground(new Color(218, 218, 218));
+
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                requestFocus();
+                repaint();
+            }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount() == 2) {
+                    Point closestEventTime = getClosestEventTime(e.getX());
+                    songControl.onSkipTo(closestEventTime.x);
+                }
+                repaint();
+            }
+        });
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                onKeyPressed(e);
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                onKeyReleased(e);
+            }
+        });
     }
 
     public TimeSignature getBarRoster() {
@@ -59,6 +97,57 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             }
         }
         return null;
+    }
+
+    public void onKeyPressed(KeyEvent e) {
+        switch(e.getKeyCode()) {
+            case KeyEvent.VK_ESCAPE -> {
+                this.curveBrush = false;
+            }
+            case KeyEvent.VK_CONTROL -> this.toggleCtrl = true;
+            case KeyEvent.VK_PLUS -> {
+                if(this.toggleCtrl) {
+                    zoom(true);
+                }
+            }
+            case KeyEvent.VK_MINUS -> {
+                if(this.toggleCtrl) {
+                    zoom(false);
+                }
+            }
+        }
+    }
+    public void onKeyReleased(KeyEvent e) {
+        switch(e.getKeyCode()) {
+            case KeyEvent.VK_CONTROL -> this.toggleCtrl = false;
+        }
+    }
+
+    public void zoom(boolean zoomIn) {
+        if(zoomIn && this.eventWidthDivision >= 12.0) {
+            this.eventWidthDivision -= 2.0;
+        } else if(!zoomIn && this.eventWidthDivision <= 18.0) {
+            this.eventWidthDivision += 2.0;
+        }
+        for(ArrayList<GraphicEvent> graphicEventArrayList : this.graphicEvents) {
+            for(GraphicEvent graphicEvent : graphicEventArrayList) {
+                graphicEvent.updateBounds();
+            }
+        }
+        updateBounds();
+        repaint();
+    }
+
+    private void updateBounds() {
+        int totalWidth = 0;
+        for(TimeMeasure timeMeasure : this.songControl.getTimeMeasures()) {
+            int msSingleBeat = timeMeasure.getLengthOneBeat();
+            totalWidth += (msSingleBeat * timeMeasure.getBeatsDuration());
+        }
+        this.setPreferredSize(new Dimension(
+                totalWidth / (int)this.eventWidthDivision,
+                this.getPreferredSize().height)
+        );
     }
 
     @Override
@@ -110,14 +199,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             this.graphicEvents.remove(0);
         }
 
-        int totalWidth = 0;
-        for(TimeMeasure timeMeasure : this.songControl.getTimeMeasures()) {
-            int msSingleBeat = timeMeasure.getLengthOneBeat();
-            totalWidth += (msSingleBeat * timeMeasure.getBeatsDuration());
-        }
-        this.setPreferredSize(new Dimension(
-                totalWidth / (int)this.eventWidthDivision,
-                this.getPreferredSize().height));
+        this.updateBounds();
 
         for(int i = 0; i < trackTimes.length; i++) {
             this.addTrack();
@@ -153,15 +235,16 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
        trackLabel.addMouseListener(new MouseAdapter() {
            @Override
            public void mouseClicked(MouseEvent e) {
-               if(e.getClickCount() == 2 && e.getButton()  == MouseEvent.BUTTON1) {
-
-                   Point eventTime = getClosestEventTime(e.getX());
-                   songControl.onAddEventToTrackRequest(
-                           currentIndex,
-                           eventTime.x,
-                           eventTime.y
-                   );
-
+               if(!curveBrush) {
+                   if(e.getClickCount() == 2 && e.getButton()  == MouseEvent.BUTTON1) {
+                       Point eventTime = getClosestEventTime(e.getX());
+                       songControl.onAddEventToTrackRequest(
+                               currentIndex,
+                               eventTime.x,
+                               eventTime.y,
+                               getDefaultCurveType()
+                       );
+                   }
                }
            }
        });
@@ -169,7 +252,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
        this.trackLabels.add(trackLabel);
        this.add(trackLabel);
 
-        JLabel numberLabel = new JLabel("" + (this.trackLabels.size()));
+        JLabel numberLabel = new JLabel("" + this.trackLabels.size());
         numberLabel.setBounds(
                 5,
                 5 + ((this.trackLabels.size() - 1) * 50),
@@ -259,5 +342,23 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         if(graphicEvent != null) {
 
         }
+    }
+
+    @Override
+    public CurveType getDefaultCurveType() {
+        return this.defaultCurveType;
+    }
+    @Override
+    public void setDefaultCurveType(CurveType curveType) {
+        this.defaultCurveType = curveType;
+    }
+
+    @Override
+    public boolean getCurveBrush() {
+        return this.curveBrush;
+    }
+    @Override
+    public void setCurveBrush(boolean curveBrush) {
+        this.curveBrush = curveBrush;
     }
 }

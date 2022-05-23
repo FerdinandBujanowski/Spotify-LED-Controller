@@ -1,5 +1,6 @@
 package gui.main_panels.player_panel;
 
+import com.wrapper.spotify.exceptions.detailed.NotFoundException;
 import control.song.SongControl;
 
 import javax.imageio.ImageIO;
@@ -127,17 +128,25 @@ public class SpotifyPlayerPanel extends JPanel {
         this.add(this.songConnectedLabel);
 
         //Sync Button
+        SpotifyPlayerPanel that = this;
         this.songConnectButton = new JButton("Connect Song");
         this.songConnectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    songControl.onStartPlayback();
+                } catch (NotFoundException ex) {
+                    JOptionPane.showMessageDialog(that, ex.getMessage(), "Connection failed!", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         this.add(this.songConnectButton);
 
         //Current Devices Text
-        this.currentDevicesText = new JLabel();
+        this.currentDevicesText = new JLabel("", SwingConstants.CENTER);
+        this.currentDevicesText.setForeground(Color.WHITE);
+        this.currentDevicesText.setBackground(Color.BLUE);
+        this.add(this.currentDevicesText);
 
         this.resizeComponents(windowDimension);
     }
@@ -152,6 +161,7 @@ public class SpotifyPlayerPanel extends JPanel {
         this.songImageLabel.setBounds((dimension.width - 300) / 2, 120, 300, 300);
         this.songConnectedLabel.setBounds(dimension.width / 2 - 150, 430, 150, 20);
         this.songConnectButton.setBounds(dimension.width / 2, 430, 150, 20);
+        this.currentDevicesText.setBounds((dimension.width) / 6 - 100, 5, 200, 100);
 
     }
 
@@ -165,6 +175,7 @@ public class SpotifyPlayerPanel extends JPanel {
             this.selectSongBox.setEnabled(true);
             this.selectSongButton.setEnabled(true);
             this.songConnectButton.setEnabled(true);
+            this.currentDevicesText.setText("<html>Available Devices: " + this.songControl.getDeviceNameList() + "</html>");
 
         } else {
             this.connectedLabel.setText("[not connected]");
@@ -173,6 +184,7 @@ public class SpotifyPlayerPanel extends JPanel {
             this.selectSongBox.setEnabled(false);
             this.selectSongButton.setEnabled(false);
             this.songConnectButton.setEnabled(false);
+            this.currentDevicesText.setText("[devices]");
         }
         if(!this.songControl.isSongPlaying()) {
             this.songConnectedLabel.setText("[not connected]");

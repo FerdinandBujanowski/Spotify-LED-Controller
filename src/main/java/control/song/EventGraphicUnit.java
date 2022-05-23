@@ -21,4 +21,10 @@ public interface EventGraphicUnit {
     double getEventWidthDivision();
     Point getClosestEventTime(int pixelInPanel);
     void onSelectRequest(int trackIndex, int msStart);
+
+    CurveType getDefaultCurveType();
+    void setDefaultCurveType(CurveType curveType);
+
+    boolean getCurveBrush();
+    void setCurveBrush(boolean curveBrush);
 }

@@ -6,6 +6,7 @@ import control.type_enums.CurveType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -42,63 +43,82 @@ public class GraphicEvent extends JLabel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if(leftHovered) {
-                    lastMovement = -1;
-                }
-                if(rightHovered) {
-                    lastMovement = 1;
+                if(!eventGraphicUnit.getCurveBrush()) {
+                    if(leftHovered) {
+                        lastMovement = -1;
+                    }
+                    if(rightHovered) {
+                        lastMovement = 1;
+                    }
                 }
             }
 
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                //eventGraphicUnit.onSelectRequest(trackIndex, eventTime.x);
+                if(!eventGraphicUnit.getCurveBrush()) {
+                    if(e.getButton() == MouseEvent.BUTTON3) {
 
-                if(e.getButton() == MouseEvent.BUTTON3) {
+                        JComboBox curveTypeComboBox = new JComboBox(CurveType.values());
+                        curveTypeComboBox.setSelectedIndex(CurveType.indexOf(curveType));
+                        JOptionPane.showOptionDialog(null, curveTypeComboBox, "Edit Curve Type", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+                        CurveType newCurveType = CurveType.values()[curveTypeComboBox.getSelectedIndex()];
 
-                    JComboBox curveTypeComboBox = new JComboBox(CurveType.values());
-                    curveTypeComboBox.setSelectedIndex(CurveType.indexOf(curveType));
-                    JOptionPane.showOptionDialog(null, curveTypeComboBox, "Edit Curve Type", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-                    CurveType newCurveType = CurveType.values()[curveTypeComboBox.getSelectedIndex()];
-
-                    songControl.onUpdateEventRequest(
-                            trackIndex,
-                            eventTime.x,
-                            false,
-                            newCurveType,
-                            eventTime.x,
-                            eventTime.y
-                    );
-                } else if(e.getButton() == MouseEvent.BUTTON1) {
-                    if(e.getClickCount() == 2) {
                         songControl.onUpdateEventRequest(
                                 trackIndex,
                                 eventTime.x,
-                                true,
-                                curveType,
-                                0,
-                                0
+                                false,
+                                newCurveType,
+                                eventTime.x,
+                                eventTime.y
                         );
+                    } else if(e.getButton() == MouseEvent.BUTTON1) {
+                        if(e.getClickCount() == 2) {
+                            songControl.onUpdateEventRequest(
+                                    trackIndex,
+                                    eventTime.x,
+                                    true,
+                                    getCurveType(),
+                                    0,
+                                    0
+                            );
+                        }
+                    }
+                } else {
+                    if(e.getButton() == MouseEvent.BUTTON1) {
+                        songControl.onUpdateEventRequest(
+                                trackIndex,
+                                eventTime.x,
+                                false,
+                                eventGraphicUnit.getDefaultCurveType(),
+                                eventTime.x,
+                                eventTime.y
+                        );
+                        repaint();
                     }
                 }
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                leftHovered = false;
-                rightHovered = false;
-                repaint();
+                if(!eventGraphicUnit.getCurveBrush()) {
+                    leftHovered = false;
+                    rightHovered = false;
+                    repaint();
+                }
             }
             @Override
             public void mouseReleased(MouseEvent e) {
-                lastMovement = 0;
-                repaint();
+                if(!eventGraphicUnit.getCurveBrush()) {
+                    lastMovement = 0;
+                    repaint();
+                }
             }
         });
 
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                if(eventGraphicUnit.getCurveBrush()) return;
 
                 int x = getX() + e.getX();
                 Point newTime = eventGraphicUnit.getClosestEventTime(x);
@@ -108,7 +128,7 @@ public class GraphicEvent extends JLabel {
                             trackIndex,
                             eventTime.x,
                             false,
-                            curveType,
+                            getCurveType(),
                             newTime.x,
                             (eventTime.x - newTime.x) + eventTime.y
                     );
@@ -117,15 +137,26 @@ public class GraphicEvent extends JLabel {
                             trackIndex,
                             eventTime.x,
                             false,
-                            curveType,
+                            getCurveType(),
                             eventTime.x,
                             (newTime.x + newTime.y) - eventTime.x
+                    );
+                } else if(lastMovement == 0 && newTime.x != eventTime.x) {
+                    songControl.onUpdateEventRequest(
+                            trackIndex,
+                            eventTime.x,
+                            false,
+                            getCurveType(),
+                            newTime.x,
+                            eventTime.y
                     );
                 }
             }
 
             @Override
             public void mouseMoved(MouseEvent e) {
+                if(eventGraphicUnit.getCurveBrush()) return;
+
                 if(e.getX() >= getWidth() - 10) {
                     if(!rightHovered) {
                         rightHovered = true;
@@ -178,6 +209,7 @@ public class GraphicEvent extends JLabel {
     }
     public void setCurveType(CurveType curveType) {
         this.curveType = curveType;
+        this.setBackground(curveType.getColor());
     }
 
     @Override

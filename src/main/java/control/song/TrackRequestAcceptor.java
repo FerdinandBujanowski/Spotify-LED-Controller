@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public interface TrackRequestAcceptor {
 
+    void onSkipTo(int ms);
     void setEventGraphicUnit(EventGraphicUnit eventGraphicUnit);
 
     Double getTrackIntensityAt(Point coordinates);
@@ -23,7 +24,7 @@ public interface TrackRequestAcceptor {
     void onAddTrackRequest();
     void onUpdateTrackRequest(int trackIndex, boolean deleted);
 
-    void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration);
+    void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType);
     void onUpdateEventRequest(int trackIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew);
     Point getUpdatedEventTime(int trackIndex, int eventIndex);
 }

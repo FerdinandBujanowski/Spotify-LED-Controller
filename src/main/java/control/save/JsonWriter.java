@@ -42,6 +42,11 @@ public abstract class JsonWriter {
     private final static String OUTPUT = "output";
     private final static String C_1 = "function_index", C_2 = "node_index", C_3 = "joint_index";
 
+    private final static String LAYERS = "layers";
+    private final static String PIXELS = "pixels";
+    private final static String X = "x";
+    private final static String Y = "y";
+
 
     public static void writeNodesToFile(NodeSaveUnit nodeSaveUnit, String path) {
         JsonObject finalObject = new JsonObject();

@@ -15,6 +15,8 @@ import gui.main_panels.player_panel.PlayButton;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
 
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
@@ -102,6 +104,7 @@ public class MainWindow extends JFrame {
         this.songMenu = new JMenu("Song");
         JMenu trackSubMenu = new JMenu("Track");
         JMenu rhythmSubMenu = new JMenu("Rhythm");
+        JMenu curveSubMenu = new JMenu("Curve");
         JMenuItem addTrackMenuItem = new JMenuItem("Add Track");
         trackSubMenu.add(addTrackMenuItem);
         this.songMenu.add(trackSubMenu);
@@ -119,6 +122,43 @@ public class MainWindow extends JFrame {
         });
         rhythmSubMenu.add(editInputRhythmMenuItem);
         this.songMenu.add(rhythmSubMenu);
+
+        JMenuItem defaultCurveItem = new JMenuItem("Default Curve");
+        defaultCurveItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CurveType[] curveTypes = CurveType.values();
+                JComboBox curveTypeComboBox = new JComboBox(curveTypes);
+                curveTypeComboBox.setSelectedIndex(CurveType.indexOf(eventEditWindow.getDefaultCurveType()));
+                JOptionPane.showOptionDialog(
+                        null, curveTypeComboBox, "Select Default Curve Type",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                );
+                eventEditWindow.setDefaultCurveType(curveTypes[curveTypeComboBox.getSelectedIndex()]);
+            }
+        });
+        curveSubMenu.add(defaultCurveItem);
+
+        JCheckBoxMenuItem curveBrushItem = new JCheckBoxMenuItem("Curve Brush");
+        curveBrushItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                eventEditWindow.setCurveBrush(curveBrushItem.isSelected());
+            }
+        });
+
+        curveSubMenu.add(curveBrushItem);
+        this.songMenu.add(curveSubMenu);
+        this.songMenu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                curveBrushItem.setSelected(eventEditWindow.getCurveBrush());
+            }
+            @Override
+            public void menuDeselected(MenuEvent e) {}
+            @Override
+            public void menuCanceled(MenuEvent e) {}
+        });
         this.songMenu.add(new JSeparator());
 
         this.createTrackNodeMenu = new JMenu("Create Track Node");
@@ -151,7 +191,9 @@ public class MainWindow extends JFrame {
             subMenus[i] = new JMenu(nodeCategories.get(i));
             this.nodeMenu.add(subMenus[i]);
         }
-        for(NodeType nodeType : NodeType.values()) {
+        for(int i = 0; i < NodeType.values().length - 1; i++) {
+            //TODO LayerNode (noch) nicht hinzufügbar durch Menu
+            NodeType nodeType = NodeType.values()[i];
             String currentCategory = nodeType.getCategoryName();
             JMenuItem currentNodeMenuItem = new JMenuItem(nodeType.getName());
             currentNodeMenuItem.addActionListener(new ActionListener() {
@@ -335,41 +377,41 @@ public class MainWindow extends JFrame {
         addPixelMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFormattedTextField numberTextField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-                numberTextField.setValue(0);
-                numberTextField.setFocusLostBehavior(JFormattedTextField.COMMIT);
-                JOptionPane.showOptionDialog(
-                        null, numberTextField, "Pick X",
-                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                );
-                int x;
-                if(numberTextField.getValue().getClass() == Long.class) {
-                    x = ((Long) numberTextField.getValue()).intValue();
-                } else {
-                    x = (int)numberTextField.getValue();
-                }
-
-                numberTextField.setValue(0);
-                JOptionPane.showOptionDialog(
-                        null, numberTextField, "Pick Y",
-                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                );
-                int y;
-                if(numberTextField.getValue().getClass() == Long.class) {
-                    y = ((Long) numberTextField.getValue()).intValue();
-                } else {
-                    y = (int)numberTextField.getValue();
-                }
+                int x = getIntegerFieldValue("Set X");
+                int y = getIntegerFieldValue("Set Y");
 
                 try {
                     ledControl.addPixel(x, y);
-                } catch (Exception ex) {
+                } catch(Exception ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
         this.ledMenu.add(new JSeparator());
         this.ledMenu.add(addPixelMenuItem);
+
+        JMenuItem addPixelMatrix = new JMenuItem("Add Pixel Matrix");
+        addPixelMatrix.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int xFrom = getIntegerFieldValue("Set X (1)");
+                int yFrom = getIntegerFieldValue("Set Y (1)");
+                int xTo = getIntegerFieldValue("Set X (2)");
+                int yTo = getIntegerFieldValue("Set Y (2)");
+
+                for(int x = Math.min(xFrom, xTo); x <= Math.max(xFrom, xTo); x++) {
+                    for(int y = Math.min(yFrom, yTo); y <= Math.max(yFrom, yTo); y++) {
+                        try {
+                            ledControl.addPixel(x, y);
+                        } catch(Exception ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            }
+        });
+        this.ledMenu.add(addPixelMatrix);
+
         jMenuBar.add(this.ledMenu);
         this.ledMenu.setEnabled(false);
         this.pack();
@@ -475,7 +517,7 @@ public class MainWindow extends JFrame {
             public void keyPressed(KeyEvent e) {
                 switch(tabbedPane.getSelectedIndex()) {
                     case 1 -> {
-                        //TODO : eventPanel key input
+                        eventEditWindow.onKeyPressed(e);
                     }
                     case 2 -> {
                         nodeEditWindow.onKeyPressed(e);
@@ -490,7 +532,7 @@ public class MainWindow extends JFrame {
             public void keyReleased(KeyEvent e) {
                 switch(tabbedPane.getSelectedIndex()) {
                     case 1 -> {
-                        //TODO : eventPanel key input
+                        eventEditWindow.onKeyReleased(e);
                     }
                     case 2 -> {
                         nodeEditWindow.onKeyReleased(e);
@@ -676,5 +718,20 @@ public class MainWindow extends JFrame {
         }
         this.playButton.updateIcon();
         this.repaint();
+    }
+
+    public int getIntegerFieldValue(String message) {
+        JFormattedTextField numberTextField = new JFormattedTextField(NumberFormat.getIntegerInstance());
+        numberTextField.setValue(0);
+        numberTextField.setFocusLostBehavior(JFormattedTextField.COMMIT);
+        JOptionPane.showOptionDialog(
+                null, numberTextField, message,
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+        );
+        if(numberTextField.getValue().getClass() == Long.class) {
+            return ((Long) numberTextField.getValue()).intValue();
+        } else {
+            return (int)numberTextField.getValue();
+        }
     }
 }
