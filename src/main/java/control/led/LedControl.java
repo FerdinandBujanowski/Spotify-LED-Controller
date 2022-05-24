@@ -1,6 +1,7 @@
 package control.led;
 
 import control.SerializableFunction;
+import control.save.LedSaveUnit;
 import logic.led.LogicLayer;
 import logic.led.LogicMask;
 
@@ -21,6 +22,13 @@ import java.util.function.Function;
         this.pixels = new ArrayList<>();
         this.pixelMask = new LogicMask();
         this.logicLayers = new ArrayList<>();
+    }
+
+    public void reinitialize(LedSaveUnit ledSaveUnit) {
+
+    }
+    public LedSaveUnit getLedSaveUnit() {
+        return new LedSaveUnit(this.pixels, this.logicLayers.size());
     }
 
     public int getLayerCount() {
@@ -58,11 +66,6 @@ import java.util.function.Function;
             throw new Exception("Pixel already set");
         }
         this.ledGraphicUnit.update();
-    }
-
-    @Override
-    public void addPixelRow(int xFrom, int yFrom, int xTo, int yTo) {
-
     }
 
      @Override

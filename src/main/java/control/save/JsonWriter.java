@@ -1,9 +1,11 @@
 package control.save;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import control.exceptions.JointConnectionFailedException;
+import control.led.LedControl;
 import control.node.NodeConnection;
 import control.node.NodeControl;
 import control.node.ThreeCoordinatePoint;
@@ -15,6 +17,7 @@ import gui.MainWindow;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
 
+import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -249,5 +252,48 @@ public abstract class JsonWriter {
                 nodeCor.getCorrespondingValue(pointObject.get(C_2).getAsInt()),
                 pointObject.get(C_3).getAsInt()
         );
+    }
+
+    public static void writeLedsToFile(LedSaveUnit ledSaveUnit, String path) {
+        JsonObject finalObject = new JsonObject();
+
+        finalObject.addProperty(LAYERS, ledSaveUnit.getLayerSize());
+
+        JsonArray pixelArray = new JsonArray();
+        for(Point pixel : ledSaveUnit.getPixels()) {
+            JsonObject pixelObject = new JsonObject();
+            pixelObject.addProperty(X, pixel.x);
+            pixelObject.addProperty(Y, pixel.y);
+            pixelArray.add(pixelObject);
+        }
+        finalObject.add(PIXELS, pixelArray);
+        try {
+            FileWriter file = new FileWriter(path);
+            file.write(finalObject.toString());
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("JSON file successfully created");
+    }
+
+    public static void addLedsFromFile(String path, LedControl ledControl) {
+        JsonObject ledObject = new JsonObject();
+        JsonParser jsonParser = new JsonParser();
+        try {
+            FileReader fileReader = new FileReader(path);
+            ledObject = jsonParser.parse(fileReader).getAsJsonObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        for(JsonElement pixelElement : ledObject.getAsJsonArray(PIXELS)) {
+            try {
+                ledControl.addPixel(
+                        pixelElement.getAsJsonObject().get(X).getAsInt(),
+                        pixelElement.getAsJsonObject().get(Y).getAsInt()
+                );
+            } catch (Exception e) {}
+        }
     }
 }

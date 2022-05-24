@@ -4,6 +4,7 @@ import control.led.LedControl;
 import control.node.NodeControl;
 import control.save.DataStore;
 import control.save.JsonWriter;
+import control.save.LedSaveUnit;
 import control.save.NodeSaveUnit;
 import control.song.SongControl;
 import control.type_enums.*;
@@ -92,6 +93,8 @@ public class MainWindow extends JFrame {
         JMenuItem saveProject = new JMenuItem("Save Project");
         JMenuItem exportNodes = new JMenuItem("Export Nodes");
         JMenuItem loadNodes = new JMenuItem("Load Nodes");
+        JMenuItem exportLeds = new JMenuItem("Export LEDs");
+        JMenuItem loadLeds = new JMenuItem("Load LEDs");
         fileMenu.add(newProject);
         fileMenu.add(openProject);
         fileMenu.add(new JSeparator());
@@ -99,6 +102,9 @@ public class MainWindow extends JFrame {
         fileMenu.add(new JSeparator());
         fileMenu.add(exportNodes);
         fileMenu.add(loadNodes);
+        fileMenu.add(new JSeparator());
+        fileMenu.add(exportLeds);
+        fileMenu.add(loadLeds);
         this.jMenuBar.add(fileMenu);
         this.setJMenuBar(jMenuBar);
         this.songMenu = new JMenu("Song");
@@ -489,7 +495,7 @@ public class MainWindow extends JFrame {
                 JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
-                fileSaveChooser.setSelectedFile(new File("nodes.json"));
+                fileSaveChooser.setSelectedFile(new File("leds.json"));
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     JsonWriter.writeNodesToFile(nodeSaveUnit, fileSaveChooser.getSelectedFile().getPath());
@@ -507,6 +513,35 @@ public class MainWindow extends JFrame {
                 int returnValue = fileOpenChooser.showOpenDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     JsonWriter.addNodesFromFile(fileOpenChooser.getSelectedFile().getPath(), nodeControl, thisWindow);
+                }
+            }
+        });
+
+        exportLeds.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LedSaveUnit ledSaveUnit = ledControl.getLedSaveUnit();
+
+                JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
+                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+                fileSaveChooser.setFileFilter(serializedFilter);
+                fileSaveChooser.setSelectedFile(new File("nodes.json"));
+                int returnValue = fileSaveChooser.showSaveDialog(getParent());
+                if(returnValue == JFileChooser.APPROVE_OPTION) {
+                    JsonWriter.writeLedsToFile(ledSaveUnit, fileSaveChooser.getSelectedFile().getPath());
+                }
+            }
+        });
+
+        loadLeds.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileOpenChooser = new JFileChooser();
+                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+                fileOpenChooser.setFileFilter(serializedFilter);
+                int returnValue = fileOpenChooser.showOpenDialog(getParent());
+                if(returnValue == JFileChooser.APPROVE_OPTION) {
+                    JsonWriter.addLedsFromFile(fileOpenChooser.getSelectedFile().getPath(), ledControl);
                 }
             }
         });

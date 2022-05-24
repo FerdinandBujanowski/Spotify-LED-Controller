@@ -8,7 +8,6 @@ public interface LedRequestAcceptor {
     void setLedGraphicUnit(LedGraphicUnit ledGraphicUnit);
     void onAddLayerRequest();
     void addPixel(int x, int y) throws Exception;
-    void addPixelRow(int xFrom, int yFrom, int xTo, int yTo);
 
     void enableLayer(int layerIndex, boolean isEnabled);
 

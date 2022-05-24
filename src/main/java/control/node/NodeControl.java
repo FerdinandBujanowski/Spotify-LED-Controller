@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-public class NodeControl implements Serializable, NodeRequestAcceptor {
+public class NodeControl implements NodeRequestAcceptor {
 
     private NodeGraphicUnit nodeGraphicUnit;
     private ArrayList<NodeGraphicUnit> functionGraphicUnits;
