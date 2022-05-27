@@ -5,26 +5,19 @@ import java.io.Serializable;
 
 public class LogicLayer implements Serializable {
 
-    private LogicMask logicMask;
-    private Color color;
+    private LogicPlane logicPlane;
     private boolean isEnabled;
 
     private LogicLayer lowerLayer;
 
     public LogicLayer(LogicLayer lowerLayer) {
         this.lowerLayer = lowerLayer;
-        this.logicMask = new LogicMask();
-        this.color = Color.BLACK;
+        this.logicPlane = new LogicPlane();
         this.isEnabled = true;
     }
 
-    public Integer updateMask(Object mask) {
-        this.logicMask = (LogicMask) mask;
-        return 0;
-    }
-
-    public Integer updateColor(Color color) {
-        this.color = color;
+    public Integer updatePlane(Object plane) {
+        this.logicPlane = (LogicPlane) plane;
         return 0;
     }
 
@@ -32,24 +25,19 @@ public class LogicLayer implements Serializable {
         if(!this.isEnabled) {
             return(this.lowerLayer != null ? this.lowerLayer.getColorAt(x, y) : Color.BLACK);
         }
-        double intensity = this.logicMask.getIntensityAt(x, y);
+        double intensity = this.logicPlane.getLogicMask().getIntensityAt(x, y);
         Color lowerColor;
         if(this.lowerLayer == null) {
             lowerColor = Color.BLACK;
         } else {
             lowerColor = this.lowerLayer.getColorAt(x, y);
         }
+        Color colorAt = this.logicPlane.getColorAt(x, y);
         return new Color(
-                this.mixWithIntensity(this.color.getRed(), lowerColor.getRed(), intensity),
-                this.mixWithIntensity(this.color.getGreen(), lowerColor.getGreen(), intensity),
-                this.mixWithIntensity(this.color.getBlue(), lowerColor.getBlue(), intensity)
+                LogicPlane.mixWithIntensity(colorAt.getRed(), lowerColor.getRed(), intensity),
+                LogicPlane.mixWithIntensity(colorAt.getGreen(), lowerColor.getGreen(), intensity),
+                LogicPlane.mixWithIntensity(colorAt.getBlue(), lowerColor.getBlue(), intensity)
         );
-    }
-
-    private int mixWithIntensity(int a, int b, double intensity) {
-        int mix = (int)(Math.round(a * intensity)) + (int)(Math.round(b * (1.d - intensity)));
-        if(mix > 255) return 255;
-        return Math.max(mix, 0);
     }
 
     public void setEnabled(boolean isEnabled) {

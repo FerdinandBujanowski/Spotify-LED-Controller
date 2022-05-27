@@ -35,12 +35,8 @@ import java.util.function.Function;
         return this.logicLayers.size();
     }
 
-    public SerializableFunction<Object, Integer> getUpdateMaskFunctionForLayer(int layerIndex) {
-        return this.logicLayers.get(layerIndex)::updateMask;
-    }
-
-    public SerializableFunction<Color, Integer> getUpdateColorFunctionForLayer(int layerIndex) {
-        return this.logicLayers.get(layerIndex)::updateColor;
+    public SerializableFunction<Object, Integer> getUpdatePlaneFunctionForLayer(int layerIndex) {
+        return this.logicLayers.get(layerIndex)::updatePlane;
     }
 
     @Override

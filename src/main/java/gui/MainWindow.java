@@ -370,8 +370,7 @@ public class MainWindow extends JFrame {
                 ledControl.onAddLayerRequest();
                 if(currentLayerCount < ledControl.getLayerCount()) {
                     nodeControl.addLayerNode(
-                            ledControl.getUpdateMaskFunctionForLayer(currentLayerCount),
-                            ledControl.getUpdateColorFunctionForLayer(currentLayerCount),
+                            ledControl.getUpdatePlaneFunctionForLayer(currentLayerCount),
                             "Layer " + (currentLayerCount + 1)
                     );
                 }

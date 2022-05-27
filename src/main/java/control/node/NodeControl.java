@@ -177,7 +177,7 @@ public class NodeControl implements NodeRequestAcceptor {
                     this.addTrackNode(trackIndex);
                 }
                 case _LAYER_NODE -> {
-                    this.addLayerNode(null, null, "[Prototype Layer]");
+                    this.addLayerNode(null, "[Prototype Layer]");
                 }
             }
         }
@@ -258,13 +258,12 @@ public class NodeControl implements NodeRequestAcceptor {
         this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._TRACK_NODE, nodeName);
     }
 
-    public void addLayerNode(SerializableFunction<Object, Integer> setMaskFunction, SerializableFunction<Color, Integer> setColorFunction, String layerName) {
+    public void addLayerNode(SerializableFunction<Object, Integer> setPlaneFunction, String layerName) {
         int newNodeIndex = this.getNextFreeNodeIndex(-1);
         LogicNode layerNode = new LogicNode(
                 newNodeIndex,
                 new InputJoint[] {
-                        new InputJoint(new MaskJointDataType(), "Mask"),
-                        new InputJoint(new ColorJointDataType(), "Color")
+                        new InputJoint(new PlaneJointDataType(), "Plane")
                 },
                 new OutputJoint[] {},
                 layerName,
@@ -274,8 +273,7 @@ public class NodeControl implements NodeRequestAcceptor {
             @Override
             public void onInputChangeEvent() {
                 super.onInputChangeEvent();
-                if(setMaskFunction != null) setMaskFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
-                if(setColorFunction != null) setColorFunction.apply((Color)this.getInputJoints()[1].getJointDataType().getData());
+                if(setPlaneFunction != null) setPlaneFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
             }
         };
 
