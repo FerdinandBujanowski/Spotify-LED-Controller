@@ -6,6 +6,7 @@ import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.JointDataType;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
@@ -139,6 +140,9 @@ public abstract class LogicNode extends LogicComponent {
 
     public Double[][] getMaskValues(Integer nullInteger) {
         return new Double[0][0];
+    }
+    public Color[][] getPlaneColorValues(Integer nullInteger) {
+        return new Color[0][0];
     }
 
     public boolean isConnectedTo(LogicNode otherNode, ArrayList<LogicNode> alreadyCheckedNodes) {

@@ -7,6 +7,7 @@ import control.exceptions.JointConnectionFailedException;
 import control.type_enums.JointType;
 import control.type_enums.NodeType;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public interface NodeRequestAcceptor {
@@ -18,6 +19,7 @@ public interface NodeRequestAcceptor {
     String[] getInputJointNames(int functionIndex, int nodeIndex);
     String[] getOutputJointNames(int functionIndex, int nodeIndex);
     SerializableFunction<Integer, Double[][]> getMaskValuesFunctionForNode(int functionIndex, int nodeIndex);
+    public SerializableFunction<Integer, Color[][]> getColorValuesFunctionForNode(int functionIndex, int nodeIndex);
     void updateInputJointHovered(int functionIndex, int nodeIndex, int inputJointIndex);
     void updateOutputJointReleased(int functionIndex, int nodeIndex, int outputJointIndex) throws FunctionNodeInUseException, JointConnectionFailedException;
     void deleteJointConnectionRequest(int functionIndex, int nodeIndex, int inputJointIndex) throws FunctionNodeInUseException;

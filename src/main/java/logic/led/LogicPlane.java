@@ -47,6 +47,17 @@ public class LogicPlane {
         return Color.BLACK;
     }
 
+    public Color[][] getColorValues() {
+        int degree = this.logicMask.getDegree();
+        Color[][] colors = new Color[degree][degree];
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                colors[x][y] = this.getColorAt(x, y);
+            }
+        }
+        return colors;
+    }
+
     public static LogicPlane multiplyMaskWithColor(LogicMask logicMask, Color color) {
         LogicPlane logicPlane = new LogicPlane();
         int degree = logicPlane.getLogicMask().getDegree();

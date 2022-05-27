@@ -525,6 +525,12 @@ public class NodeControl implements NodeRequestAcceptor {
     }
 
     @Override
+    public SerializableFunction<Integer, Color[][]> getColorValuesFunctionForNode(int functionIndex, int nodeIndex) {
+        LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
+        return logicNode::getPlaneColorValues;
+    }
+
+    @Override
     public void updateInputJointHovered(int functionIndex, int nodeIndex, int inputJointIndex) {
         if(functionIndex == -1) {
             this.jointHoveredNodeIndex = nodeIndex;
