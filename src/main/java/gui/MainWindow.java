@@ -9,7 +9,7 @@ import control.save.NodeSaveUnit;
 import control.song.SongControl;
 import control.type_enums.*;
 import gui.main_panels.event_panel.EventEditWindow;
-import gui.main_panels.function_panels.FunctionTabbedPane;
+import gui.main_panels.node_panel.FunctionTabbedPane;
 import gui.main_panels.led_panel.LedEditWindow;
 import gui.main_panels.node_panel.NodeEditWindow;
 import gui.main_panels.player_panel.PlayButton;

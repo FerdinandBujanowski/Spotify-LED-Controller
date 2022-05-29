@@ -1,4 +1,4 @@
-package gui.main_panels.function_panels;
+package gui.main_panels.node_panel;
 
 import control.type_enums.JointType;
 import control.node.NodeControl;

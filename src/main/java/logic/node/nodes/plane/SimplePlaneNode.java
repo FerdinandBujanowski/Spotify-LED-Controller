@@ -39,6 +39,12 @@ public class SimplePlaneNode extends LogicNode {
     }
 
     @Override
+    public Double[][] getMaskValues(Integer nullInteger) {
+        LogicPlane logicPlane = (LogicPlane) this.getOutputJoints()[0].getJointDataType().getData();
+        return logicPlane.getLogicMask().getValues();
+    }
+
+    @Override
     public Color[][] getPlaneColorValues(Integer nullInteger) {
         LogicPlane logicPlane = (LogicPlane) this.getOutputJoints()[0].getJointDataType().getData();
         return logicPlane.getColorValues();

@@ -1,4 +1,4 @@
-package gui.main_panels;
+package gui.main_panels.node_panel;
 
 import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
@@ -443,7 +443,10 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
 
         MaskPanel maskPanel = null;
         if(nodeType != null && nodeType.hasMaskOutput()) {
-            maskPanel = new MaskPanel(this.getNodeControl().getMaskValuesFunctionForNode(functionIndex, nodeIndex));
+            maskPanel = new MaskPanel(
+                    this.getNodeControl().getMaskValuesFunctionForNode(functionIndex, nodeIndex),
+                    this.getNodeControl().getColorValuesFunctionForNode(functionIndex, nodeIndex)
+            );
         }
         GraphicNode newGraphicNode = new GraphicNode(
                 new Point(functionIndex, nodeIndex),

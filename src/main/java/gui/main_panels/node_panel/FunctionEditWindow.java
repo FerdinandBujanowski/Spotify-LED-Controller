@@ -1,10 +1,9 @@
-package gui.main_panels.function_panels;
+package gui.main_panels.node_panel;
 
 import control.node.NodeConnection;
 import control.node.NodeControl;
 import control.type_enums.JointType;
-import control.type_enums.NodeType;
-import gui.main_panels.ParentNodePanel;
+import gui.main_panels.node_panel.ParentNodePanel;
 
 import java.awt.*;
 import java.util.ArrayList;

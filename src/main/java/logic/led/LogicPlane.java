@@ -48,17 +48,19 @@ public class LogicPlane {
     }
 
     public Color[][] getColorValues() {
+        this.logicMask.cleanUp();
         int degree = this.logicMask.getDegree();
-        Color[][] colors = new Color[degree][degree];
-        for(int x = -degree; x <= degree; x++) {
-            for(int y = -degree; y <= degree; y++) {
-                colors[x][y] = this.getColorAt(x, y);
+        Color[][] colors = new Color[(degree * 2) + 1][(degree * 2) + 1];
+        for(int x = 0; x < colors.length; x++) {
+            for(int y = 0; y < colors.length; y++) {
+                colors[x][y] = this.getColorAt(x - degree, y - degree);
             }
         }
         return colors;
     }
 
     public static LogicPlane multiplyMaskWithColor(LogicMask logicMask, Color color) {
+
         LogicPlane logicPlane = new LogicPlane();
         int degree = logicMask.getDegree();
         for(int x = -degree; x <= degree; x++) {
@@ -66,6 +68,7 @@ public class LogicPlane {
                 logicPlane.setIntensityAt(x, y, logicMask.getIntensityAt(x, y), color);
             }
         }
+        logicPlane.getLogicMask().cleanUp();
         return logicPlane;
     }
 }

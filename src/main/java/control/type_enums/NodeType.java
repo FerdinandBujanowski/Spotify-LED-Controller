@@ -84,7 +84,7 @@ public enum NodeType {
     MODULO_NODE("Modulo", "Math Functions", ModuloNode.class),
 
     //PLANE
-    SIMPLE_PLANE_NODE("Simple Plane", "Plane", SimplePlaneNode.class),
+    SIMPLE_PLANE_NODE("Simple Plane", "Plane", SimplePlaneNode.class, true),
 
     //TYPE CAST
     NUMBER_TO_UNIT_NODE("Number to Unit", "Type Cast", CastNumberToUnitNode.class),

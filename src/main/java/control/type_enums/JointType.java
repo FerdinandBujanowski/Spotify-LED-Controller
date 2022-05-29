@@ -20,12 +20,12 @@ public enum JointType {
     255, 235, 198
      */
 
-    INTEGER_TYPE(new Color(0, 0, 66), IntegerJointDataType.class, "Integer"),
+    INTEGER_TYPE(new Color(0, 0, 45), IntegerJointDataType.class, "Integer"),
     NUMBER_TYPE(new Color(0, 0, 128), NumberJointDataType.class, "Number"),
     UNIT_NUMBER_TYPE(new Color(0, 255, 255), UnitNumberJointDataType.class, "Unit Number"),
     INTERVAL_TYPE(new Color(35, 101, 51), IntervalJointDataType.class, "Interval"),
     BOOLEAN_TYPE(new Color(227, 34, 39), BooleanJointDataType.class, "Boolean"),
-    COLOR_TYPE(new Color(255, 192, 203), ColorJointDataType.class, "Color"),
+    COLOR_TYPE(new Color(159, 0, 255), ColorJointDataType.class, "Color"),
     PLANE_TYPE(new Color(255, 160, 14), PlaneJointDataType.class, "Plane"),
     MASK_TYPE(new Color(255, 215, 0), MaskJointDataType.class, "Mask");
 

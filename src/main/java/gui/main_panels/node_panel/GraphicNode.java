@@ -4,7 +4,6 @@ import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
 import control.node.NodeControl;
 import control.exceptions.CannotDeleteNodeException;
-import gui.main_panels.ParentNodePanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
