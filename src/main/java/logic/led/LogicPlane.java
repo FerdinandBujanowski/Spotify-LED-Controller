@@ -60,7 +60,7 @@ public class LogicPlane {
 
     public static LogicPlane multiplyMaskWithColor(LogicMask logicMask, Color color) {
         LogicPlane logicPlane = new LogicPlane();
-        int degree = logicPlane.getLogicMask().getDegree();
+        int degree = logicMask.getDegree();
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
                 logicPlane.setIntensityAt(x, y, logicMask.getIntensityAt(x, y), color);
