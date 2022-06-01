@@ -38,6 +38,14 @@ public class LogicPlane {
         return Math.max(mix, 0);
     }
 
+    public static Color addColors(Color a, Color b) {
+        return new Color(
+                Math.min(a.getRed() + b.getRed(), 255),
+                Math.min(a.getGreen() + b.getGreen(), 255),
+                Math.min(a.getBlue() + b.getBlue(), 255)
+        );
+    }
+
     public Color getColorAt(int x, int y) {
         for(ThreeCoordinatePoint point : this.colorCoordinatePoints) {
             if(point.getX() == x && point.getY() == y) {
@@ -69,6 +77,41 @@ public class LogicPlane {
             }
         }
         logicPlane.getLogicMask().cleanUp();
+        return logicPlane;
+    }
+
+    public static LogicPlane getPlaneAdditive(LogicPlane planeOver, LogicPlane planeUnder) {
+        LogicMask outputMask = LogicMask.getJoinedMask_Add(planeOver.logicMask, planeUnder.logicMask);
+        LogicPlane logicPlane = new LogicPlane();
+        int degree = outputMask.getDegree();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                Color colorOver = planeOver.getColorAt(x, y);
+                Color colorUnder = planeUnder.getColorAt(x, y);
+                Color mixedColor = LogicPlane.addColors(colorOver, colorUnder);
+                logicPlane.setIntensityAt(x, y, outputMask.getIntensityAt(x, y), mixedColor);
+            }
+        }
+
+        return logicPlane;
+    }
+
+    public static LogicPlane getPlaneOverlay(LogicPlane planeOver, LogicPlane planeUnder) {
+        LogicMask outputMask = LogicMask.getJoinedMask_Add(planeOver.logicMask, planeUnder.logicMask);
+        LogicPlane logicPlane = new LogicPlane();
+        int degree = outputMask.getDegree();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                Color colorOver = planeOver.getColorAt(x, y), colorUnder = planeUnder.getColorAt(x, y);
+                double intensity = planeOver.logicMask.getIntensityAt(x, y);
+                Color mixedColor = new Color(
+                        LogicPlane.mixWithIntensity(colorOver.getRed(), colorUnder.getRed(), intensity),
+                        LogicPlane.mixWithIntensity(colorOver.getGreen(), colorUnder.getGreen(), intensity),
+                        LogicPlane.mixWithIntensity(colorOver.getBlue(), colorUnder.getBlue(), intensity)
+                );
+                logicPlane.setIntensityAt(x, y, outputMask.getIntensityAt(x, y), mixedColor);
+            }
+        }
         return logicPlane;
     }
 }

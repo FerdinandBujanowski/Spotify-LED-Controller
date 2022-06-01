@@ -286,6 +286,14 @@ public class MainWindow extends JFrame {
                                 );
                                 extraParameters[i] = RoundAlgorithmType.values()[algorithmComboBox.getSelectedIndex()];
                             }
+                            case COLOR_MIXING_INPUT -> {
+                                JComboBox mixComboBox = new JComboBox(MixingAlgorithmType.values());
+                                JOptionPane.showOptionDialog(
+                                        null, mixComboBox, inputDialogTypes[i].getMessage(),
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                                );
+                                extraParameters[i] = MixingAlgorithmType.values()[mixComboBox.getSelectedIndex()];
+                            }
                         }
                     }
                     if(tabbedPane.getSelectedComponent() == nodeEditWindow) {

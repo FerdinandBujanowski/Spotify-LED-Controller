@@ -29,11 +29,15 @@ public class SimplePlaneNode extends LogicNode {
         );
     }
 
+    public SimplePlaneNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, NodeType nodeType, Object[] extraParameters) {
+        super(nodeIndex, inputJoints, outputJoints, nodeType, extraParameters);
+    }
+
     @Override
-    public JointDataType[] function(InputJoint[] inputJoints) {
+    public PlaneJointDataType[] function(InputJoint[] inputJoints) {
         LogicMask mask = (LogicMask) inputJoints[0].getJointDataType().getData();
         Color color = (Color) inputJoints[1].getJointDataType().getData();
-        return new JointDataType[] {
+        return new PlaneJointDataType[] {
                 new PlaneJointDataType(LogicPlane.multiplyMaskWithColor(mask, color))
         };
     }

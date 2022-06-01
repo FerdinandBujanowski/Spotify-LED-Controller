@@ -12,7 +12,8 @@ public enum InputDialogType {
     STRING_TYPE_INPUT("Please enter string"),
     COLOR_TYPE_INPUT("Please pick color"),
     ROUND_PIXEL_INPUT("Please select rounding algorithm"),
-    ROUND_INPUT("Please select rounding algorithm");
+    ROUND_INPUT("Please select rounding algorithm"),
+    COLOR_MIXING_INPUT("Please select color mixing type");
 
     private final String message;
 
@@ -52,7 +53,7 @@ public enum InputDialogType {
             case COLOR_TYPE_INPUT -> new Color(Integer.parseInt(objectString));
             case ROUND_PIXEL_INPUT -> PixelAlgorithmType.getTypeByString(objectString);
             case ROUND_INPUT -> RoundAlgorithmType.getTypeByString(objectString);
+            case COLOR_MIXING_INPUT -> MixingAlgorithmType.getTypeByString(objectString);
         };
     }
-
 }

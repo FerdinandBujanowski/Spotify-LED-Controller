@@ -14,6 +14,7 @@ import logic.node.nodes.debug.DebugNode;
 import logic.node.nodes.logical_operators.*;
 import logic.node.nodes.mask.*;
 import logic.node.nodes.math_functions.*;
+import logic.node.nodes.plane.OverlayPlaneNode;
 import logic.node.nodes.plane.SimplePlaneNode;
 import logic.node.nodes.type_cast.*;
 import logic.node.nodes.update.UpdateNode;
@@ -85,6 +86,7 @@ public enum NodeType {
 
     //PLANE
     SIMPLE_PLANE_NODE("Simple Plane", "Plane", SimplePlaneNode.class, true),
+    OVERLAY_PLANE_NODE("Overlay Plane", "Plane", OverlayPlaneNode.class, new InputDialogType[] { InputDialogType.COLOR_MIXING_INPUT }, true),
 
     //TYPE CAST
     NUMBER_TO_UNIT_NODE("Number to Unit", "Type Cast", CastNumberToUnitNode.class),
