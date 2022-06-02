@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.function.Function;
 
- public class LedControl implements Serializable, LedRequestAcceptor {
+ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeCommunication {
 
     ArrayList<Point> pixels;
     LogicMask pixelMask;
@@ -33,10 +33,6 @@ import java.util.function.Function;
 
     public int getLayerCount() {
         return this.logicLayers.size();
-    }
-
-    public SerializableFunction<Object, Integer> getUpdatePlaneFunctionForLayer(int layerIndex) {
-        return this.logicLayers.get(layerIndex)::updatePlane;
     }
 
     @Override
@@ -80,6 +76,12 @@ import java.util.function.Function;
      }
 
      @Override
+     public Point getPixelAt(int pixelIndex) {
+        if(this.pixels.size() <= pixelIndex) return new Point(0, 0);
+        else return this.pixels.get(pixelIndex);
+     }
+
+     @Override
      public int getFinalDegree() {
          return this.pixelMask.getDegree();
      }
@@ -89,5 +91,15 @@ import java.util.function.Function;
         if(this.logicLayers.size() > 0) {
             return this.logicLayers.get(this.logicLayers.size() - 1).getColorAt(x, y);
         } else return new Color(0, 0, 0);
+     }
+
+     @Override
+     public SerializableFunction<Object, Integer> updatePlaneFunction(int layerIndex) {
+         return this.logicLayers.get(layerIndex)::updatePlane;
+     }
+
+     @Override
+     public SerializableFunction<Integer, Point> pixelPositionFunction() {
+         return this::getPixelAt;
      }
  }

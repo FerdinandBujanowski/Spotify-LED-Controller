@@ -16,6 +16,8 @@ import logic.node.nodes.mask.*;
 import logic.node.nodes.math_functions.*;
 import logic.node.nodes.plane.OverlayPlaneNode;
 import logic.node.nodes.plane.SimplePlaneNode;
+import logic.node.nodes.random.RandomIntegerNode;
+import logic.node.nodes.random.RandomUnitNumberNode;
 import logic.node.nodes.type_cast.*;
 import logic.node.nodes.update.UpdateNode;
 
@@ -88,6 +90,10 @@ public enum NodeType {
     SIMPLE_PLANE_NODE("Simple Plane", "Plane", SimplePlaneNode.class, true),
     OVERLAY_PLANE_NODE("Overlay Plane", "Plane", OverlayPlaneNode.class, new InputDialogType[] { InputDialogType.COLOR_MIXING_INPUT }, true),
 
+    //RANDOM
+    RANDOM_INTEGER_NODE("Random Integer", "Random", RandomIntegerNode.class),
+    RANDOM_UNIT_NUMBER_NODE("Random Unit", "Random", RandomUnitNumberNode.class),
+
     //TYPE CAST
     NUMBER_TO_UNIT_NODE("Number to Unit", "Type Cast", CastNumberToUnitNode.class),
     UNIT_TO_NUMBER_NODE("Unit to Number", "Type Cast", CastUnitToNumberNode.class),
@@ -102,6 +108,7 @@ public enum NodeType {
     _INPUT_PARAMETER_NODE("Input Parameter", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT, InputDialogType.JOINT_TYPE_INPUT, InputDialogType.STRING_TYPE_INPUT }),
     _OUTPUT_PARAMETER_NODE("Output Parameter", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT, InputDialogType.JOINT_TYPE_INPUT, InputDialogType.STRING_TYPE_INPUT }),
     _TRACK_NODE("Track", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
+    _LED_POSITION_NODE("LED Position", "Commands", null),
     _LAYER_NODE("Layer", "Commands", null);
 
     private final String name;

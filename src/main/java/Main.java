@@ -32,6 +32,7 @@ public class Main {
                 nodeControl,
                 ledControl
         );
+        nodeControl.setLedNodeCommunication(ledControl);
         mainWindow.setVisible(true);
 
         AtomicInteger currentMs = new AtomicInteger((int) System.currentTimeMillis());

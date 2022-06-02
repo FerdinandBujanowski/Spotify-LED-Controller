@@ -12,6 +12,7 @@ public interface LedRequestAcceptor {
     void enableLayer(int layerIndex, boolean isEnabled);
 
     Point[] getPixels();
+    Point getPixelAt(int pixelIndex);
     int getFinalDegree();
     Color getColorAt(int x, int y);
 }

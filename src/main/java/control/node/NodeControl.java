@@ -4,6 +4,7 @@ import control.SerializableFunction;
 import control.exceptions.CannotDeleteNodeException;
 import control.exceptions.FunctionNodeInUseException;
 import control.exceptions.JointConnectionFailedException;
+import control.led.LedNodeCommunication;
 import control.save.NodeSaveUnit;
 import control.type_enums.*;
 import gui.main_panels.node_panel.GraphicNode;
@@ -21,6 +22,8 @@ public class NodeControl implements NodeRequestAcceptor {
 
     private NodeGraphicUnit nodeGraphicUnit;
     private ArrayList<NodeGraphicUnit> functionGraphicUnits;
+
+    private LedNodeCommunication ledNodeCommunication;
 
     public static final int JOINT_WIDTH = 14;
     public static final int NODE_TOP_HEIGHT = 25, NODE_CENTER_HEIGHT = 30, NODE_BOTTOM_HEIGHT = 15;
@@ -84,6 +87,10 @@ public class NodeControl implements NodeRequestAcceptor {
                 }
             }
         }
+    }
+
+    public void setLedNodeCommunication(LedNodeCommunication ledNodeCommunication) {
+        this.ledNodeCommunication = ledNodeCommunication;
     }
 
     public int getNextFreeNodeIndex(int functionIndex) {
@@ -178,6 +185,9 @@ public class NodeControl implements NodeRequestAcceptor {
                 }
                 case _LAYER_NODE -> {
                     this.addLayerNode(null, "[Prototype Layer]");
+                }
+                case _LED_POSITION_NODE -> {
+                    this.addLedPositionNode(functionIndex, "Led Position", this.ledNodeCommunication.pixelPositionFunction());
                 }
             }
         }
@@ -281,6 +291,38 @@ public class NodeControl implements NodeRequestAcceptor {
         this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._LAYER_NODE, layerName);
     }
 
+    public void addLedPositionNode(int functionIndex, String nodeName, SerializableFunction<Integer, Point> getPositionFunction) {
+        int newNodeIndex = this.getNextFreeNodeIndex(functionIndex);
+        LogicNode ledPositionNode = new LogicNode(
+                newNodeIndex,
+                new InputJoint[] {
+                        new InputJoint(new IntegerJointDataType(), "LED Index")
+                },
+                new OutputJoint[] {
+                        new OutputJoint(new IntegerJointDataType(), "X"),
+                        new OutputJoint(new IntegerJointDataType(), "Y")
+                },
+                nodeName,
+                NodeType._LED_POSITION_NODE
+        ) {
+            @Override
+            public JointDataType[] function(InputJoint[] inputJoints) {
+                int ledIndex = (int) inputJoints[0].getJointDataType().getData();
+                Point position = getPositionFunction.apply(ledIndex);
+                return new JointDataType[] {
+                        new IntegerJointDataType(position.x),
+                        new IntegerJointDataType(position.y)
+                };
+            }
+        };
+
+        this.logicNodes.add(ledPositionNode);
+        if(functionIndex == -1) {
+            this.nodeGraphicUnit.addGraphicNode(functionIndex, newNodeIndex, NodeType._LED_POSITION_NODE, nodeName);
+        } else {
+            this.functionGraphicUnits.get(functionIndex).addGraphicNode(functionIndex, newNodeIndex, NodeType._LED_POSITION_NODE, nodeName);
+        }
+    }
 
     public LogicNode findNode(int functionIndex, int nodeIndex) {
         if(functionIndex == -1) {

@@ -378,7 +378,7 @@ public class MainWindow extends JFrame {
                 ledControl.onAddLayerRequest();
                 if(currentLayerCount < ledControl.getLayerCount()) {
                     nodeControl.addLayerNode(
-                            ledControl.getUpdatePlaneFunctionForLayer(currentLayerCount),
+                            ledControl.updatePlaneFunction(currentLayerCount),
                             "Layer " + (currentLayerCount + 1)
                     );
                 }
@@ -450,7 +450,6 @@ public class MainWindow extends JFrame {
                 JFileChooser fileOpenChooser = new JFileChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
                 fileOpenChooser.setFileFilter(serializedFilter);
-                //fileOpenChooser.setCurrentDirectory(new File("params"));
                 int returnValue = fileOpenChooser.showOpenDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     DataStore data = DataStore.readFromFile(fileOpenChooser.getSelectedFile().getPath());
@@ -502,7 +501,7 @@ public class MainWindow extends JFrame {
                 JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
-                fileSaveChooser.setSelectedFile(new File("leds.json"));
+                fileSaveChooser.setSelectedFile(new File("nodes.json"));
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     JsonWriter.writeNodesToFile(nodeSaveUnit, fileSaveChooser.getSelectedFile().getPath());
@@ -532,7 +531,7 @@ public class MainWindow extends JFrame {
                 JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
-                fileSaveChooser.setSelectedFile(new File("nodes.json"));
+                fileSaveChooser.setSelectedFile(new File("leds.json"));
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     JsonWriter.writeLedsToFile(ledSaveUnit, fileSaveChooser.getSelectedFile().getPath());
