@@ -19,6 +19,7 @@ import logic.node.nodes.plane.SimplePlaneNode;
 import logic.node.nodes.random.RandomIntegerNode;
 import logic.node.nodes.random.RandomUnitNumberNode;
 import logic.node.nodes.type_cast.*;
+import logic.node.nodes.update.CountNode;
 import logic.node.nodes.update.UpdateNode;
 
 public enum NodeType {
@@ -101,6 +102,7 @@ public enum NodeType {
     BOOLEAN_TO_NUMBER_NODE("Boolean to Number", "Type Cast", CastBooleanToNumberNode.class),
 
     //UPDATE
+    COUNT_NODE("Count Node", "Update", CountNode.class, new InputDialogType[] { InputDialogType.UPDATE_INPUT }),
     UPDATE_NODE("Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT, InputDialogType.UPDATE_INPUT }),
 
     //COMMANDS

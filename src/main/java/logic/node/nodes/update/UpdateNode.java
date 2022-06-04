@@ -39,22 +39,8 @@ public class UpdateNode extends LogicNode {
     @Override
     public JointDataType[] function(InputJoint[] inputJoints) {
         boolean newBoolean = (Boolean) inputJoints[0].getJointDataType().getData();
-        switch(this.updateType) {
-            case FLIP_ALWAYS -> {
-                if((!this.toggleBoolean && newBoolean) || (this.toggleBoolean && !newBoolean)) {
-                    this.oldData.setData(inputJoints[1].getJointDataType().getData());
-                }
-            }
-            case WHILE_TRUE -> {
-                if(newBoolean) {
-                    this.oldData.setData(inputJoints[1].getJointDataType().getData());
-                }
-            }
-            case FLIP_TRUE_FALSE -> {
-                if(!this.toggleBoolean && newBoolean) {
-                    this.oldData.setData(inputJoints[1].getJointDataType().getData());
-                }
-            }
+        if(UpdateType.update(this.toggleBoolean, newBoolean, this.updateType)) {
+            this.oldData.setData(inputJoints[1].getJointDataType().getData());
         }
         if(this.toggleBoolean != newBoolean) this.toggleBoolean = newBoolean;
 
