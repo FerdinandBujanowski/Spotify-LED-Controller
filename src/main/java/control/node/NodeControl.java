@@ -258,7 +258,7 @@ public class NodeControl implements NodeRequestAcceptor {
             @Override
             public JointDataType[] function(InputJoint[] nullInputJoints) {
                 double intensity = 0.d;
-                if(trackIntensities.get(trackIndex) != null) {
+                if(trackIntensities.size() > trackIndex) {
                     intensity = trackIntensities.get(trackIndex);
                 }
                 return new UnitNumberJointDataType[] { new UnitNumberJointDataType(intensity) };
@@ -282,7 +282,7 @@ public class NodeControl implements NodeRequestAcceptor {
 
             @Override
             public void onInputChangeEvent() {
-                super.onInputChangeEvent();
+                updateAll();
                 if(setPlaneFunction != null) setPlaneFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
             }
         };
@@ -316,10 +316,11 @@ public class NodeControl implements NodeRequestAcceptor {
             }
         };
 
-        this.logicNodes.add(ledPositionNode);
         if(functionIndex == -1) {
+            this.logicNodes.add(ledPositionNode);
             this.nodeGraphicUnit.addGraphicNode(functionIndex, newNodeIndex, NodeType._LED_POSITION_NODE, nodeName);
         } else {
+            this.findFunction(functionIndex).getLogicNodes().add(ledPositionNode);
             this.functionGraphicUnits.get(functionIndex).addGraphicNode(functionIndex, newNodeIndex, NodeType._LED_POSITION_NODE, nodeName);
         }
     }

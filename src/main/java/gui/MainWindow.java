@@ -294,6 +294,14 @@ public class MainWindow extends JFrame {
                                 );
                                 extraParameters[i] = MixingAlgorithmType.values()[mixComboBox.getSelectedIndex()];
                             }
+                            case UPDATE_INPUT -> {
+                                JComboBox updateComboBox = new JComboBox(UpdateType.values());
+                                JOptionPane.showOptionDialog(
+                                        null, updateComboBox, inputDialogTypes[i].getMessage(),
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                                );
+                                extraParameters[i] = UpdateType.values()[updateComboBox.getSelectedIndex()];
+                            }
                         }
                     }
                     if(tabbedPane.getSelectedComponent() == nodeEditWindow) {

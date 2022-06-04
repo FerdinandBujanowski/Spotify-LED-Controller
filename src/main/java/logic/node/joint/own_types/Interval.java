@@ -4,8 +4,7 @@ import java.io.Serializable;
 
 public class Interval implements Serializable {
 
-    //start INCLUSIVE, end EXCLUSIVE
-    private int start, end;
+    private final int start, end;
 
     public Interval(int start, int end) {
         this.start = start;

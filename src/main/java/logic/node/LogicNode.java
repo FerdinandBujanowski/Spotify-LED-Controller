@@ -61,6 +61,25 @@ public abstract class LogicNode extends LogicComponent {
         return this.extraParameters;
     }
 
+    public void updateAll() {
+
+        for(InputJoint inputJoint : this.getInputJoints()) {
+            if(inputJoint.getConnectedOutputJoint() != null) {
+                inputJoint.getConnectedOutputJoint().getParentNode().updateAll();
+                inputJoint.getJointDataType().setData(inputJoint.getConnectedOutputJoint().getJointDataType().getData());
+            } else {
+                inputJoint.getJointDataType().setData(inputJoint.getJointDataType().getDefaultData());
+            }
+        }
+
+        JointDataType[] jointDataTypes = this.function(this.getInputJoints());
+        for(int i = 0; i < jointDataTypes.length; i++) {
+            if(jointDataTypes[i] != null && this.getOutputJoints()[i] != null) {
+                this.getOutputJoints()[i].getJointDataType().setData(jointDataTypes[i].getData());
+            }
+        }
+    }
+
     public void onInputChangeEvent() {
         //System.out.println("Node " + this.nodeIndex + ": input change detected");
 

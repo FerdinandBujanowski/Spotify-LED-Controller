@@ -51,7 +51,7 @@ public enum NodeType {
     PI_NODE("PI", "Constant", PiNode.class),
 
     //DEBUG
-    DEBUG_NODE("Debug Node", "Debug", DebugNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    DEBUG_NODE("Debug Node", "Debug", DebugNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT, InputDialogType.STRING_TYPE_INPUT }),
 
     //INTERVAL
     CREATE_INTERVAL_NODE("Create Interval", "Interval", CreateIntervalNode.class),
@@ -101,7 +101,7 @@ public enum NodeType {
     BOOLEAN_TO_NUMBER_NODE("Boolean to Number", "Type Cast", CastBooleanToNumberNode.class),
 
     //UPDATE
-    UPDATE_NODE("Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
+    UPDATE_NODE("Update Node", "Update", UpdateNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT, InputDialogType.UPDATE_INPUT }),
 
     //COMMANDS
     _FUNCTION_NODE("Function", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT, InputDialogType.INTEGER_TYPE_INPUT }),

@@ -14,8 +14,8 @@ public class CreateIntervalNode extends LogicNode {
         super(
                 nodeIndex,
                 new InputJoint[] {
-                        new InputJoint(new IntegerJointDataType(), "Start (incl.)"),
-                        new InputJoint(new IntegerJointDataType(), "End (excl.)")
+                        new InputJoint(new IntegerJointDataType(), "Start"),
+                        new InputJoint(new IntegerJointDataType(), "End")
                 },
                 new OutputJoint[] {
                         new OutputJoint(new IntervalJointDataType(), "Interval")

@@ -9,7 +9,7 @@ import logic.node.joint.joint_types.JointDataType;
 
 public class DebugNode extends LogicNode {
 
-    public DebugNode(int nodeIndex, JointType jointType) {
+    public DebugNode(int nodeIndex, JointType jointType, String name) {
         super(
                 nodeIndex,
                 new InputJoint[] {
@@ -18,6 +18,7 @@ public class DebugNode extends LogicNode {
                 new OutputJoint[] {
                         new OutputJoint(JointType.getCopyOfDataTypeByJointType(jointType), "Output")
                 },
+                "Debug " + name,
                 NodeType.DEBUG_NODE,
                 new Object[] { jointType }
         );
@@ -25,7 +26,7 @@ public class DebugNode extends LogicNode {
 
     @Override
     public JointDataType[] function(InputJoint[] inputJoints) {
-        System.out.println("[DEBUG: value is " + inputJoints[0].getJointDataType().getData().toString() + "]");
+        System.out.println("[" + this.getSpecificName() + ": value is " + inputJoints[0].getJointDataType().getData().toString() + "]");
         return new JointDataType[] { inputJoints[0].getJointDataType() };
     }
 }

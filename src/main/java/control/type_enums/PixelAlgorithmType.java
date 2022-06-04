@@ -22,5 +22,4 @@ public enum PixelAlgorithmType {
         }
         return null;
     }
-
 }
