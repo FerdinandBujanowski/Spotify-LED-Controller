@@ -45,4 +45,13 @@ public enum CurveType {
         }
         return -1;
     }
+
+    public static CurveType getCurveTypeByString(String name) {
+        for(CurveType curveType : CurveType.values()) {
+            if(curveType.toString().equals(name)) {
+                return curveType;
+            }
+        }
+        return null;
+    }
 }

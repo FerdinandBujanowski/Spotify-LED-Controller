@@ -10,12 +10,16 @@ import control.node.NodeConnection;
 import control.node.NodeControl;
 import control.node.ThreeCoordinatePoint;
 import control.node.TwoIntegerCorrespondence;
+import control.song.SongControl;
+import control.type_enums.CurveType;
 import control.type_enums.InputDialogType;
 import control.type_enums.JointType;
 import control.type_enums.NodeType;
 import gui.MainWindow;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
+import logic.song.LogicEvent;
+import logic.song.LogicTrack;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -25,6 +29,16 @@ import java.io.IOException;
 import java.util.function.Function;
 
 public abstract class JsonWriter {
+
+    private final static String TRACKS = "tracks";
+    private final static String EVENTS = "events";
+    private final static String START = "start";
+    private final static String DURATION = "duration";
+    private final static String CURVE_TYPE = "curve_type";
+    //TODO : seperate export/import events and time measures
+    private final static String TIME_MEASURES = "time_measures";
+    private final static String BEATS_BAR = "beats_per_bar";
+    private final static String BEATS_MINUTE = "beats_per_minute";
 
     private final static String NODES = "nodes";
     private final static String NODE_CONNECTIONS = "node_connections";
@@ -50,6 +64,62 @@ public abstract class JsonWriter {
     private final static String X = "x";
     private final static String Y = "y";
 
+    public static void writeTracksToFile(EventSaveUnit eventSaveUnit, String path) {
+        JsonObject finalObject = new JsonObject();
+
+        JsonArray trackArray = new JsonArray();
+        for(LogicTrack logicTrack : eventSaveUnit.getLogicTracks()) {
+            JsonObject eventsObject = new JsonObject();
+            eventsObject.add(EVENTS, getEventsArray(logicTrack));
+            trackArray.add(eventsObject);
+        }
+        finalObject.add(TRACKS, trackArray);
+
+        try {
+            FileWriter file = new FileWriter(path);
+            file.write(finalObject.toString());
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("JSON file successfully created");
+    }
+
+    private static JsonArray getEventsArray(LogicTrack logicTrack) {
+        JsonArray eventsArray = new JsonArray();
+        for(LogicEvent logicEvent : logicTrack.getEventsCopyArray()) {
+            JsonObject eventObject = new JsonObject();
+            eventObject.addProperty(START, logicEvent.getMsStart());
+            eventObject.addProperty(DURATION, logicEvent.getMsDuration());
+            eventObject.addProperty(CURVE_TYPE, logicEvent.getCurveType().toString());
+            eventsArray.add(eventObject);
+        }
+        return eventsArray;
+    }
+
+    public static void addTracksFromFile(String path, SongControl songControl) {
+        JsonObject tracksObject = new JsonObject();
+        JsonParser jsonParser = new JsonParser();
+        try {
+            FileReader fileReader = new FileReader(path);
+            tracksObject = jsonParser.parse(fileReader).getAsJsonObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        for(JsonElement trackElement : tracksObject.getAsJsonArray(TRACKS)) {
+            int newTrackIndex = songControl.getTrackCount();
+            songControl.onAddTrackRequest();
+            for(JsonElement eventElement : trackElement.getAsJsonObject().getAsJsonArray(EVENTS)) {
+                songControl.onAddEventToTrackRequest(
+                        newTrackIndex,
+                        eventElement.getAsJsonObject().get(START).getAsInt(),
+                        eventElement.getAsJsonObject().get(DURATION).getAsInt(),
+                        CurveType.getCurveTypeByString(eventElement.getAsJsonObject().get(CURVE_TYPE).getAsString())
+                );
+            }
+        }
+    }
 
     public static void writeNodesToFile(NodeSaveUnit nodeSaveUnit, String path) {
         JsonObject finalObject = new JsonObject();

@@ -2,10 +2,7 @@ package gui;
 
 import control.led.LedControl;
 import control.node.NodeControl;
-import control.save.DataStore;
-import control.save.JsonWriter;
-import control.save.LedSaveUnit;
-import control.save.NodeSaveUnit;
+import control.save.*;
 import control.song.SongControl;
 import control.type_enums.*;
 import gui.main_panels.event_panel.EventEditWindow;
@@ -91,6 +88,10 @@ public class MainWindow extends JFrame {
         JMenuItem newProject = new JMenuItem("New Project");
         JMenuItem openProject = new JMenuItem("Open Project");
         JMenuItem saveProject = new JMenuItem("Save Project");
+        JMenuItem exportTracks = new JMenuItem("Export Tracks");
+        JMenuItem loadTracks = new JMenuItem("Add Tracks");
+        JMenuItem exportTimeMeasures = new JMenuItem("Export Time Measures");
+        JMenuItem loadTimeMeasures = new JMenuItem("Set Time Measures");
         JMenuItem exportNodes = new JMenuItem("Export Nodes");
         JMenuItem loadNodes = new JMenuItem("Load Nodes");
         JMenuItem exportLeds = new JMenuItem("Export LEDs");
@@ -99,6 +100,11 @@ public class MainWindow extends JFrame {
         fileMenu.add(openProject);
         fileMenu.add(new JSeparator());
         fileMenu.add(saveProject);
+        fileMenu.add(new JSeparator());
+        fileMenu.add(exportTracks);
+        fileMenu.add(loadTracks);
+        fileMenu.add(exportTimeMeasures);
+        fileMenu.add(loadTimeMeasures);
         fileMenu.add(new JSeparator());
         fileMenu.add(exportNodes);
         fileMenu.add(loadNodes);
@@ -495,6 +501,35 @@ public class MainWindow extends JFrame {
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     DataStore.writeToFile(fileSaveChooser.getSelectedFile().getPath(), dataStore);
+                }
+            }
+        });
+
+        exportTracks.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EventSaveUnit eventSaveUnit = songControl.createEventSaveUnit();
+
+                JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
+                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+                fileSaveChooser.setFileFilter(serializedFilter);
+                fileSaveChooser.setSelectedFile(new File("tracks.json"));
+                int returnValue = fileSaveChooser.showSaveDialog(getParent());
+                if(returnValue == JFileChooser.APPROVE_OPTION) {
+                    JsonWriter.writeTracksToFile(eventSaveUnit, fileSaveChooser.getSelectedFile().getPath());
+                }
+            }
+        });
+
+        loadTracks.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileOpenChooser = new JFileChooser();
+                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+                fileOpenChooser.setFileFilter(serializedFilter);
+                int returnValue = fileOpenChooser.showOpenDialog(getParent());
+                if(returnValue == JFileChooser.APPROVE_OPTION) {
+                    JsonWriter.addTracksFromFile(fileOpenChooser.getSelectedFile().getPath(), songControl);
                 }
             }
         });
