@@ -54,6 +54,7 @@ import java.util.function.Function;
         if(!this.pixels.contains(newPixel)) {
             this.pixels.add(newPixel);
             this.pixelMask.setIntensityAt(x, y, 1.0);
+            this.ledGraphicUnit.addPixel(x, y);
         } else {
             throw new Exception("Pixel already set");
         }

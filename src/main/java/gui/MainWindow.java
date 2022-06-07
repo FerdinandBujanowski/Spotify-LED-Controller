@@ -439,6 +439,18 @@ public class MainWindow extends JFrame {
         });
         this.ledMenu.add(addPixelMatrix);
 
+        JMenuItem onlyDrawLedsItem = new JCheckBoxMenuItem("Only Draw LEDs");
+        onlyDrawLedsItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ledEditWindow.setDrawOnlyLedPixels(onlyDrawLedsItem.isSelected());
+                ledEditWindow.repaint();
+            }
+        });
+
+        this.ledMenu.add(new JSeparator());
+        this.ledMenu.add(onlyDrawLedsItem);
+
         jMenuBar.add(this.ledMenu);
         this.ledMenu.setEnabled(false);
         this.pack();
@@ -636,6 +648,7 @@ public class MainWindow extends JFrame {
                 songSlider.setSize(newSize.width, 20);
 
                 if(spotifyPlayerPanel != null) spotifyPlayerPanel.resizeComponents(newSize);
+                if(ledEditWindow != null) ledEditWindow.resizeComponents(newSize);
                 repaint();
                 repaintWindows(songControl, nodeControl);
 
@@ -789,6 +802,7 @@ public class MainWindow extends JFrame {
         if(this.eventEditWindow != null) this.eventEditWindow.repaint();
         if(this.nodeEditWindow != null) this.nodeEditWindow.repaint();
         if(this.functionTabbedPane != null) this.functionTabbedPane.repaint();
+        if(this.ledEditWindow != null) this.ledEditWindow.repaint();
 
         if(this.createTrackNodeMenu.getItemCount() != songControl.getTrackCount()) {
             while(this.createTrackNodeMenu.getItemCount() != 0) {

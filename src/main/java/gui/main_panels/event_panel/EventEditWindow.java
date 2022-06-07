@@ -124,9 +124,10 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     public void zoom(boolean zoomIn) {
-        if(zoomIn && this.eventWidthDivision >= 12.0) {
+        int oldX = this.getX() * (int)this.eventWidthDivision;
+        if(zoomIn && this.eventWidthDivision >= 4.0) {
             this.eventWidthDivision -= 2.0;
-        } else if(!zoomIn && this.eventWidthDivision <= 18.0) {
+        } else if(!zoomIn && this.eventWidthDivision <= 28.0) {
             this.eventWidthDivision += 2.0;
         }
         for(ArrayList<GraphicEvent> graphicEventArrayList : this.graphicEvents) {
@@ -135,6 +136,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             }
         }
         updateBounds();
+        this.setLocation((int)Math.round(oldX / this.eventWidthDivision), 0);
         repaint();
     }
 

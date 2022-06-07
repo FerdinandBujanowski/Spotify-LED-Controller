@@ -13,9 +13,9 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     private LedRequestAcceptor ledControl;
     private boolean drawOnlyLedPixels;
 
+    private ArrayList<GraphicPixel> graphicPixels;
     private LayersPanel layersPanel;
     private JPanel pixelPanel;
-
 
     public LedEditWindow(LedRequestAcceptor ledControl, Dimension windowDimension) {
         super(null);
@@ -25,61 +25,65 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
         this.drawOnlyLedPixels = false;
 
+        this.graphicPixels = new ArrayList<>();
         this.layersPanel = new LayersPanel(ledControl, this);
-
         this.pixelPanel = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
                 //super.paintComponent(g);
 
-                Point[] pixels = ledControl.getPixels();
                 int finalDegree = ledControl.getFinalDegree();
                 int pixelLength = (finalDegree * 2) + 1;
-                double step = this.getWidth() / (double)pixelLength;
+                int step = (int)Math.round(this.getWidth() / (double)pixelLength);
 
                 if(!drawOnlyLedPixels) {
+                    g.setColor(Color.BLACK);
+                    g.fillRect(0, 0, this.getWidth(), this.getHeight());
+
                     for(int i = -finalDegree; i <= finalDegree; i++) {
                         for(int j = -finalDegree; j <= finalDegree; j++) {
                             g.setColor(ledControl.getColorAt(i, j));
                             g.fillRect(
-                                    (int)Math.round((i + finalDegree) * step),
-                                    (int)Math.round((j + finalDegree) * step),
-                                    (int)Math.round(step), (int)Math.round(step)
+                                    (i + finalDegree) * step,
+                                    (j + finalDegree) * step,
+                                    step, step
                             );
                         }
                     }
                 }
-                for(Point pixel : pixels) {
-                    if(drawOnlyLedPixels) {
-                        g.setColor(ledControl.getColorAt(pixel.x, pixel.y));
-                        g.fillRect(
-                                (int)Math.round((pixel.x + finalDegree) * step),
-                                (int)Math.round((pixel.y + finalDegree) * step),
-                                (int)Math.round(step) - 1, (int)Math.round(step) - 1
-                        );
-                    }
-                    g.setColor(Color.WHITE);
-                    g.drawRect(
-                            (int)Math.round((pixel.x + finalDegree) * step),
-                            (int)Math.round((pixel.y + finalDegree) * step),
-                            (int)Math.round(step) - 1, (int)Math.round(step) - 1
-                    );
-                }
             }
         };
         this.add(this.pixelPanel);
-        this.pixelPanel.setBounds(
-                ((windowDimension.width - 200) / 2) - 200,
-                30,
-                400, 400
-        );
 
         this.setOpaque(true);
         this.setBackground(new Color(40, 40, 40));
+        this.resizeComponents(windowDimension);
+    }
+
+    public void resizeComponents(Dimension dimension) {
+        this.pixelPanel.setBounds(
+                ((dimension.width - 200) / 2) - 200,
+                30,
+                400, 400
+        );
+        this.update();
     }
 
     public JPanel getLayersPanel() {
         return this.layersPanel;
+    }
+
+    @Override
+    public void addPixel(int x, int y) {
+        GraphicPixel newPixel = new GraphicPixel(this.ledControl, x, y);
+        this.graphicPixels.add(newPixel);
+        this.add(newPixel);
+        this.setComponentZOrder(newPixel, 0);
+    }
+
+    @Override
+    public void setDrawOnlyLedPixels(boolean drawOnlyLedPixels) {
+        this.drawOnlyLedPixels = drawOnlyLedPixels;
     }
 
     @Override
@@ -91,61 +95,18 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     @Override
     public void update() {
+        //TODO : hier bounds-änderungen der graphic pixels vornehmen
+        int finalDegree = this.ledControl.getFinalDegree();
+        int pixelLength = (finalDegree * 2) + 1;
+        int step = (int)Math.round(this.pixelPanel.getWidth() / (double)pixelLength);
+
+        for(GraphicPixel graphicPixel : this.graphicPixels) {
+            graphicPixel.setBounds(
+                    this.pixelPanel.getX() + ((graphicPixel.getPixelX() + finalDegree) * step),
+                    this.pixelPanel.getY() + ((graphicPixel.getPixelY() + finalDegree) * step),
+                    step, step
+            );
+        }
         this.repaint();
     }
-}
-
-class LayersPanel extends JPanel {
-
-    private LedRequestAcceptor ledRequestAcceptor;
-    private LedGraphicUnit ledGraphicUnit;
-
-    private ArrayList<JLabel> layerLabels;
-    private ArrayList<JCheckBox> layerCheckBoxes;
-
-    public LayersPanel(LedRequestAcceptor ledRequestAcceptor, LedGraphicUnit ledGraphicUnit) {
-        super(null);
-
-        this.ledRequestAcceptor = ledRequestAcceptor;
-        this.ledGraphicUnit = ledGraphicUnit;
-        this.layerLabels = new ArrayList<>();
-        this.layerCheckBoxes = new ArrayList<>();
-
-        this.setOpaque(true);
-        this.setBackground(new Color(40, 40, 40));
-    }
-
-    public void addLayer(int newIndex) {
-        JLabel newLayerLabel = new JLabel("Layer " + (newIndex + 1), SwingConstants.CENTER);
-        newLayerLabel.setForeground(Color.WHITE);
-        this.layerLabels.add(newLayerLabel);
-        this.add(newLayerLabel);
-
-        JCheckBox newLayerCheckBox = new JCheckBox();
-        newLayerCheckBox.setSelected(true);
-        newLayerCheckBox.setBackground(new Color(40, 40, 40));
-        this.layerCheckBoxes.add(newLayerCheckBox);
-        this.add(newLayerCheckBox);
-
-        newLayerCheckBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO : Layer wird sichtbar / unsichtbar gemacht
-                ledRequestAcceptor.enableLayer(newIndex, newLayerCheckBox.isSelected());
-            }
-        });
-
-        this.setPreferredSize(new Dimension(this.getWidth(), this.layerLabels.size() * 30));
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        for(int i = 1; i <= this.layerLabels.size(); i++) {
-            this.layerLabels.get(this.layerLabels.size() - i).setBounds(50, (i - 1) * 30, 100, 30);
-            this.layerCheckBoxes.get(this.layerCheckBoxes.size() - i).setBounds(50, (i - 1) * 30 + 5, 20, 20);
-        }
-    }
-
 }
