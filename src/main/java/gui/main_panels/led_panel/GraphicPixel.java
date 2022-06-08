@@ -18,11 +18,20 @@ public class GraphicPixel extends JLabel {
         this.pixelX = x;
         this.pixelY = y;
         this.ledRequestAcceptor = ledRequestAcceptor;
-        
+
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                super.mouseDragged(e);
+                if(outsideOfBounds(e.getX(), e.getY())) {
+                    int oldX = getPixelX(), oldY = getPixelY();
+                    int newX = getPixelX(), newY = getPixelY();
+                    if(e.getX() < 0) newX--;
+                    else if(e.getX() > getWidth()) newX++;
+                    if(e.getY() < 0) newY--;
+                    else if(e.getY() > getHeight()) newY++;
+
+                    ledRequestAcceptor.onUpdatePixelRequest(oldX, oldY, newX, newY, false);
+                }
             }
         });
     }
@@ -34,6 +43,11 @@ public class GraphicPixel extends JLabel {
         return this.pixelY;
     }
 
+    public void setNewCoordinates(int newX, int newY) {
+        this.pixelX = newX;
+        this.pixelY = newY;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -43,13 +57,8 @@ public class GraphicPixel extends JLabel {
         g.drawRect(0, 0, this.getWidth() - 1, this.getHeight() - 1);
     }
 
-    @Override
-    public void setBounds(int x, int y, int width, int height) {
-        super.setBounds(x, y, width, height);
-        if(width == 0 && height == 0) {
-            System.out.println("AA");
-            Exception exception = new Exception("test");
-            exception.printStackTrace();
-        }
+    private boolean outsideOfBounds(int x, int y) {
+        if(x < 0 || x > this.getWidth()) return true;
+        else return y < 0 || y > this.getHeight();
     }
 }

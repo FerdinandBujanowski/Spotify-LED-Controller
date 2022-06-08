@@ -65,6 +65,7 @@ public enum NodeType {
     //MASK
     SQUARE_MASK_NODE("Square Mask", "Mask", SquareMaskNode.class, true),
     CIRCLE_MASK_NODE("Circle Mask", "Mask", CircleMaskNode.class, true),
+    BLEND_MASK_NODE("Blend Mask", "Mask", BlendMaskNode.class, new InputDialogType[] { InputDialogType.BLEND_INPUT }, true),
     MASK_ADDITION_NODE("Mask Addition", "Mask", MaskAdditionNode.class, true),
     MASK_SUBTRACTION_NODE("Mask Subtraction", "Mask", MaskSubtractionNode.class, true),
     MASK_DIFFERENCE_NODE("Mask Difference", "Mask", MaskDifferenceNode.class, true),

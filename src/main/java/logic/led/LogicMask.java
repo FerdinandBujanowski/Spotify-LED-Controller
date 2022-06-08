@@ -273,6 +273,25 @@ public class LogicMask implements Serializable {
         return newMask;
     }
 
+    public static LogicMask getBlendMask_Horizontal(int size, int iteration, double alterationPercentage) {
+        LogicMask newMask = new LogicMask();
+        int degree = size % 2 == 0 ? size / 2 - 1 : (size - 1) / 2;
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                newMask.setIntensityAt(x, y, LogicMask.getBlendCurve(y, iteration, alterationPercentage));
+            }
+        }
+        return newMask;
+    }
+
+    public static LogicMask getBlendMask_Vertical(int size, int iteration, double alterationPercentage) {
+        return LogicMask.getRotatedMask_Closest(LogicMask.getBlendMask_Horizontal(size, iteration, alterationPercentage), Math.PI / 2);
+    }
+
+    private static double getBlendCurve(int x, int iteration, double alterationPercentage) {
+        return (Math.cos((x - (alterationPercentage * iteration)) * Math.PI / iteration) + 1) / 2;
+    }
+
     public static double[] rotateCoordinates(double x, double y, double radians) {
         return new double[] {
                 Math.cos(radians) * x - Math.sin(radians) * y,

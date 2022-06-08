@@ -308,6 +308,14 @@ public class MainWindow extends JFrame {
                                 );
                                 extraParameters[i] = UpdateType.values()[updateComboBox.getSelectedIndex()];
                             }
+                            case BLEND_INPUT -> {
+                                JComboBox blendComboBox = new JComboBox(BlendType.values());
+                                JOptionPane.showOptionDialog(
+                                        null, blendComboBox, inputDialogTypes[i].getMessage(),
+                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
+                                );
+                                extraParameters[i] = BlendType.values()[blendComboBox.getSelectedIndex()];
+                            }
                         }
                     }
                     if(tabbedPane.getSelectedComponent() == nodeEditWindow) {

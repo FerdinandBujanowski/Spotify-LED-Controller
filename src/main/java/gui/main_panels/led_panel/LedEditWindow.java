@@ -82,6 +82,17 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     @Override
+    public void movePixel(int index, int newX, int newY) {
+        GraphicPixel graphicPixel = this.graphicPixels.get(index);
+        graphicPixel.setNewCoordinates(newX, newY);
+        this.update();
+    }
+    @Override
+    public void deletePixel(int index) {
+        this.remove(this.graphicPixels.get(index));
+    }
+
+    @Override
     public void setDrawOnlyLedPixels(boolean drawOnlyLedPixels) {
         this.drawOnlyLedPixels = drawOnlyLedPixels;
     }
