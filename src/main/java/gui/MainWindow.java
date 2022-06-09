@@ -68,7 +68,7 @@ public class MainWindow extends JFrame {
         this.tabbedPane.addTab("Events", null);
         this.tabbedPane.addTab("Nodes", null);
         this.tabbedPane.addTab("Functions", null);
-        this.tabbedPane.addTab("LED's", null);
+        this.tabbedPane.addTab("LEDs", null);
 
         JPanel buttonPanel = new JPanel(null);
         JSlider songSlider = new JSlider(0, 1000, 0);
