@@ -1,6 +1,7 @@
 package logic.led;
 
 import control.SerializableFunction;
+import control.type_enums.BlendType;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -79,6 +80,33 @@ public class LogicMask implements Serializable {
             output += "\n";
         }
         return output;
+    }
+
+    public static LogicMask getSquareMask(int degree, double intensity) {
+        LogicMask logicMask = new LogicMask();
+        for(int i = -degree; i <= degree; i++) {
+            for(int j = -degree; j <= degree; j++) {
+                logicMask.setIntensityAt(i, j, intensity);
+            }
+        }
+
+        logicMask.cleanUp();
+        return logicMask;
+    }
+    public static LogicMask getCircleMask(int radius, double intensity) {
+        LogicMask logicMask = new LogicMask();
+        for(int i = -radius; i <= radius; i++) {
+            for(int j = -radius; j <= radius; j++) {
+                double hypothenuse = Math.sqrt(Math.pow(i, 2) + Math.pow(j, 2));
+                if(hypothenuse <= radius) {
+                    logicMask.setIntensityAt(i, j, intensity);
+                } else {
+                    logicMask.setIntensityAt(i, j, 0.0);
+                }
+            }
+        }
+        logicMask.cleanUp();
+        return logicMask;
     }
 
     private static LogicMask getJoinedMask(LogicMask maskA, LogicMask maskB, SerializableFunction<Double[], Double> operation) {
@@ -273,7 +301,24 @@ public class LogicMask implements Serializable {
         return newMask;
     }
 
-    public static LogicMask getBlendMask_Horizontal(int degree, int iteration, double alterationPercentage) {
+    public static LogicMask getBlendMask(int degree, int iteration, double alterationPercentage, BlendType blendType) {
+        switch(blendType) {
+            case HORIZONTAL -> {
+                return LogicMask.getBlendMask_Horizontal(degree, iteration, alterationPercentage);
+            }
+            case VERTICAL -> {
+                return LogicMask.getBlendMask_Vertical(degree, iteration, alterationPercentage);
+            }
+            case CIRCULAR -> {
+                return LogicMask.getBlendMask_Circular(degree, iteration, alterationPercentage);
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    private static LogicMask getBlendMask_Horizontal(int degree, int iteration, double alterationPercentage) {
         LogicMask newMask = new LogicMask();
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
@@ -283,11 +328,31 @@ public class LogicMask implements Serializable {
         return newMask;
     }
 
-    public static LogicMask getBlendMask_Vertical(int degree, int iteration, double alterationPercentage) {
-        return LogicMask.getRotatedMask_Closest(LogicMask.getBlendMask_Horizontal(degree, iteration, alterationPercentage), Math.PI / 2);
+    private static LogicMask getBlendMask_Vertical(int degree, int iteration, double alterationPercentage) {
+        LogicMask newMask = new LogicMask();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                newMask.setIntensityAt(x, y, LogicMask.getBlendCurve(x, iteration, alterationPercentage));
+            }
+        }
+        return newMask;
     }
 
-    private static double getBlendCurve(int x, int iteration, double alterationPercentage) {
+    private static LogicMask getBlendMask_Circular(int degree, int iteration, double alterationPercentage) {
+        LogicMask circularMask = new LogicMask();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                double xValue = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+                circularMask.setIntensityAt(x, y, LogicMask.getBlendCurve(xValue, iteration, alterationPercentage));
+            }
+        }
+        return LogicMask.getJoinedMask_Multiply(
+                circularMask,
+                LogicMask.getCircleMask(degree, 1.d)
+        );
+    }
+
+    private static double getBlendCurve(double x, int iteration, double alterationPercentage) {
         return (Math.cos((x - (alterationPercentage * iteration)) * Math.PI * 2 / iteration) + 1) / 2;
     }
 

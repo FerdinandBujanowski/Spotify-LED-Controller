@@ -39,18 +39,7 @@ public class BlendMaskNode extends SquareMaskNode {
         int iteration = (int) inputJoints[1].getJointDataType().getData();
         double alteration = (double) inputJoints[2].getJointDataType().getData();
 
-        LogicMask logicMask;
-        switch(this.blendType) {
-            case HORIZONTAL -> {
-                logicMask = LogicMask.getBlendMask_Horizontal(degree, iteration, alteration);
-            }
-            case VERTICAL -> {
-                logicMask = LogicMask.getBlendMask_Vertical(degree, iteration, alteration);
-            }
-            default -> {
-                logicMask = new LogicMask();
-            }
-        }
+        LogicMask logicMask = LogicMask.getBlendMask(degree, iteration, alteration, this.blendType);
         return new MaskJointDataType[] { new MaskJointDataType(logicMask) };
     }
 }

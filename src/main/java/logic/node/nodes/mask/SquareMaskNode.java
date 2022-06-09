@@ -35,17 +35,10 @@ public class SquareMaskNode extends LogicNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
-        LogicMask logicMask = new LogicMask();
         int degree = (Integer) inputJoints[0].getJointDataType().getData();
         double intensity = (Double) inputJoints[1].getJointDataType().getData();
 
-        for(int i = -degree; i <= degree; i++) {
-            for(int j = -degree; j <= degree; j++) {
-                logicMask.setIntensityAt(i, j, intensity);
-            }
-        }
-
-        logicMask.cleanUp();
+        LogicMask logicMask = LogicMask.getSquareMask(degree, intensity);
         return new MaskJointDataType[] { new MaskJointDataType(logicMask) };
     }
 
