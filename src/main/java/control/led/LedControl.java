@@ -59,13 +59,13 @@ import java.util.function.Function;
         } else {
             throw new Exception("Pixel already set");
         }
-        this.ledGraphicUnit.update();
+        this.ledGraphicUnit.updatePixelBounds();
     }
 
      @Override
      public void enableLayer(int layerIndex, boolean isEnabled) {
         this.logicLayers.get(layerIndex).setEnabled(isEnabled);
-        this.ledGraphicUnit.update();
+        this.ledGraphicUnit.updatePixelBounds();
      }
 
      @Override
@@ -99,12 +99,15 @@ import java.util.function.Function;
          int pixelIndex = this.getPixelIndex(oldX, oldY);
          if(pixelIndex == -1) return;
 
-        if(deleted) {
-            this.ledGraphicUnit.deletePixel(pixelIndex);
-        } else if(this.getPixelIndex(newX, newY) == -1) {
-            this.pixels.set(pixelIndex, new Point(newX, newY));
-            this.ledGraphicUnit.movePixel(pixelIndex, newX, newY);
-        }
+         this.pixelMask.setIntensityAt(oldX, oldY, 0);
+         if(deleted) {
+             this.ledGraphicUnit.deletePixel(pixelIndex);
+         } else if(this.getPixelIndex(newX, newY) == -1) {
+             this.pixels.set(pixelIndex, new Point(newX, newY));
+             this.pixelMask.setIntensityAt(newX, newY, 1);
+             this.ledGraphicUnit.movePixel(pixelIndex, newX, newY);
+         }
+         this.pixelMask.cleanUp();
      }
 
      @Override

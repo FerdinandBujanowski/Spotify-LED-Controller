@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     private LedRequestAcceptor ledControl;
+    private int finalDegree;
     private boolean drawOnlyLedPixels;
 
     private ArrayList<GraphicPixel> graphicPixels;
@@ -22,6 +23,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
         this.ledControl = ledControl;
         this.ledControl.setLedGraphicUnit(this);
+        this.finalDegree = 0;
 
         this.drawOnlyLedPixels = false;
 
@@ -66,7 +68,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
                 30,
                 400, 400
         );
-        this.update();
+        this.updatePixelBounds();
     }
 
     public JPanel getLayersPanel() {
@@ -75,7 +77,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     @Override
     public void addPixel(int x, int y) {
-        GraphicPixel newPixel = new GraphicPixel(this.ledControl, x, y);
+        GraphicPixel newPixel = new GraphicPixel(this.ledControl, this, x, y);
         this.graphicPixels.add(newPixel);
         this.add(newPixel);
         this.setComponentZOrder(newPixel, 0);
@@ -85,7 +87,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     public void movePixel(int index, int newX, int newY) {
         GraphicPixel graphicPixel = this.graphicPixels.get(index);
         graphicPixel.setNewCoordinates(newX, newY);
-        this.update();
+        this.updatePixelPositions();
     }
     @Override
     public void deletePixel(int index) {
@@ -105,16 +107,20 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     @Override
-    public void update() {
-        //TODO : hier bounds-änderungen der graphic pixels vornehmen
-        int finalDegree = this.ledControl.getFinalDegree();
-        int pixelLength = (finalDegree * 2) + 1;
+    public void updatePixelBounds() {
+        this.finalDegree = this.ledControl.getFinalDegree();
+        this.updatePixelPositions();
+    }
+
+    @Override
+    public void updatePixelPositions() {
+        int pixelLength = (this.finalDegree * 2) + 1;
         int step = (int)Math.round(this.pixelPanel.getWidth() / (double)pixelLength);
 
         for(GraphicPixel graphicPixel : this.graphicPixels) {
             graphicPixel.setBounds(
-                    this.pixelPanel.getX() + ((graphicPixel.getPixelX() + finalDegree) * step),
-                    this.pixelPanel.getY() + ((graphicPixel.getPixelY() + finalDegree) * step),
+                    this.pixelPanel.getX() + ((graphicPixel.getPixelX() + this.finalDegree) * step),
+                    this.pixelPanel.getY() + ((graphicPixel.getPixelY() + this.finalDegree) * step),
                     step, step
             );
         }

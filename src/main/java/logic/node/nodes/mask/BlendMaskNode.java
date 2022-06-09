@@ -11,7 +11,7 @@ import logic.node.joint.joint_types.UnitNumberJointDataType;
 
 public class BlendMaskNode extends SquareMaskNode {
 
-    private BlendType blendType;
+    private final BlendType blendType;
 
     public BlendMaskNode(int nodeIndex, BlendType blendType) {
         super(

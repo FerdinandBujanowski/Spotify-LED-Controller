@@ -1,9 +1,11 @@
 package gui.main_panels.led_panel;
 
+import control.led.LedGraphicUnit;
 import control.led.LedRequestAcceptor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
@@ -12,12 +14,14 @@ public class GraphicPixel extends JLabel {
     private int pixelX;
     private int pixelY;
 
-    private LedRequestAcceptor ledRequestAcceptor;
+    private final LedRequestAcceptor ledRequestAcceptor;
+    private final LedGraphicUnit ledGraphicUnit;
 
-    public GraphicPixel(LedRequestAcceptor ledRequestAcceptor, int x, int y) {
+    public GraphicPixel(LedRequestAcceptor ledRequestAcceptor, LedGraphicUnit ledGraphicUnit, int x, int y) {
         this.pixelX = x;
         this.pixelY = y;
         this.ledRequestAcceptor = ledRequestAcceptor;
+        this.ledGraphicUnit = ledGraphicUnit;
 
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -32,6 +36,13 @@ public class GraphicPixel extends JLabel {
 
                     ledRequestAcceptor.onUpdatePixelRequest(oldX, oldY, newX, newY, false);
                 }
+            }
+        });
+
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                ledGraphicUnit.updatePixelBounds();
             }
         });
     }
