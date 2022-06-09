@@ -369,7 +369,6 @@ public class MainWindow extends JFrame {
                         JOptionPane.showOptionDialog(null, jointTypeComboBox, "Output " + (i + 1) + " Type", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
                         outputTypes[i] = JointType.values()[jointTypeComboBox.getSelectedIndex()];
                     }
-
                     createFunction(functionName, inputNames, inputTypes, outputNames, outputTypes, nodeControl);
                 }
             }
@@ -400,7 +399,7 @@ public class MainWindow extends JFrame {
                 ledControl.onAddLayerRequest();
                 if(currentLayerCount < ledControl.getLayerCount()) {
                     nodeControl.addLayerNode(
-                            ledControl.updatePlaneFunction(currentLayerCount),
+                            ledControl.updateTextureFunction(currentLayerCount),
                             "Layer " + (currentLayerCount + 1)
                     );
                 }

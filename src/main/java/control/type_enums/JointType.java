@@ -1,6 +1,5 @@
 package control.type_enums;
 
-import gui.MainWindow;
 import logic.node.joint.joint_types.*;
 
 import java.awt.*;
@@ -26,7 +25,7 @@ public enum JointType {
     INTERVAL_TYPE(new Color(35, 101, 51), IntervalJointDataType.class, "Interval"),
     BOOLEAN_TYPE(new Color(227, 34, 39), BooleanJointDataType.class, "Boolean"),
     COLOR_TYPE(new Color(159, 0, 255), ColorJointDataType.class, "Color"),
-    PLANE_TYPE(new Color(255, 160, 14), PlaneJointDataType.class, "Plane"),
+    TEXTURE_TYPE(new Color(255, 160, 14), TextureJointDataType.class, "Texture"),
     MASK_TYPE(new Color(255, 215, 0), MaskJointDataType.class, "Mask");
 
     private final Color color;

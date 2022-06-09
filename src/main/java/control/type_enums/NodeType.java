@@ -14,8 +14,8 @@ import logic.node.nodes.debug.DebugNode;
 import logic.node.nodes.logical_operators.*;
 import logic.node.nodes.mask.*;
 import logic.node.nodes.math_functions.*;
-import logic.node.nodes.plane.OverlayPlaneNode;
-import logic.node.nodes.plane.SimplePlaneNode;
+import logic.node.nodes.texture.OverlayTextureNode;
+import logic.node.nodes.texture.SimpleTextureNode;
 import logic.node.nodes.random.RandomIntegerNode;
 import logic.node.nodes.random.RandomUnitNumberNode;
 import logic.node.nodes.type_cast.*;
@@ -88,9 +88,9 @@ public enum NodeType {
     SQRT_NODE("Square Root", "Math Functions", SquareRootNode.class),
     MODULO_NODE("Modulo", "Math Functions", ModuloNode.class),
 
-    //PLANE
-    SIMPLE_PLANE_NODE("Simple Plane", "Plane", SimplePlaneNode.class, true),
-    OVERLAY_PLANE_NODE("Overlay Plane", "Plane", OverlayPlaneNode.class, new InputDialogType[] { InputDialogType.COLOR_MIXING_INPUT }, true),
+    //TEXTURE
+    SIMPLE_TEXTURE_NODE("Simple Texture", "Texture", SimpleTextureNode.class, true),
+    OVERLAY_TEXTURE_NODE("Overlay Texture", "Texture", OverlayTextureNode.class, new InputDialogType[] { InputDialogType.COLOR_MIXING_INPUT }, true),
 
     //RANDOM
     RANDOM_INTEGER_NODE("Random Integer", "Random", RandomIntegerNode.class),

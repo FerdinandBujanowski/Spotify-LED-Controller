@@ -5,19 +5,19 @@ import java.io.Serializable;
 
 public class LogicLayer implements Serializable {
 
-    private LogicPlane logicPlane;
+    private LogicTexture logicTexture;
     private boolean isEnabled;
 
     private LogicLayer lowerLayer;
 
     public LogicLayer(LogicLayer lowerLayer) {
         this.lowerLayer = lowerLayer;
-        this.logicPlane = new LogicPlane();
+        this.logicTexture = new LogicTexture();
         this.isEnabled = true;
     }
 
-    public Integer updatePlane(Object plane) {
-        this.logicPlane = (LogicPlane) plane;
+    public Integer updateTexture(Object texture) {
+        this.logicTexture = (LogicTexture) texture;
         return 0;
     }
 
@@ -25,18 +25,18 @@ public class LogicLayer implements Serializable {
         if(!this.isEnabled) {
             return(this.lowerLayer != null ? this.lowerLayer.getColorAt(x, y) : Color.BLACK);
         }
-        double intensity = this.logicPlane.getLogicMask().getIntensityAt(x, y);
+        double intensity = this.logicTexture.getLogicMask().getIntensityAt(x, y);
         Color lowerColor;
         if(this.lowerLayer == null) {
             lowerColor = Color.BLACK;
         } else {
             lowerColor = this.lowerLayer.getColorAt(x, y);
         }
-        Color colorAt = this.logicPlane.getColorAt(x, y);
+        Color colorAt = this.logicTexture.getColorAt(x, y);
         return new Color(
-                LogicPlane.mixWithIntensity(colorAt.getRed(), lowerColor.getRed(), intensity),
-                LogicPlane.mixWithIntensity(colorAt.getGreen(), lowerColor.getGreen(), intensity),
-                LogicPlane.mixWithIntensity(colorAt.getBlue(), lowerColor.getBlue(), intensity)
+                LogicTexture.mixWithIntensity(colorAt.getRed(), lowerColor.getRed(), intensity),
+                LogicTexture.mixWithIntensity(colorAt.getGreen(), lowerColor.getGreen(), intensity),
+                LogicTexture.mixWithIntensity(colorAt.getBlue(), lowerColor.getBlue(), intensity)
         );
     }
 

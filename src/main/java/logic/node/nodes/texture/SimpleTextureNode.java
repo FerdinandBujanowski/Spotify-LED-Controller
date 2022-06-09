@@ -1,0 +1,55 @@
+package logic.node.nodes.texture;
+
+import control.type_enums.NodeType;
+import logic.led.LogicMask;
+import logic.led.LogicTexture;
+import logic.node.LogicNode;
+import logic.node.joint.InputJoint;
+import logic.node.joint.OutputJoint;
+import logic.node.joint.joint_types.ColorJointDataType;
+import logic.node.joint.joint_types.MaskJointDataType;
+import logic.node.joint.joint_types.TextureJointDataType;
+
+import java.awt.*;
+
+public class SimpleTextureNode extends LogicNode {
+
+    public SimpleTextureNode(int nodeIndex) {
+        super(
+                nodeIndex,
+                new InputJoint[] {
+                        new InputJoint(new MaskJointDataType(), "Mask"),
+                        new InputJoint(new ColorJointDataType(), "Color")
+                },
+                new OutputJoint[] {
+                        new OutputJoint(new TextureJointDataType(), "Output")
+                },
+                NodeType.SIMPLE_TEXTURE_NODE
+        );
+    }
+
+    public SimpleTextureNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, NodeType nodeType, Object[] extraParameters) {
+        super(nodeIndex, inputJoints, outputJoints, nodeType, extraParameters);
+    }
+
+    @Override
+    public TextureJointDataType[] function(InputJoint[] inputJoints) {
+        LogicMask mask = (LogicMask) inputJoints[0].getJointDataType().getData();
+        Color color = (Color) inputJoints[1].getJointDataType().getData();
+        return new TextureJointDataType[] {
+                new TextureJointDataType(LogicTexture.multiplyMaskWithColor(mask, color))
+        };
+    }
+
+    @Override
+    public Double[][] getMaskValues(Integer nullInteger) {
+        LogicTexture logicTexture = (LogicTexture) this.getOutputJoints()[0].getJointDataType().getData();
+        return logicTexture.getLogicMask().getValues();
+    }
+
+    @Override
+    public Color[][] getTextureColorValues(Integer nullInteger) {
+        LogicTexture logicTexture = (LogicTexture) this.getOutputJoints()[0].getJointDataType().getData();
+        return logicTexture.getColorValues();
+    }
+}

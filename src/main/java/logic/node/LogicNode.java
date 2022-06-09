@@ -160,7 +160,7 @@ public abstract class LogicNode extends LogicComponent {
     public Double[][] getMaskValues(Integer nullInteger) {
         return new Double[0][0];
     }
-    public Color[][] getPlaneColorValues(Integer nullInteger) {
+    public Color[][] getTextureColorValues(Integer nullInteger) {
         return new Color[0][0];
     }
 

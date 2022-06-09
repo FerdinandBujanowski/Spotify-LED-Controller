@@ -120,8 +120,8 @@ import java.util.function.Function;
      }
 
      @Override
-     public SerializableFunction<Object, Integer> updatePlaneFunction(int layerIndex) {
-         return this.logicLayers.get(layerIndex)::updatePlane;
+     public SerializableFunction<Object, Integer> updateTextureFunction(int layerIndex) {
+         return this.logicLayers.get(layerIndex)::updateTexture;
      }
 
      @Override

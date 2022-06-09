@@ -5,13 +5,13 @@ import control.node.ThreeCoordinatePoint;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class LogicPlane {
+public class LogicTexture {
 
     private LogicMask logicMask;
     private ArrayList<ThreeCoordinatePoint> colorCoordinatePoints;
     private ArrayList<Color> colors;
 
-    public LogicPlane() {
+    public LogicTexture() {
         this.logicMask = new LogicMask();
         this.colorCoordinatePoints = new ArrayList<>();
         this.colors = new ArrayList<>();
@@ -67,51 +67,51 @@ public class LogicPlane {
         return colors;
     }
 
-    public static LogicPlane multiplyMaskWithColor(LogicMask logicMask, Color color) {
+    public static LogicTexture multiplyMaskWithColor(LogicMask logicMask, Color color) {
 
-        LogicPlane logicPlane = new LogicPlane();
+        LogicTexture logicTexture = new LogicTexture();
         int degree = logicMask.getDegree();
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
-                logicPlane.setIntensityAt(x, y, logicMask.getIntensityAt(x, y), color);
+                logicTexture.setIntensityAt(x, y, logicMask.getIntensityAt(x, y), color);
             }
         }
-        logicPlane.getLogicMask().cleanUp();
-        return logicPlane;
+        logicTexture.getLogicMask().cleanUp();
+        return logicTexture;
     }
 
-    public static LogicPlane getPlaneAdditive(LogicPlane planeOver, LogicPlane planeUnder) {
-        LogicMask outputMask = LogicMask.getJoinedMask_Add(planeOver.logicMask, planeUnder.logicMask);
-        LogicPlane logicPlane = new LogicPlane();
+    public static LogicTexture getTextureAdditive(LogicTexture textureOver, LogicTexture textureUnder) {
+        LogicMask outputMask = LogicMask.getJoinedMask_Add(textureOver.logicMask, textureUnder.logicMask);
+        LogicTexture logicTexture = new LogicTexture();
         int degree = outputMask.getDegree();
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
-                Color colorOver = planeOver.getColorAt(x, y);
-                Color colorUnder = planeUnder.getColorAt(x, y);
-                Color mixedColor = LogicPlane.addColors(colorOver, colorUnder);
-                logicPlane.setIntensityAt(x, y, outputMask.getIntensityAt(x, y), mixedColor);
+                Color colorOver = textureOver.getColorAt(x, y);
+                Color colorUnder = textureUnder.getColorAt(x, y);
+                Color mixedColor = LogicTexture.addColors(colorOver, colorUnder);
+                logicTexture.setIntensityAt(x, y, outputMask.getIntensityAt(x, y), mixedColor);
             }
         }
 
-        return logicPlane;
+        return logicTexture;
     }
 
-    public static LogicPlane getPlaneOverlay(LogicPlane planeOver, LogicPlane planeUnder) {
-        LogicMask outputMask = LogicMask.getJoinedMask_Add(planeOver.logicMask, planeUnder.logicMask);
-        LogicPlane logicPlane = new LogicPlane();
+    public static LogicTexture getTextureOverlay(LogicTexture textureOver, LogicTexture textureUnder) {
+        LogicMask outputMask = LogicMask.getJoinedMask_Add(textureOver.logicMask, textureUnder.logicMask);
+        LogicTexture logicTexture = new LogicTexture();
         int degree = outputMask.getDegree();
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
-                Color colorOver = planeOver.getColorAt(x, y), colorUnder = planeUnder.getColorAt(x, y);
-                double intensity = planeOver.logicMask.getIntensityAt(x, y);
+                Color colorOver = textureOver.getColorAt(x, y), colorUnder = textureUnder.getColorAt(x, y);
+                double intensity = textureOver.logicMask.getIntensityAt(x, y);
                 Color mixedColor = new Color(
-                        LogicPlane.mixWithIntensity(colorOver.getRed(), colorUnder.getRed(), intensity),
-                        LogicPlane.mixWithIntensity(colorOver.getGreen(), colorUnder.getGreen(), intensity),
-                        LogicPlane.mixWithIntensity(colorOver.getBlue(), colorUnder.getBlue(), intensity)
+                        LogicTexture.mixWithIntensity(colorOver.getRed(), colorUnder.getRed(), intensity),
+                        LogicTexture.mixWithIntensity(colorOver.getGreen(), colorUnder.getGreen(), intensity),
+                        LogicTexture.mixWithIntensity(colorOver.getBlue(), colorUnder.getBlue(), intensity)
                 );
-                logicPlane.setIntensityAt(x, y, outputMask.getIntensityAt(x, y), mixedColor);
+                logicTexture.setIntensityAt(x, y, outputMask.getIntensityAt(x, y), mixedColor);
             }
         }
-        return logicPlane;
+        return logicTexture;
     }
 }

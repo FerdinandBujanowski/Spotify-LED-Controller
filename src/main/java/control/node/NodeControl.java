@@ -14,7 +14,6 @@ import logic.node.joint.*;
 import logic.node.joint.joint_types.*;
 
 import java.awt.*;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
@@ -268,12 +267,12 @@ public class NodeControl implements NodeRequestAcceptor {
         this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._TRACK_NODE, nodeName);
     }
 
-    public void addLayerNode(SerializableFunction<Object, Integer> setPlaneFunction, String layerName) {
+    public void addLayerNode(SerializableFunction<Object, Integer> setTextureFunction, String layerName) {
         int newNodeIndex = this.getNextFreeNodeIndex(-1);
         LogicNode layerNode = new LogicNode(
                 newNodeIndex,
                 new InputJoint[] {
-                        new InputJoint(new PlaneJointDataType(), "Plane")
+                        new InputJoint(new TextureJointDataType(), "Texture")
                 },
                 new OutputJoint[] {},
                 layerName,
@@ -283,7 +282,7 @@ public class NodeControl implements NodeRequestAcceptor {
             @Override
             public void onInputChangeEvent() {
                 updateAll();
-                if(setPlaneFunction != null) setPlaneFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
+                if(setTextureFunction != null) setTextureFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
             }
         };
 
@@ -570,7 +569,7 @@ public class NodeControl implements NodeRequestAcceptor {
     @Override
     public SerializableFunction<Integer, Color[][]> getColorValuesFunctionForNode(int functionIndex, int nodeIndex) {
         LogicNode logicNode = this.findNode(functionIndex, nodeIndex);
-        return logicNode::getPlaneColorValues;
+        return logicNode::getTextureColorValues;
     }
 
     @Override

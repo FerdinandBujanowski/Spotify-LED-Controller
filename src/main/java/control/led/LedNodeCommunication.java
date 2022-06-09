@@ -6,7 +6,7 @@ import java.awt.*;
 
 public interface LedNodeCommunication {
 
-    SerializableFunction<Object, Integer> updatePlaneFunction(int layerIndex);
+    SerializableFunction<Object, Integer> updateTextureFunction(int layerIndex);
     SerializableFunction<Integer, Point> pixelPositionFunction();
 
 }
