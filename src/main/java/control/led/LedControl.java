@@ -53,9 +53,10 @@ import java.util.function.Function;
     public void addPixel(int x, int y) throws Exception {
         Point newPixel = new Point(x, y);
         if(!this.pixels.contains(newPixel)) {
+            int newIndex = this.pixels.size();
             this.pixels.add(newPixel);
             this.pixelMask.setIntensityAt(x, y, 1.0);
-            this.ledGraphicUnit.addPixel(x, y);
+            this.ledGraphicUnit.addPixel(newIndex, x, y);
         } else {
             throw new Exception("Pixel already set");
         }

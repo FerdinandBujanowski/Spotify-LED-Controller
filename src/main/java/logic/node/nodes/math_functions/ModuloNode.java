@@ -5,7 +5,7 @@ import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.IntegerJointDataType;
-import logic.node.joint.joint_types.NumberJointDataType;
+import logic.node.joint.joint_types.JointDataType;
 
 public class ModuloNode extends LogicNode {
 
@@ -24,12 +24,13 @@ public class ModuloNode extends LogicNode {
     }
 
     @Override
-    public NumberJointDataType[] function(InputJoint[] inputJoints) {
+    public JointDataType[] function(InputJoint[] inputJoints) {
         int data = (Integer) inputJoints[0].getJointDataType().getData();
         int divisor = (Integer) inputJoints[1].getJointDataType().getData();
 
-        return new NumberJointDataType[] {
-                new NumberJointDataType(data % divisor)
+        int output = divisor == 0 ? data : data % divisor;
+        return new IntegerJointDataType[] {
+                new IntegerJointDataType(output)
         };
     }
 }

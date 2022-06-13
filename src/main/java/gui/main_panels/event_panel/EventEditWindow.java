@@ -52,7 +52,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         this.curveBrush = false;
 
         this.setOpaque(true);
-        this.setBackground(new Color(218, 218, 218));
+        this.setBackground(new Color(25, 20, 20));
 
         this.addMouseListener(new MouseAdapter() {
             @Override
@@ -219,7 +219,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
        JLabel trackLabel = new JLabel();
        trackLabel.setOpaque(true);
-       trackLabel.setBackground(new Color(238, 238, 238));
+        this.setBackground(new Color(25, 20, 20));
 
        trackLabel.setBounds(
                0,

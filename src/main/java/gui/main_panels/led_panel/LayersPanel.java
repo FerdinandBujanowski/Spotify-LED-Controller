@@ -26,7 +26,7 @@ class LayersPanel extends JPanel {
         this.layerCheckBoxes = new ArrayList<>();
 
         this.setOpaque(true);
-        this.setBackground(new Color(40, 40, 40));
+        this.setBackground(new Color(25, 20, 20));
     }
 
     public void addLayer(int newIndex) {
@@ -37,7 +37,7 @@ class LayersPanel extends JPanel {
 
         JCheckBox newLayerCheckBox = new JCheckBox();
         newLayerCheckBox.setSelected(true);
-        newLayerCheckBox.setBackground(new Color(40, 40, 40));
+        newLayerCheckBox.setBackground(new Color(25, 20, 20));
         this.layerCheckBoxes.add(newLayerCheckBox);
         this.add(newLayerCheckBox);
 

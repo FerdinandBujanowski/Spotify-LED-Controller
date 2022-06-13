@@ -447,55 +447,53 @@ public class MainWindow extends JFrame {
         this.ledMenu.add(addPixelMatrix);
 
         JMenuItem onlyDrawLedsItem = new JCheckBoxMenuItem("Only Draw LEDs");
-        onlyDrawLedsItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ledEditWindow.setDrawOnlyLedPixels(onlyDrawLedsItem.isSelected());
-                ledEditWindow.repaint();
-            }
+        onlyDrawLedsItem.addActionListener(e -> {
+            ledEditWindow.setDrawOnlyLedPixels(onlyDrawLedsItem.isSelected());
+            ledEditWindow.repaint();
         });
-
         this.ledMenu.add(new JSeparator());
         this.ledMenu.add(onlyDrawLedsItem);
 
-        jMenuBar.add(this.ledMenu);
+        JMenuItem showIndexItem = new JCheckBoxMenuItem("Show Indexes");
+        showIndexItem.addActionListener(e -> {
+            ledEditWindow.showIndexes(showIndexItem.isSelected());
+            ledEditWindow.repaint();
+        });
+
+        this.ledMenu.add(showIndexItem);
+
+        this.jMenuBar.add(this.ledMenu);
         this.ledMenu.setEnabled(false);
         this.pack();
         this.setCorrectLocation();
 
-        newProject.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(bProjectOpen) {
-                    //TODO: Abfangen, dass im Zweifelsfall das geöffnete Programm nicht gespeichert wird
-                }
-                newProject(songControl, nodeControl, ledControl, dimension);
-                pack();
-                setCorrectLocation();
-                repaint();
-                bProjectOpen = true;
+        newProject.addActionListener(e -> {
+            if(bProjectOpen) {
+                //TODO: Abfangen, dass im Zweifelsfall das geöffnete Programm nicht gespeichert wird
             }
+            newProject(songControl, nodeControl, ledControl, dimension);
+            pack();
+            setCorrectLocation();
+            repaint();
+            bProjectOpen = true;
         });
 
-        openProject.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileOpenChooser = new JFileChooser();
-                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
-                fileOpenChooser.setFileFilter(serializedFilter);
-                int returnValue = fileOpenChooser.showOpenDialog(getParent());
-                if(returnValue == JFileChooser.APPROVE_OPTION) {
-                    DataStore data = DataStore.readFromFile(fileOpenChooser.getSelectedFile().getPath());
-                    if(data != null) {
+        openProject.addActionListener(e -> {
+            JFileChooser fileOpenChooser = new JFileChooser();
+            FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
+            fileOpenChooser.setFileFilter(serializedFilter);
+            int returnValue = fileOpenChooser.showOpenDialog(getParent());
+            if(returnValue == JFileChooser.APPROVE_OPTION) {
+                DataStore data = DataStore.readFromFile(fileOpenChooser.getSelectedFile().getPath());
+                if(data != null) {
 
-                        newProject(songControl, nodeControl, data.getLedControl(), dimension);
-                        songControl.reinitialize(data.getEventSaveUnit());
-                        nodeControl.reinitialize(data.getNodeSaveUnit());
-                        nodeEditWindow.updateGraphicNodes(data.getNodeEditGraphicNodePositions());
-                        functionTabbedPane.updateFunctions(data.getFunctionEditGraphicNodePositions());
+                    newProject(songControl, nodeControl, data.getLedControl(), dimension);
+                    songControl.reinitialize(data.getEventSaveUnit());
+                    nodeControl.reinitialize(data.getNodeSaveUnit());
+                    nodeEditWindow.updateGraphicNodes(data.getNodeEditGraphicNodePositions());
+                    functionTabbedPane.updateFunctions(data.getFunctionEditGraphicNodePositions());
 
-                        enableTabs();
-                    }
+                    enableTabs();
                 }
             }
         });

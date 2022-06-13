@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class NodeEditWindow extends ParentNodePanel {
 
     public NodeEditWindow(NodeRequestAcceptor nodeControl) {
-        super(nodeControl, -1, Color.LIGHT_GRAY);
+        super(nodeControl, -1);
         nodeControl.setNodeGraphicUnit(this);
     }
 

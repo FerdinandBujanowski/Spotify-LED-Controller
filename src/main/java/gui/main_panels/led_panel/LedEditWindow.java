@@ -12,7 +12,9 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     private LedRequestAcceptor ledControl;
     private int finalDegree;
+    private int extraSpace;
     private boolean drawOnlyLedPixels;
+    private boolean showIndexes;
 
     private ArrayList<GraphicPixel> graphicPixels;
     private LayersPanel layersPanel;
@@ -24,6 +26,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         this.ledControl = ledControl;
         this.ledControl.setLedGraphicUnit(this);
         this.finalDegree = 0;
+        this.extraSpace = 0;
 
         this.drawOnlyLedPixels = false;
 
@@ -34,7 +37,6 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
             public void paintComponent(Graphics g) {
                 //super.paintComponent(g);
 
-                int finalDegree = ledControl.getFinalDegree();
                 int pixelLength = (finalDegree * 2) + 1;
                 int step = (int)Math.round(this.getWidth() / (double)pixelLength);
 
@@ -46,11 +48,18 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
                         for(int j = -finalDegree; j <= finalDegree; j++) {
                             g.setColor(ledControl.getColorAt(i, j));
                             g.fillRect(
-                                    (i + finalDegree) * step,
-                                    (j + finalDegree) * step,
+                                    (i + finalDegree) * step + extraSpace,
+                                    (j + finalDegree) * step + extraSpace,
                                     step, step
                             );
                         }
+                    }
+                    g.setColor(Color.DARK_GRAY);
+                    for(int x = extraSpace; x < getWidth(); x += step) {
+                        g.drawLine(x, 0, x, getHeight());
+                    }
+                    for(int y = extraSpace; y <= getHeight(); y += step) {
+                        g.drawLine(0, y, getWidth(), y);
                     }
                 }
             }
@@ -58,7 +67,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         this.add(this.pixelPanel);
 
         this.setOpaque(true);
-        this.setBackground(new Color(40, 40, 40));
+        this.setBackground(new Color(25, 20, 20));
         this.resizeComponents(windowDimension);
     }
 
@@ -76,8 +85,37 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     @Override
-    public void addPixel(int x, int y) {
-        GraphicPixel newPixel = new GraphicPixel(this.ledControl, this, x, y);
+    public void addLayer(int newIndex) {
+        this.layersPanel.addLayer(newIndex);
+        this.layersPanel.repaint();
+        this.repaint();
+    }
+
+    @Override
+    public void updatePixelBounds() {
+        this.finalDegree = this.ledControl.getFinalDegree();
+        this.updatePixelPositions();
+    }
+
+    @Override
+    public void updatePixelPositions() {
+        int pixelLength = (this.finalDegree * 2) + 1;
+        int step = (int)Math.round(this.pixelPanel.getWidth() / (double)pixelLength);
+
+        this.extraSpace = (int)Math.round((this.pixelPanel.getWidth() - (pixelLength * step)) / 2.0);
+        for(GraphicPixel graphicPixel : this.graphicPixels) {
+            graphicPixel.setBounds(
+                    this.pixelPanel.getX() + ((graphicPixel.getPixelX() + this.finalDegree) * step) + this.extraSpace,
+                    this.pixelPanel.getY() + ((graphicPixel.getPixelY() + this.finalDegree) * step) + this.extraSpace,
+                    step, step
+            );
+        }
+        this.repaint();
+    }
+
+    @Override
+    public void addPixel(int index, int x, int y) {
+        GraphicPixel newPixel = new GraphicPixel(this.ledControl, this, index, x, y);
         this.graphicPixels.add(newPixel);
         this.add(newPixel);
         this.setComponentZOrder(newPixel, 0);
@@ -100,30 +138,23 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     @Override
-    public void addLayer(int newIndex) {
-        this.layersPanel.addLayer(newIndex);
-        this.layersPanel.repaint();
-        this.repaint();
-    }
-
-    @Override
-    public void updatePixelBounds() {
-        this.finalDegree = this.ledControl.getFinalDegree();
-        this.updatePixelPositions();
-    }
-
-    @Override
-    public void updatePixelPositions() {
-        int pixelLength = (this.finalDegree * 2) + 1;
-        int step = (int)Math.round(this.pixelPanel.getWidth() / (double)pixelLength);
-
+    public void showIndexes(boolean showIndexes) {
+        this.showIndexes = showIndexes;
         for(GraphicPixel graphicPixel : this.graphicPixels) {
-            graphicPixel.setBounds(
-                    this.pixelPanel.getX() + ((graphicPixel.getPixelX() + this.finalDegree) * step),
-                    this.pixelPanel.getY() + ((graphicPixel.getPixelY() + this.finalDegree) * step),
-                    step, step
-            );
+            graphicPixel.showIndex(showIndexes);
         }
-        this.repaint();
+    }
+
+    @Override
+    public boolean isShowIndexes() {
+        return this.showIndexes;
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        for(GraphicPixel graphicPixel : this.graphicPixels) {
+            graphicPixel.setBackground(this.ledControl.getColorAt(graphicPixel.getPixelX(), graphicPixel.getPixelY()));
+        }
     }
 }

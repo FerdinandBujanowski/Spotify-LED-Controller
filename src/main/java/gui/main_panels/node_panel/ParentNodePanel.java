@@ -37,7 +37,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
     private ArrayList<Integer> selectedNodeIndexes, copiedNodeIndexes;
     private boolean toggleShift, toggleCtrl, toggleG;
 
-    public ParentNodePanel(NodeRequestAcceptor nodeControl, int functionIndex, Color backgroundColor) {
+    public ParentNodePanel(NodeRequestAcceptor nodeControl, int functionIndex) {
         super(null);
 
         this.nodeControl = nodeControl;
@@ -57,7 +57,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         this.zoomLabel.setSize(50, 50);
 
         this.setOpaque(true);
-        this.setBackground(backgroundColor);
+        this.setBackground(Color.DARK_GRAY);
 
         this.addMouseListener(new MouseAdapter() {
             @Override

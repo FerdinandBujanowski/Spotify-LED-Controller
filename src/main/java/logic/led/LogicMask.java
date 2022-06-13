@@ -346,10 +346,7 @@ public class LogicMask implements Serializable {
                 circularMask.setIntensityAt(x, y, LogicMask.getBlendCurve(xValue, iteration, alterationPercentage));
             }
         }
-        return LogicMask.getJoinedMask_Multiply(
-                circularMask,
-                LogicMask.getCircleMask(degree, 1.d)
-        );
+        return circularMask;
     }
 
     private static double getBlendCurve(double x, int iteration, double alterationPercentage) {

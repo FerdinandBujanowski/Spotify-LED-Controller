@@ -37,7 +37,7 @@ public class SpotifyPlayerPanel extends JPanel {
         super(null);
 
         this.setOpaque(true);
-        this.setBackground(new Color(24, 24, 24));
+        this.setBackground(new Color(25, 20, 20));
 
         this.songControl = songControl;
 

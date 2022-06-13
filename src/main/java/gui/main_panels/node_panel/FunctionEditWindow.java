@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class FunctionEditWindow extends ParentNodePanel {
 
     public FunctionEditWindow(NodeControl nodeControl, int functionIndex) {
-        super(nodeControl, functionIndex, Color.DARK_GRAY);
+        super(nodeControl, functionIndex);
         nodeControl.addFunctionGraphicUnit(this);
     }
 

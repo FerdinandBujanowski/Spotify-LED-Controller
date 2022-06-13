@@ -1,3 +1,5 @@
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import control.led.LedControl;
 import control.node.NodeControl;
 import control.song.SongControl;
@@ -15,8 +17,8 @@ public class Main {
     public static void main(String[] args) {
 
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            UIManager.setLookAndFeel(new FlatDarculaLaf());
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
