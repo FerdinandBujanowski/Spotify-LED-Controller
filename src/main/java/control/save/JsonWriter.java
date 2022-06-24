@@ -10,7 +10,7 @@ import control.node.NodeConnection;
 import control.node.NodeControl;
 import control.node.ThreeCoordinatePoint;
 import control.node.TwoIntegerCorrespondence;
-import control.song.SongControl;
+import control.event.EventControl;
 import control.type_enums.CurveType;
 import control.type_enums.InputDialogType;
 import control.type_enums.JointType;
@@ -18,15 +18,14 @@ import control.type_enums.NodeType;
 import gui.MainWindow;
 import logic.function.LogicFunction;
 import logic.node.LogicNode;
-import logic.song.LogicEvent;
-import logic.song.LogicTrack;
+import logic.event.LogicEvent;
+import logic.event.LogicTrack;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.function.Function;
 
 public abstract class JsonWriter {
 
@@ -97,7 +96,7 @@ public abstract class JsonWriter {
         return eventsArray;
     }
 
-    public static void addTracksFromFile(String path, SongControl songControl) {
+    public static void addTracksFromFile(String path, EventControl eventControl) {
         JsonObject tracksObject = new JsonObject();
         JsonParser jsonParser = new JsonParser();
         try {
@@ -108,10 +107,10 @@ public abstract class JsonWriter {
         }
 
         for(JsonElement trackElement : tracksObject.getAsJsonArray(TRACKS)) {
-            int newTrackIndex = songControl.getTrackCount();
-            songControl.onAddTrackRequest();
+            int newTrackIndex = eventControl.getTrackCount();
+            eventControl.onAddTrackRequest();
             for(JsonElement eventElement : trackElement.getAsJsonObject().getAsJsonArray(EVENTS)) {
-                songControl.onAddEventToTrackRequest(
+                eventControl.onAddEventToTrackRequest(
                         newTrackIndex,
                         eventElement.getAsJsonObject().get(START).getAsInt(),
                         eventElement.getAsJsonObject().get(DURATION).getAsInt(),

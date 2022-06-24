@@ -1,4 +1,4 @@
-package control.song;
+package control.event;
 
 import com.google.gson.JsonParser;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
@@ -16,8 +16,8 @@ import control.save.EventSaveUnit;
 import control.spotify.SpotifyWebHandler;
 import control.type_enums.CurveType;
 import gui.main_panels.player_panel.SpotifyPlayerPanel;
-import logic.song.LogicEvent;
-import logic.song.LogicTrack;
+import logic.event.LogicEvent;
+import logic.event.LogicTrack;
 import org.apache.hc.core5.http.ParseException;
 
 import javax.imageio.ImageIO;
@@ -30,7 +30,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SongControl implements TrackRequestAcceptor, Serializable {
+public class EventControl implements TrackRequestAcceptor, Serializable {
 
     SpotifyWebHandler spotifyWebHandler;
     private EventGraphicUnit eventWindow;
@@ -51,7 +51,7 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
 
     private ArrayList<LogicTrack> logicTracks;
 
-    public SongControl() {
+    public EventControl() {
         this.spotifyWebHandler = new SpotifyWebHandler();
         this.eventWindow = null;
 
@@ -399,11 +399,9 @@ public class SongControl implements TrackRequestAcceptor, Serializable {
 
     @Override
     public void onAddTrackRequest() {
-        if(this.songSelected) {
-            //TODO: hier alle möglichen Fehler abfangen
-            this.logicTracks.add(new LogicTrack());
-            this.eventWindow.addTrack();
-        }
+        //TODO: hier alle möglichen Fehler abfangen
+        this.logicTracks.add(new LogicTrack());
+        this.eventWindow.addTrack();
     }
     @Override
     public void onUpdateTrackRequest(int trackIndex, boolean deleted) {

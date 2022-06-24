@@ -1,4 +1,4 @@
-package control.song;
+package control.event;
 
 import java.io.Serializable;
 

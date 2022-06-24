@@ -1,4 +1,4 @@
-package logic.song;
+package logic.event;
 
 import control.exceptions.EventTimeNegativeException;
 import control.type_enums.CurveType;

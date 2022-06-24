@@ -1,11 +1,10 @@
-package control.song;
+package control.event;
 
 import control.type_enums.CurveType;
-import logic.song.LogicEvent;
+import logic.event.LogicEvent;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class TrackTime implements Serializable {
 

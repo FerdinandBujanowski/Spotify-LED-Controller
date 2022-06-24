@@ -1,9 +1,8 @@
-package control.song;
+package control.event;
 
 import control.type_enums.CurveType;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 public interface EventGraphicUnit {
 
