@@ -15,6 +15,8 @@ public class GraphicPixel extends JLabel {
     private int pixelY;
     private final int pixelIndex;
 
+    private boolean orderMode, ordered;
+
     private final LedRequestAcceptor ledRequestAcceptor;
     private final LedGraphicUnit ledGraphicUnit;
 
@@ -23,16 +25,19 @@ public class GraphicPixel extends JLabel {
         this.pixelIndex = index;
         this.pixelX = x;
         this.pixelY = y;
+        this.orderMode = false;
+        this.ordered = false;
         this.ledRequestAcceptor = ledRequestAcceptor;
         this.ledGraphicUnit = ledGraphicUnit;
 
+        this.setOpaque(true);
         this.setForeground(Color.WHITE);
         this.showIndex(ledGraphicUnit.isShowIndexes());
 
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if(outsideOfBounds(e.getX(), e.getY())) {
+                if(outsideOfBounds(e.getX(), e.getY()) && !orderMode) {
                     int oldX = getPixelX(), oldY = getPixelY();
                     int newX = getPixelX(), newY = getPixelY();
                     if(e.getX() < 0) newX--;
@@ -47,6 +52,12 @@ public class GraphicPixel extends JLabel {
 
         this.addMouseListener(new MouseAdapter() {
             @Override
+            public void mousePressed(MouseEvent e) {
+                if(orderMode) {
+                    ledGraphicUnit.requestPixelOrdered(pixelIndex);
+                }
+            }
+            @Override
             public void mouseReleased(MouseEvent e) {
                 ledGraphicUnit.updatePixelBounds();
             }
@@ -60,6 +71,10 @@ public class GraphicPixel extends JLabel {
         return this.pixelY;
     }
 
+    public int getPixelIndex() {
+        return this.pixelIndex;
+    }
+
     public void setNewCoordinates(int newX, int newY) {
         this.pixelX = newX;
         this.pixelY = newY;
@@ -69,8 +84,8 @@ public class GraphicPixel extends JLabel {
         super.paintComponent(g);
         g.setColor(Color.WHITE);
         g.drawRect(0, 0, this.getWidth() - 1, this.getHeight() - 1);
-
     }
+
     private boolean outsideOfBounds(int x, int y) {
         if(x < 0 || x > this.getWidth()) return true;
         else return y < 0 || y > this.getHeight();
@@ -82,5 +97,17 @@ public class GraphicPixel extends JLabel {
         } else {
             this.setText("");
         }
+    }
+
+    public void setOrderMode(boolean orderMode) {
+        this.orderMode = orderMode;
+    }
+
+    public void setOrdered(boolean ordered) {
+        this.ordered = ordered;
+    }
+
+    public boolean isOrdered() {
+        return this.ordered;
     }
 }

@@ -459,8 +459,25 @@ public class MainWindow extends JFrame {
             ledEditWindow.showIndexes(showIndexItem.isSelected());
             ledEditWindow.repaint();
         });
-
         this.ledMenu.add(showIndexItem);
+
+        JMenuItem orderModeItem = new JCheckBoxMenuItem("Order Mode");
+        orderModeItem.addActionListener(e -> {
+            boolean submit = false;
+            if(!orderModeItem.isSelected()) {
+                int confirm = JOptionPane.showConfirmDialog(this, "Do you want to submit the order changes?", "Submit Order", JOptionPane.YES_NO_OPTION);
+                submit = confirm == JOptionPane.YES_OPTION;
+            }
+            ledEditWindow.setOrderMode(orderModeItem.isSelected(), submit);
+            ledEditWindow.repaint();
+
+            for(int i = 0; i < ledMenu.getItemCount(); i++) {
+                if(ledMenu.getItem(i) != orderModeItem && ledMenu.getItem(i) != null) {
+                    ledMenu.getItem(i).setEnabled(!orderModeItem.isSelected());
+                }
+            }
+        });
+        this.ledMenu.add(orderModeItem);
 
         this.jMenuBar.add(this.ledMenu);
         this.ledMenu.setEnabled(false);
@@ -625,6 +642,9 @@ public class MainWindow extends JFrame {
                     }
                     case 3 -> {
                         functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).onKeyPressed(e);
+                    }
+                    case 4 -> {
+                        ledEditWindow.onKeyPressed(e);
                     }
                 }
             }

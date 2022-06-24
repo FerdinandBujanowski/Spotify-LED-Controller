@@ -1,6 +1,8 @@
 package control.led;
 
 import control.SerializableFunction;
+import control.node.ThreeCoordinatePoint;
+import control.node.TwoIntegerCorrespondence;
 import control.save.LedSaveUnit;
 import logic.led.LogicLayer;
 import logic.led.LogicMask;
@@ -62,6 +64,19 @@ import java.util.function.Function;
         }
         this.ledGraphicUnit.updatePixelBounds();
     }
+
+     @Override
+     public void requestNewOrder(ArrayList<ThreeCoordinatePoint> newOrder) {
+        for(ThreeCoordinatePoint threeCoordinatePoint : newOrder) {
+            Point oldPosition = this.pixels.get(threeCoordinatePoint.getX());
+            int oldIndex = this.getPixelIndex(threeCoordinatePoint.getY(), threeCoordinatePoint.getZ());
+            this.pixels.set(threeCoordinatePoint.getX(), new Point(threeCoordinatePoint.getY(), threeCoordinatePoint.getZ()));
+            this.ledGraphicUnit.movePixel(threeCoordinatePoint.getX(), threeCoordinatePoint.getY(), threeCoordinatePoint.getZ());
+            this.pixels.set(oldIndex, new Point(oldPosition.x, oldPosition.y));
+            this.ledGraphicUnit.movePixel(oldIndex, oldPosition.x, oldPosition.y);
+        }
+        this.ledGraphicUnit.updatePixelBounds();
+     }
 
      @Override
      public void enableLayer(int layerIndex, boolean isEnabled) {

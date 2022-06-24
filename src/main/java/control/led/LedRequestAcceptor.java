@@ -1,5 +1,8 @@
 package control.led;
 
+import control.node.ThreeCoordinatePoint;
+import control.node.TwoIntegerCorrespondence;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -8,6 +11,7 @@ public interface LedRequestAcceptor {
     void setLedGraphicUnit(LedGraphicUnit ledGraphicUnit);
     void onAddLayerRequest();
     void addPixel(int x, int y) throws Exception;
+    void requestNewOrder(ArrayList<ThreeCoordinatePoint> newOrder);
 
     void enableLayer(int layerIndex, boolean isEnabled);
 

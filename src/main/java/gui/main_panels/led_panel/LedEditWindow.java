@@ -1,11 +1,12 @@
 package gui.main_panels.led_panel;
 
 import control.led.*;
+import control.node.ThreeCoordinatePoint;
+import control.node.TwoIntegerCorrespondence;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class LedEditWindow extends JPanel implements LedGraphicUnit {
@@ -15,6 +16,10 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     private int extraSpace;
     private boolean drawOnlyLedPixels;
     private boolean showIndexes;
+    private boolean orderMode;
+    private TwoIntegerCorrespondence newOrderCorrespondence;
+
+    ArrayList<ThreeCoordinatePoint> newOrder;
 
     private ArrayList<GraphicPixel> graphicPixels;
     private LayersPanel layersPanel;
@@ -29,6 +34,11 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         this.extraSpace = 0;
 
         this.drawOnlyLedPixels = false;
+        this.showIndexes = false;
+        this.orderMode = false;
+        this.newOrderCorrespondence = new TwoIntegerCorrespondence();
+
+        this.newOrder = new ArrayList<>();
 
         this.graphicPixels = new ArrayList<>();
         this.layersPanel = new LayersPanel(ledControl, this);
@@ -72,16 +82,22 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     public void resizeComponents(Dimension dimension) {
+        int sideLength = (int)Math.round(0.75 * Math.min(dimension.width, dimension.height));
+        int remainingLength = dimension.height - sideLength;
         this.pixelPanel.setBounds(
-                ((dimension.width - 200) / 2) - 200,
-                30,
-                400, 400
+                ((dimension.width - (sideLength / 2)) / 2) - (sideLength / 2),
+                remainingLength / 4,
+                sideLength, sideLength
         );
         this.updatePixelBounds();
     }
 
     public JPanel getLayersPanel() {
         return this.layersPanel;
+    }
+
+    public void onKeyPressed(KeyEvent e) {
+
     }
 
     @Override
@@ -122,6 +138,15 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     @Override
+    public Point getPixelPosition(int index) {
+        GraphicPixel graphicPixel = this.graphicPixels.get(index);
+        if(graphicPixel != null) {
+            return new Point(graphicPixel.getPixelX(), graphicPixel.getPixelY());
+        }
+        else return new Point(0, 0);
+    }
+
+    @Override
     public void movePixel(int index, int newX, int newY) {
         GraphicPixel graphicPixel = this.graphicPixels.get(index);
         graphicPixel.setNewCoordinates(newX, newY);
@@ -151,10 +176,44 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     @Override
+    public void setOrderMode(boolean orderMode, boolean submit) {
+        this.orderMode = orderMode;
+        if(orderMode) {
+            while(!this.newOrder.isEmpty()) {
+                this.newOrder.remove(0);
+            }
+        }
+        else if(submit) {
+            this.ledControl.requestNewOrder(this.newOrder);
+        }
+        for(GraphicPixel graphicPixel : this.graphicPixels) {
+            graphicPixel.setOrderMode(orderMode);
+            if(!orderMode) graphicPixel.setOrdered(false);
+        }
+    }
+
+    @Override
+    public void requestPixelOrdered(int oldIndex) {
+        GraphicPixel graphicPixel = this.graphicPixels.get(oldIndex);
+        this.newOrder.add(new ThreeCoordinatePoint(this.newOrder.size(), graphicPixel.getPixelX(), graphicPixel.getPixelY()));
+        this.graphicPixels.get(oldIndex).setOrdered(true);
+    }
+
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         for(GraphicPixel graphicPixel : this.graphicPixels) {
-            graphicPixel.setBackground(this.ledControl.getColorAt(graphicPixel.getPixelX(), graphicPixel.getPixelY()));
+            if(!this.orderMode) {
+                graphicPixel.setBackground(this.ledControl.getColorAt(graphicPixel.getPixelX(), graphicPixel.getPixelY()));
+            } else {
+                if(graphicPixel.isOrdered()) {
+                    graphicPixel.setBackground(Color.GREEN);
+                } else {
+                    int intensity = (int)Math.round((graphicPixel.getPixelIndex() / (double)this.graphicPixels.size()) * 255);
+                    graphicPixel.setBackground(new Color(intensity, intensity, intensity));
+                }
+            }
+            graphicPixel.repaint();
         }
     }
 }

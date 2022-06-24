@@ -6,19 +6,6 @@ import java.awt.*;
 
 public enum JointType {
 
-    /*
-    COLOR PALETTE:
-    0, 56, 68,
-    0, 82, 86,
-    0, 108, 103,
-    121, 128, 142,
-    241, 148, 180,
-    248, 163, 90,
-    255, 177, 0,
-    255, 206, 99,
-    255, 235, 198
-     */
-
     INTEGER_TYPE(new Color(0, 0, 45), IntegerJointDataType.class, "Integer"),
     NUMBER_TYPE(new Color(0, 0, 128), NumberJointDataType.class, "Number"),
     UNIT_NUMBER_TYPE(new Color(0, 255, 255), UnitNumberJointDataType.class, "Unit Number"),
