@@ -1,15 +1,12 @@
 import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
+import control.event.EventControl;
 import control.led.LedControl;
 import control.node.NodeControl;
 import control.song.SongControl;
-import control.spotify.SpotifyWebHandler;
 import gui.MainWindow;
-import logic.led.LogicMask;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
@@ -23,6 +20,7 @@ public class Main {
         }
 
         SongControl songControl = new SongControl();
+        EventControl eventControl = new EventControl();
         NodeControl nodeControl = new NodeControl();
         LedControl ledControl = new LedControl();
 
@@ -31,6 +29,7 @@ public class Main {
                 new Dimension((int)(screenSize.width * 0.75), (int)(screenSize.height * 0.75)),
                 "LED Node Control",
                 songControl,
+                eventControl,
                 nodeControl,
                 ledControl
         );
@@ -49,11 +48,11 @@ public class Main {
                         songControl.setCurrentSongMs(updatedMS);
                         songControl.onSkipTo(updatedMS);
 
-                        songControl.tick(updatedMS);
-                        nodeControl.tick(updatedMS, songControl.getTrackIntensitiesAt(updatedMS));
+                        eventControl.tick(updatedMS);
+                        nodeControl.tick(updatedMS, eventControl.getTrackIntensitiesAt(updatedMS));
                     }
                 }
-                mainWindow.repaintWindows(songControl, nodeControl);
+                mainWindow.repaintWindows(eventControl, nodeControl);
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -76,9 +75,9 @@ public class Main {
 
                         int correctMS = msSince.get() + songControl.getCurrentSongMs();
 
-                        songControl.tick(correctMS);
-                        nodeControl.tick(correctMS, songControl.getTrackIntensitiesAt(correctMS));
-                        mainWindow.repaintWindows(songControl, nodeControl);
+                        eventControl.tick(correctMS);
+                        nodeControl.tick(correctMS, eventControl.getTrackIntensitiesAt(correctMS));
+                        mainWindow.repaintWindows(eventControl, nodeControl);
 
                     } else {
                         currentMs.set((int)System.currentTimeMillis());

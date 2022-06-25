@@ -3,6 +3,7 @@ package gui;
 import control.led.LedControl;
 import control.node.NodeControl;
 import control.save.*;
+import control.event.EventControl;
 import control.song.SongControl;
 import control.type_enums.*;
 import gui.main_panels.event_panel.EventEditWindow;
@@ -48,7 +49,7 @@ public class MainWindow extends JFrame {
 
     private boolean bProjectOpen;
 
-    public MainWindow(Dimension dimension, String title, SongControl songControl, NodeControl nodeControl, LedControl ledControl) {
+    public MainWindow(Dimension dimension, String title, SongControl songControl, EventControl eventControl, NodeControl nodeControl, LedControl ledControl) {
         super(title);
 
         this.dimension = dimension;
@@ -177,10 +178,10 @@ public class MainWindow extends JFrame {
         addTrackMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int trackCount = songControl.getTrackCount();
-                songControl.onAddTrackRequest();
-                if(trackCount < songControl.getTrackCount()) {
-                    String trackName = "Track " + songControl.getTrackCount();
+                int trackCount = eventControl.getTrackCount();
+                eventControl.onAddTrackRequest();
+                if(trackCount < eventControl.getTrackCount()) {
+                    String trackName = "Track " + eventControl.getTrackCount();
                     JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, trackCount, nodeControl);
                     createTrackNodeMenu.add(newTrackNodeItem);
                 }
@@ -488,7 +489,7 @@ public class MainWindow extends JFrame {
             if(bProjectOpen) {
                 //TODO: Abfangen, dass im Zweifelsfall das geöffnete Programm nicht gespeichert wird
             }
-            newProject(songControl, nodeControl, ledControl, dimension);
+            newProject(songControl, eventControl, nodeControl, ledControl, dimension);
             pack();
             setCorrectLocation();
             repaint();
@@ -504,8 +505,8 @@ public class MainWindow extends JFrame {
                 DataStore data = DataStore.readFromFile(fileOpenChooser.getSelectedFile().getPath());
                 if(data != null) {
 
-                    newProject(songControl, nodeControl, data.getLedControl(), dimension);
-                    songControl.reinitialize(data.getEventSaveUnit());
+                    newProject(songControl, eventControl, nodeControl, data.getLedControl(), dimension);
+                    eventControl.reinitialize(data.getEventSaveUnit());
                     nodeControl.reinitialize(data.getNodeSaveUnit());
                     nodeEditWindow.updateGraphicNodes(data.getNodeEditGraphicNodePositions());
                     functionTabbedPane.updateFunctions(data.getFunctionEditGraphicNodePositions());
@@ -521,7 +522,7 @@ public class MainWindow extends JFrame {
                 Point[] nodeEditGraphicNodePositions = bakeGraphicNodePositions();
                 Point[][] functionEditGraphicNodePositions = bakeFunctionGraphicNodePositions();
                 DataStore dataStore = new DataStore(
-                        songControl.createEventSaveUnit(),
+                        eventControl.createEventSaveUnit(),
                         nodeControl.createNodeSaveUnit(),
                         ledControl,
                         nodeEditGraphicNodePositions,
@@ -542,7 +543,7 @@ public class MainWindow extends JFrame {
         exportTracks.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                EventSaveUnit eventSaveUnit = songControl.createEventSaveUnit();
+                EventSaveUnit eventSaveUnit = eventControl.createEventSaveUnit();
 
                 JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
@@ -563,7 +564,7 @@ public class MainWindow extends JFrame {
                 fileOpenChooser.setFileFilter(serializedFilter);
                 int returnValue = fileOpenChooser.showOpenDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
-                    JsonWriter.addTracksFromFile(fileOpenChooser.getSelectedFile().getPath(), songControl);
+                    JsonWriter.addTracksFromFile(fileOpenChooser.getSelectedFile().getPath(), eventControl);
                 }
             }
         });
@@ -675,7 +676,7 @@ public class MainWindow extends JFrame {
                 if(spotifyPlayerPanel != null) spotifyPlayerPanel.resizeComponents(newSize);
                 if(ledEditWindow != null) ledEditWindow.resizeComponents(newSize);
                 repaint();
-                repaintWindows(songControl, nodeControl);
+                repaintWindows(eventControl, nodeControl);
 
                 //TODO : other tabs
             }
@@ -723,10 +724,10 @@ public class MainWindow extends JFrame {
         return functionGraphicNodePositions;
     }
 
-    private void newProject(SongControl songControl, NodeControl nodeControl, LedControl ledControl, Dimension dimension) {
+    private void newProject(SongControl songControl, EventControl eventControl, NodeControl nodeControl, LedControl ledControl, Dimension dimension) {
 
         this.spotifyPlayerPanel = new SpotifyPlayerPanel(songControl, dimension);
-        this.eventEditWindow = new EventEditWindow(songControl);
+        this.eventEditWindow = new EventEditWindow(eventControl);
         this.nodeEditWindow = new NodeEditWindow(nodeControl);
         this.functionTabbedPane = new FunctionTabbedPane(nodeControl);
         this.ledEditWindow = new LedEditWindow(ledControl, dimension);
@@ -822,18 +823,18 @@ public class MainWindow extends JFrame {
         };
     }
 
-    public void repaintWindows(SongControl songControl, NodeControl nodeControl) {
+    public void repaintWindows(EventControl eventControl, NodeControl nodeControl) {
         if(this.spotifyPlayerPanel != null) this.spotifyPlayerPanel.repaint();
         if(this.eventEditWindow != null) this.eventEditWindow.repaint();
         if(this.nodeEditWindow != null) this.nodeEditWindow.repaint();
         if(this.functionTabbedPane != null) this.functionTabbedPane.repaint();
         if(this.ledEditWindow != null) this.ledEditWindow.repaint();
 
-        if(this.createTrackNodeMenu.getItemCount() != songControl.getTrackCount()) {
+        if(this.createTrackNodeMenu.getItemCount() != eventControl.getTrackCount()) {
             while(this.createTrackNodeMenu.getItemCount() != 0) {
                 this.createTrackNodeMenu.remove(0);
             }
-            for(int i = 0; i < songControl.getTrackCount(); i++) {
+            for(int i = 0; i < eventControl.getTrackCount(); i++) {
                 String trackName = "Track " + (i + 1);
                 JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, i, nodeControl);
                 this.createTrackNodeMenu.add(newTrackNodeItem);

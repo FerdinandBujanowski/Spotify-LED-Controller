@@ -1,6 +1,6 @@
 package gui.main_panels.event_panel;
 
-import control.song.*;
+import control.event.*;
 import control.type_enums.CurveType;
 import control.type_enums.TimeSignature;
 

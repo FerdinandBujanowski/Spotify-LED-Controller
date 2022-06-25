@@ -1,12 +1,11 @@
 package gui.main_panels.event_panel;
 
-import control.song.EventGraphicUnit;
-import control.song.TrackRequestAcceptor;
+import control.event.EventGraphicUnit;
+import control.event.TrackRequestAcceptor;
 import control.type_enums.CurveType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;

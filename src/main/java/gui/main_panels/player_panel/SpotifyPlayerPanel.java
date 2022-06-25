@@ -1,16 +1,14 @@
 package gui.main_panels.player_panel;
 
 import com.wrapper.spotify.exceptions.detailed.NotFoundException;
+import control.event.EventControl;
 import control.song.SongControl;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 
 public class SpotifyPlayerPanel extends JPanel {
 
