@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
-    private TrackRequestAcceptor songControl;
+    private EventRequestAcceptor eventControl;
 
     private ArrayList<JLabel> trackLabels;
     private ArrayList<ArrayList<GraphicEvent>> graphicEvents;
@@ -28,11 +28,11 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     private CurveType defaultCurveType;
     private boolean curveBrush;
 
-    public EventEditWindow(TrackRequestAcceptor songControl) {
+    public EventEditWindow(EventRequestAcceptor eventControl) {
         super(null);
 
-        this.songControl = songControl;
-        this.songControl.setEventGraphicUnit(this);
+        this.eventControl = eventControl;
+        this.eventControl.setEventGraphicUnit(this);
 
         this.trackLabels = new ArrayList<>();
         this.graphicEvents = new ArrayList<>();
@@ -64,7 +64,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             public void mouseClicked(MouseEvent e) {
                 if(e.getClickCount() == 2) {
                     Point closestEventTime = getClosestEventTime(e.getX());
-                    songControl.onSkipTo(closestEventTime.x);
+                    eventControl.onSkipTo(closestEventTime.x);
                 }
                 repaint();
             }
@@ -79,6 +79,9 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 onKeyReleased(e);
             }
         });
+
+        eventControl.onAddTimeMeasureRequest(4, 60, 0, 16);
+        eventControl.onAddTrackRequest();
     }
 
     public TimeSignature getBarRoster() {
@@ -140,23 +143,11 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         repaint();
     }
 
-    private void updateBounds() {
-        int totalWidth = 0;
-        for(TimeMeasure timeMeasure : this.songControl.getTimeMeasures()) {
-            int msSingleBeat = timeMeasure.getLengthOneBeat();
-            totalWidth += (msSingleBeat * timeMeasure.getBeatsDuration());
-        }
-        this.setPreferredSize(new Dimension(
-                totalWidth / (int)this.eventWidthDivision,
-                this.getPreferredSize().height)
-        );
-    }
-
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        ArrayList<TimeMeasure> timeMeasures = this.songControl.getTimeMeasures();
+        ArrayList<TimeMeasure> timeMeasures = this.eventControl.getTimeMeasures();
         if(timeMeasures != null) {
             for(TimeMeasure timeMeasure : timeMeasures) {
 
@@ -164,14 +155,14 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 double msFullBar = msSingleBeat * timeMeasure.getBeatsPerBar();
 
                 g.setColor(Color.GRAY);
-                for(int i = 0; i < (int)Math.floor(timeMeasure.getBeatsDuration() * (1.0 / this.barRoster.getRatio())); i++) {
+                for(int i = 0; i < (int)Math.floor(timeMeasure.getBarsDuration() * timeMeasure.getBeatsPerBar() * (1.0 / this.barRoster.getRatio())); i++) {
                     int x = (int)Math.floor((timeMeasure.getMsStart() / this.eventWidthDivision)
                     + ((this.barRoster.getRatio() * (double)i) * (msFullBar / this.eventWidthDivision)));
                     g.drawLine(x, 0, x, this.getHeight());
                 }
 
-                g.setColor(Color.BLACK);
-                for(int i = 0; i < timeMeasure.getBeatsDuration(); i += timeMeasure.getBeatsPerBar()) {
+                g.setColor(Color.WHITE);
+                for(int i = 0; i < timeMeasure.getBarsDuration() * timeMeasure.getBeatsPerBar(); i += timeMeasure.getBeatsPerBar()) {
                     int x = (int)Math.floor((timeMeasure.getMsStart() / this.eventWidthDivision)
                             + ((double)i * (msSingleBeat / this.eventWidthDivision)));
                     g.drawLine(x, 0, x, this.getHeight());
@@ -215,18 +206,35 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
+    public void updateBounds() {
+        int totalWidth = 0;
+        for(TimeMeasure timeMeasure : this.eventControl.getTimeMeasures()) {
+            int msSingleBeat = timeMeasure.getLengthOneBeat();
+            totalWidth += (msSingleBeat * timeMeasure.getBarsDuration() * timeMeasure.getBeatsPerBar());
+        }
+        this.setPreferredSize(new Dimension(
+                totalWidth / (int)this.eventWidthDivision,
+                this.getPreferredSize().height)
+        );
+
+        for(int i = 0; i < trackLabels.size(); i++) {
+            trackLabels.get(i).setBounds(
+                    0,
+                    20 + (i * 50),
+                    this.getPreferredSize().width,
+                    30
+            );
+        }
+    }
+
+    @Override
     public void addTrack() {
 
        JLabel trackLabel = new JLabel();
        trackLabel.setOpaque(true);
         this.setBackground(new Color(25, 20, 20));
 
-       trackLabel.setBounds(
-               0,
-               20 + (this.trackLabels.size() * 50),
-               this.getPreferredSize().width,
-               30
-       );
+
        this.setPreferredSize(new Dimension(
                this.getPreferredSize().width,
                this.getPreferredSize().height + 50
@@ -240,7 +248,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                if(!curveBrush) {
                    if(e.getClickCount() == 2 && e.getButton()  == MouseEvent.BUTTON1) {
                        Point eventTime = getClosestEventTime(e.getX());
-                       songControl.onAddEventToTrackRequest(
+                       eventControl.onAddEventToTrackRequest(
                                currentIndex,
                                eventTime.x,
                                eventTime.y,
@@ -265,6 +273,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
        this.graphicEvents.add(new ArrayList<>());
 
+       this.updateBounds();
        this.repaint();
     }
 
@@ -276,7 +285,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
     @Override
     public void addEventToTrack(int trackNumber, int msStart, int msDuration, CurveType curveType) {
-        GraphicEvent graphicEvent = new GraphicEvent(trackNumber, curveType, msStart, msDuration, this, this.songControl);
+        GraphicEvent graphicEvent = new GraphicEvent(trackNumber, curveType, msStart, msDuration, this, this.eventControl);
 
         this.graphicEvents.get(trackNumber).add(graphicEvent);
         this.add(graphicEvent);
@@ -310,7 +319,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         );
 
         for(int i = 0; i < this.trackLabels.size(); i++) {
-            int currentEventIndex = this.songControl.getCorrespondingEventIndex(i, ms);
+            int currentEventIndex = this.eventControl.getCorrespondingEventIndex(i, ms);
             for(int j = 0; j < this.graphicEvents.get(i).size(); j++) {
                 if(currentEventIndex == j) {
                     this.graphicEvents.get(i).get(j).setEnabled(false);
@@ -329,7 +338,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     @Override
     public Point getClosestEventTime(int pixelInPanel) {
         int msInSong = pixelInPanel * (int)this.eventWidthDivision;
-        TimeMeasure timeMeasure = this.songControl.getCorrespondingTimeMeasure(msInSong);
+        TimeMeasure timeMeasure = this.eventControl.getCorrespondingTimeMeasure(msInSong);
         double msOneSection = timeMeasure.getLengthOneBar() * this.barRoster.getRatio();
         int msInTimeMeasure = msInSong - timeMeasure.getMsStart();
         return new Point(

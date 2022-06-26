@@ -1,7 +1,7 @@
 package gui.main_panels.event_panel;
 
 import control.event.EventGraphicUnit;
-import control.event.TrackRequestAcceptor;
+import control.event.EventRequestAcceptor;
 import control.type_enums.CurveType;
 
 import javax.swing.*;
@@ -13,7 +13,7 @@ import java.awt.event.MouseMotionAdapter;
 public class GraphicEvent extends JLabel {
 
     private EventGraphicUnit eventGraphicUnit;
-    private TrackRequestAcceptor songControl;
+    private EventRequestAcceptor songControl;
 
     private CurveType curveType;
     private int trackIndex;
@@ -23,7 +23,7 @@ public class GraphicEvent extends JLabel {
     private boolean leftHovered, rightHovered;
     private int lastMovement;
 
-    public GraphicEvent(int trackIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, TrackRequestAcceptor songControl) {
+    public GraphicEvent(int trackIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, EventRequestAcceptor songControl) {
         this.trackIndex = trackIndex;
         this.curveType = curveType;
         this.eventTime = new Point();

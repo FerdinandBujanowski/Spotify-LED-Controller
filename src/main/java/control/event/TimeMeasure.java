@@ -8,16 +8,16 @@ public class TimeMeasure implements Serializable {
     private float beatsPerMinute;
 
     private int msStart;
-    private int beatsDuration;
+    private int barsDuration;
 
     private int lengthOneBeat;
     private int lengthOneBar;
 
-    public TimeMeasure(int beatsPerBar, float beatsPerMinute, int msStart, int beatsDuration) {
+    public TimeMeasure(int beatsPerBar, float beatsPerMinute, int msStart, int barsDuration) {
         this.beatsPerBar = beatsPerBar;
         this.beatsPerMinute = beatsPerMinute;
         this.msStart = msStart;
-        this.beatsDuration = beatsDuration;
+        this.barsDuration = barsDuration;
 
         this.lengthOneBeat = (int)Math.round(1000.0 / (this.beatsPerMinute / 60.0));
         this.lengthOneBar = this.lengthOneBeat * this.beatsPerBar;
@@ -32,8 +32,8 @@ public class TimeMeasure implements Serializable {
     public int getMsStart() {
         return this.msStart;
     }
-    public int getBeatsDuration() {
-        return this.beatsDuration;
+    public int getBarsDuration() {
+        return this.barsDuration;
     }
 
     public int getLengthOneBeat() {

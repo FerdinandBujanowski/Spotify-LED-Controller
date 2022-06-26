@@ -7,6 +7,7 @@ import java.awt.*;
 public interface EventGraphicUnit {
 
     void syncTracks(TrackTime[] trackTimes);
+    void updateBounds();
 
     void addTrack();
     void removeTrack(int TrackNumber);

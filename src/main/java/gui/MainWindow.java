@@ -1,5 +1,6 @@
 package gui;
 
+import control.event.TimeMeasure;
 import control.led.LedControl;
 import control.node.NodeControl;
 import control.save.*;
@@ -126,10 +127,9 @@ public class MainWindow extends JFrame {
         editInputRhythmMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JComboBox notationTypeComboBox = new JComboBox(TimeSignature.getNameArray());
-                notationTypeComboBox.setSelectedIndex(TimeSignature.indexOf(eventEditWindow.getBarRoster()));
-                JOptionPane.showOptionDialog(null, notationTypeComboBox, "Edit Input Notation", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-                TimeSignature newTimeSignature = TimeSignature.values()[notationTypeComboBox.getSelectedIndex()];
+                int currentSelection = TimeSignature.indexOf(eventEditWindow.getBarRoster());
+                int selectedOption = Dialogues.getSelectedOptionFromArray(TimeSignature.getNameArray(), "Edit InputNotation", currentSelection);
+                TimeSignature newTimeSignature = TimeSignature.values()[selectedOption];
                 eventEditWindow.setBarRoster(newTimeSignature);
             }
         });
@@ -140,14 +140,9 @@ public class MainWindow extends JFrame {
         defaultCurveItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CurveType[] curveTypes = CurveType.values();
-                JComboBox curveTypeComboBox = new JComboBox(curveTypes);
-                curveTypeComboBox.setSelectedIndex(CurveType.indexOf(eventEditWindow.getDefaultCurveType()));
-                JOptionPane.showOptionDialog(
-                        null, curveTypeComboBox, "Select Default Curve Type",
-                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                );
-                eventEditWindow.setDefaultCurveType(curveTypes[curveTypeComboBox.getSelectedIndex()]);
+                int currentSelection = CurveType.indexOf(eventEditWindow.getDefaultCurveType());
+                int selectedOption = Dialogues.getSelectedOptionFromArray(CurveType.values(), "Select Default Curve Type", currentSelection);
+                eventEditWindow.setDefaultCurveType(CurveType.values()[selectedOption]);
             }
         });
         curveSubMenu.add(defaultCurveItem);
@@ -217,60 +212,26 @@ public class MainWindow extends JFrame {
                     Object[] extraParameters = new Object[inputDialogTypes.length];
 
                     for(int i = 0; i < inputDialogTypes.length; i++) {
+                        String message = inputDialogTypes[i].getMessage();
                         switch(inputDialogTypes[i]) {
                             case JOINT_TYPE_INPUT -> {
-                                JComboBox jointTypeComboBox = new JComboBox(JointType.getNames());
-                                JOptionPane.showOptionDialog(
-                                        null, jointTypeComboBox, inputDialogTypes[i].getMessage(),
-                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                                );
-                                extraParameters[i] = JointType.values()[jointTypeComboBox.getSelectedIndex()];
+                                int selectedOption = Dialogues.getSelectedOptionFromArray(JointType.getNames(), message, 0);
+                                extraParameters[i] = JointType.values()[selectedOption];
                             }
                             case NUMBER_TYPE_INPUT -> {
-                                JFormattedTextField numberTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-                                numberTextField.setValue(0.0);
-                                numberTextField.setFocusLostBehavior(JFormattedTextField.COMMIT);
-                                JOptionPane.showOptionDialog(
-                                        null, numberTextField, inputDialogTypes[i].getMessage(),
-                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                                );
-                                extraParameters[i] = numberTextField.getValue();
-                                if(extraParameters[i].getClass() == Long.class) {
-                                    extraParameters[i] = ((Long) numberTextField.getValue()).doubleValue();
-                                }
+                                extraParameters[i] = Dialogues.getNumberValue(message);
                             }
                             case COLOR_TYPE_INPUT -> {
-                                Color pickedColor = JColorChooser.showDialog(null, inputDialogTypes[i].getMessage(), null);
+                                Color pickedColor = JColorChooser.showDialog(null, message, null);
                                 extraParameters[i] = pickedColor;
                             }
                             case INTEGER_TYPE_INPUT -> {
-                                JFormattedTextField numberTextField = new JFormattedTextField(NumberFormat.getIntegerInstance());
-                                numberTextField.setValue(0);
-                                numberTextField.setFocusLostBehavior(JFormattedTextField.COMMIT);
-                                JOptionPane.showOptionDialog(
-                                        null, numberTextField, inputDialogTypes[i].getMessage(),
-                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                                );
-                                extraParameters[i] = numberTextField.getValue();
-                                if(extraParameters[i].getClass() == Long.class) {
-                                    extraParameters[i] = ((Long) numberTextField.getValue()).intValue();
-                                }
+                                extraParameters[i] = Dialogues.getIntegerValue(message);
                             }
                             case UNIT_NUMBER_TYPE_INPUT -> {
-                                JFormattedTextField numberTextField = new JFormattedTextField(NumberFormat.getNumberInstance());
-                                numberTextField.setValue(0.0);
-                                numberTextField.setFocusLostBehavior(JFormattedTextField.COMMIT);
-                                JOptionPane.showOptionDialog(
-                                        null, numberTextField, inputDialogTypes[i].getMessage(),
-                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                                );
-                                Object value = numberTextField.getValue();
-                                if(numberTextField.getValue().getClass() == Long.class) {
-                                    value = ((Long) numberTextField.getValue()).doubleValue();
-                                }
-                                if((Double)value > 1.d) value = 1.d;
-                                else if((Double)value < 0.d) value = 0.d;
-
+                                double value = Dialogues.getNumberValue(message);
+                                if(value > 1.d) value = 1.d;
+                                else if(value < 0.d) value = 0.d;
                                 extraParameters[i] = value;
                             }
                             case STRING_TYPE_INPUT -> {
@@ -280,42 +241,26 @@ public class MainWindow extends JFrame {
                             case ROUND_PIXEL_INPUT -> {
                                 JComboBox algorithmComboBox = new JComboBox(PixelAlgorithmType.values());
                                 JOptionPane.showOptionDialog(
-                                        null, algorithmComboBox, inputDialogTypes[i].getMessage(),
+                                        null, algorithmComboBox, message,
                                         JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
                                 );
                                 extraParameters[i] = PixelAlgorithmType.values()[algorithmComboBox.getSelectedIndex()];
                             }
                             case ROUND_INPUT -> {
-                                JComboBox algorithmComboBox = new JComboBox(RoundAlgorithmType.values());
-                                JOptionPane.showOptionDialog(
-                                        null, algorithmComboBox, inputDialogTypes[i].getMessage(),
-                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                                );
-                                extraParameters[i] = RoundAlgorithmType.values()[algorithmComboBox.getSelectedIndex()];
+                                int selectedOption = Dialogues.getSelectedOptionFromArray(RoundAlgorithmType.values(), message, 0);
+                                extraParameters[i] = RoundAlgorithmType.values()[selectedOption];
                             }
                             case COLOR_MIXING_INPUT -> {
-                                JComboBox mixComboBox = new JComboBox(MixingAlgorithmType.values());
-                                JOptionPane.showOptionDialog(
-                                        null, mixComboBox, inputDialogTypes[i].getMessage(),
-                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                                );
-                                extraParameters[i] = MixingAlgorithmType.values()[mixComboBox.getSelectedIndex()];
+                                int selectedOption = Dialogues.getSelectedOptionFromArray(MixingAlgorithmType.values(), message, 0);
+                                extraParameters[i] = MixingAlgorithmType.values()[selectedOption];
                             }
                             case UPDATE_INPUT -> {
-                                JComboBox updateComboBox = new JComboBox(UpdateType.values());
-                                JOptionPane.showOptionDialog(
-                                        null, updateComboBox, inputDialogTypes[i].getMessage(),
-                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                                );
-                                extraParameters[i] = UpdateType.values()[updateComboBox.getSelectedIndex()];
+                                int selectedOption = Dialogues.getSelectedOptionFromArray(UpdateType.values(), message, 0);
+                                extraParameters[i] = UpdateType.values()[selectedOption];
                             }
                             case BLEND_INPUT -> {
-                                JComboBox blendComboBox = new JComboBox(BlendType.values());
-                                JOptionPane.showOptionDialog(
-                                        null, blendComboBox, inputDialogTypes[i].getMessage(),
-                                        JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null
-                                );
-                                extraParameters[i] = BlendType.values()[blendComboBox.getSelectedIndex()];
+                                int selectedOption = Dialogues.getSelectedOptionFromArray(BlendType.values(), message, 0);
+                                extraParameters[i] = BlendType.values()[selectedOption];
                             }
                         }
                     }

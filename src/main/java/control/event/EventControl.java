@@ -1,36 +1,15 @@
 package control.event;
 
-import com.google.gson.JsonParser;
-import com.wrapper.spotify.exceptions.SpotifyWebApiException;
-import com.wrapper.spotify.exceptions.detailed.NotFoundException;
-import com.wrapper.spotify.model_objects.miscellaneous.*;
-import com.wrapper.spotify.model_objects.specification.AudioFeatures;
-import com.wrapper.spotify.model_objects.specification.Track;
-import com.wrapper.spotify.model_objects.specification.User;
-import com.wrapper.spotify.requests.data.player.*;
-import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
-import com.wrapper.spotify.requests.data.tracks.GetAudioAnalysisForTrackRequest;
-import com.wrapper.spotify.requests.data.tracks.GetAudioFeaturesForTrackRequest;
-import com.wrapper.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 import control.save.EventSaveUnit;
-import control.spotify.SpotifyWebHandler;
 import control.type_enums.CurveType;
-import gui.main_panels.player_panel.SpotifyPlayerPanel;
 import logic.event.LogicEvent;
 import logic.event.LogicTrack;
-import org.apache.hc.core5.http.ParseException;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class EventControl implements TrackRequestAcceptor, Serializable {
+public class EventControl implements EventRequestAcceptor, Serializable {
 
     private EventGraphicUnit eventWindow;
     private ArrayList<LogicTrack> logicTracks;
@@ -85,22 +64,6 @@ public class EventControl implements TrackRequestAcceptor, Serializable {
     }
 
     @Override
-    public ArrayList<TimeMeasure> getTimeMeasures() {
-        return this.timeMeasures;
-    }
-
-    @Override
-    public TimeMeasure getCorrespondingTimeMeasure(int ms) {
-        for(TimeMeasure timeMeasure : this.timeMeasures) {
-            int msEnd = timeMeasure.getMsStart() + (timeMeasure.getLengthOneBeat() * timeMeasure.getBeatsDuration());
-            if(ms >= timeMeasure.getMsStart() && ms < msEnd) {
-                return timeMeasure;
-            }
-        }
-        return null;
-    }
-
-    @Override
     public int getCorrespondingEventIndex(int trackIndex, int ms) {
         return this.logicTracks.get(trackIndex).getEventIndex(ms);
     }
@@ -127,8 +90,30 @@ public class EventControl implements TrackRequestAcceptor, Serializable {
     }
 
     @Override
+    public ArrayList<TimeMeasure> getTimeMeasures() {
+        return this.timeMeasures;
+    }
+
+    @Override
+    public TimeMeasure getCorrespondingTimeMeasure(int ms) {
+        for(TimeMeasure timeMeasure : this.timeMeasures) {
+            int msEnd = timeMeasure.getMsStart() + (timeMeasure.getLengthOneBeat() * timeMeasure.getBarsDuration() * timeMeasure.getBeatsPerBar());
+            if(ms >= timeMeasure.getMsStart() && ms < msEnd) {
+                return timeMeasure;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void onAddTimeMeasureRequest(int beatsPerBar, float beatsPerMinute, int msStart, int barsDuration) {
+        this.timeMeasures.add(new TimeMeasure(beatsPerBar, beatsPerMinute, msStart, barsDuration));
+    }
+
+    @Override
     public void onAddTrackRequest() {
         //TODO: hier alle möglichen Fehler abfangen
+        //this.eventWindow.updateBounds();
         this.logicTracks.add(new LogicTrack());
         this.eventWindow.addTrack();
     }
@@ -139,7 +124,10 @@ public class EventControl implements TrackRequestAcceptor, Serializable {
 
     @Override
     public void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType) {
-        if(this.logicTracks.get(trackIndex) != null) {
+        if(trackIndex == 0) {
+            //TODO: adding a time measure
+        }
+        else if(this.logicTracks.get(trackIndex) != null) {
             int oldLength = this.logicTracks.get(trackIndex).getEventsCopyArray().length;
             this.logicTracks.get(trackIndex).addEventToTrack(msStart, msDuration, curveType, -1);
 
