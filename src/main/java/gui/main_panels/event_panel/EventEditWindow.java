@@ -16,6 +16,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
     private EventRequestAcceptor eventControl;
 
+    private ArrayList<GraphicTimeMeasure> graphicTimeMeasures;
     private ArrayList<JLabel> trackLabels;
     private ArrayList<ArrayList<GraphicEvent>> graphicEvents;
     private JLabel cursorLabel;
@@ -34,6 +35,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         this.eventControl = eventControl;
         this.eventControl.setEventGraphicUnit(this);
 
+        this.graphicTimeMeasures = new ArrayList<>();
         this.trackLabels = new ArrayList<>();
         this.graphicEvents = new ArrayList<>();
 
@@ -133,6 +135,9 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         } else if(!zoomIn && this.eventWidthDivision <= 28.0) {
             this.eventWidthDivision += 2.0;
         }
+        for(GraphicTimeMeasure graphicTimeMeasure : this.graphicTimeMeasures) {
+            graphicTimeMeasure.updateBounds();
+        }
         for(ArrayList<GraphicEvent> graphicEventArrayList : this.graphicEvents) {
             for(GraphicEvent graphicEvent : graphicEventArrayList) {
                 graphicEvent.updateBounds();
@@ -224,6 +229,26 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                     this.getPreferredSize().width,
                     30
             );
+        }
+    }
+
+    @Override
+    public void addTimeMeasure(TimeMeasure timeMeasure) {
+        GraphicTimeMeasure graphicTimeMeasure = new GraphicTimeMeasure(timeMeasure, this.eventControl, this);
+        this.graphicTimeMeasures.add(graphicTimeMeasure);
+        this.add(graphicTimeMeasure);
+        graphicTimeMeasure.getParent().setComponentZOrder(graphicTimeMeasure, 0);
+    }
+
+    @Override
+    public void removeTimeMeasure(int msStart) {
+        for(GraphicTimeMeasure graphicTimeMeasure : this.graphicTimeMeasures) {
+            if(graphicTimeMeasure.getTimeMeasure().getMsStart() == msStart) {
+                this.graphicTimeMeasures.remove(graphicTimeMeasure);
+                this.remove(graphicTimeMeasure);
+                repaint();
+                return;
+            }
         }
     }
 

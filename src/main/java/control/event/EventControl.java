@@ -107,7 +107,37 @@ public class EventControl implements EventRequestAcceptor, Serializable {
 
     @Override
     public void onAddTimeMeasureRequest(int beatsPerBar, float beatsPerMinute, int msStart, int barsDuration) {
-        this.timeMeasures.add(new TimeMeasure(beatsPerBar, beatsPerMinute, msStart, barsDuration));
+        TimeMeasure newTimeMeasure = new TimeMeasure(beatsPerBar, beatsPerMinute, msStart, barsDuration);
+        this.timeMeasures.add(newTimeMeasure);
+        this.eventWindow.addTimeMeasure(newTimeMeasure);
+    }
+
+    @Override
+    public void onSplitTimeMeasureRequest(int msStart, int barsInto) {
+        this.eventWindow.removeTimeMeasure(msStart);
+
+        for(TimeMeasure timeMeasure : this.timeMeasures) {
+            if(timeMeasure.getMsStart() == msStart) {
+                this.timeMeasures.remove(timeMeasure);
+                int barsRight = timeMeasure.getBarsDuration() - barsInto;
+                int msInto = msStart + (timeMeasure.getLengthOneBar() * barsInto);
+
+                this.onAddTimeMeasureRequest(
+                        timeMeasure.getBeatsPerBar(),
+                        timeMeasure.getBeatsPerMinute(),
+                        msStart,
+                        barsInto
+                );
+                this.onAddTimeMeasureRequest(
+                        timeMeasure.getBeatsPerBar(),
+                        timeMeasure.getBeatsPerMinute(),
+                        msInto,
+                        barsRight
+                );
+                return;
+            }
+        }
+
     }
 
     @Override
@@ -142,6 +172,9 @@ public class EventControl implements EventRequestAcceptor, Serializable {
 
     @Override
     public void onUpdateEventRequest(int trackIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew) {
+        if(trackIndex == 0) {
+
+        }
         int eventIndex = this.logicTracks.get(trackIndex).getEventIndex(msStartOld);
         if(eventIndex == -1) return;
 

@@ -9,6 +9,9 @@ public interface EventGraphicUnit {
     void syncTracks(TrackTime[] trackTimes);
     void updateBounds();
 
+    void addTimeMeasure(TimeMeasure timeMeasure);
+    void removeTimeMeasure(int msStart);
+
     void addTrack();
     void removeTrack(int TrackNumber);
 

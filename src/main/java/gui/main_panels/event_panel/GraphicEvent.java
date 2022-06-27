@@ -3,6 +3,7 @@ package gui.main_panels.event_panel;
 import control.event.EventGraphicUnit;
 import control.event.EventRequestAcceptor;
 import control.type_enums.CurveType;
+import gui.Dialogues;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +37,7 @@ public class GraphicEvent extends JLabel {
         this.lastMovement = 0;
 
         this.setOpaque(true);
-        this.setBackground(curveType.getColor());
+        this.setBackground(curveType != null ? curveType.getColor() : Color.WHITE);
 
         this.addMouseListener(new MouseAdapter() {
 
@@ -55,13 +56,11 @@ public class GraphicEvent extends JLabel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                if(!eventGraphicUnit.getCurveBrush()) {
+                if(!eventGraphicUnit.getCurveBrush() && curveType != null) {
                     if(e.getButton() == MouseEvent.BUTTON3) {
 
-                        JComboBox curveTypeComboBox = new JComboBox(CurveType.values());
-                        curveTypeComboBox.setSelectedIndex(CurveType.indexOf(curveType));
-                        JOptionPane.showOptionDialog(null, curveTypeComboBox, "Edit Curve Type", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-                        CurveType newCurveType = CurveType.values()[curveTypeComboBox.getSelectedIndex()];
+                        int selectedOption = Dialogues.getSelectedOptionFromArray(CurveType.values(), "Edit Curve Type", CurveType.indexOf(getCurveType()));
+                        CurveType newCurveType = CurveType.values()[selectedOption];
 
                         songControl.onUpdateEventRequest(
                                 trackIndex,
@@ -211,17 +210,31 @@ public class GraphicEvent extends JLabel {
         this.setBackground(curveType.getColor());
     }
 
+    public boolean isRightHovered() {
+        return this.rightHovered;
+    }
+    public boolean isLeftHovered() {
+        return this.leftHovered;
+    }
+    public int getLastMovement() {
+        return this.lastMovement;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, this.getSize().width, this.getSize().height);
+
+        g.setColor(this.curveType.getColor().darker());
+        g.fillRect(2, 2, this.getWidth() - 4, this.getHeight() - 4);
+
+
+        g.setColor(Color.WHITE);
         if(!this.isEnabled()) {
-            g.setColor(Color.WHITE);
             g.fillRect(0, 0, this.getWidth(), this.getHeight());
         }
-        g.setColor(Color.WHITE);
         for(int i = 0; i < this.getWidth(); i++) {
             double x = (double)i / (double)this.getWidth();
             g.fillRect(

@@ -138,7 +138,6 @@ public class GraphicNode extends JPanel {
             parentNodePanel.add(this.graphicOutputJoints[i]);
         }
 
-        GraphicNode self = this;
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
