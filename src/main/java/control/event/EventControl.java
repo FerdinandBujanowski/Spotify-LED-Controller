@@ -155,9 +155,10 @@ public class EventControl implements EventRequestAcceptor, Serializable {
     @Override
     public void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType) {
         if(trackIndex == 0) {
+            return;
             //TODO: adding a time measure
         }
-        else if(this.logicTracks.get(trackIndex) != null) {
+        if(this.logicTracks.get(trackIndex) != null) {
             int oldLength = this.logicTracks.get(trackIndex).getEventsCopyArray().length;
             this.logicTracks.get(trackIndex).addEventToTrack(msStart, msDuration, curveType, -1);
 

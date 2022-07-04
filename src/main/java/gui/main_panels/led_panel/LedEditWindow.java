@@ -202,6 +202,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        this.ledControl.updatePort();
         for(GraphicPixel graphicPixel : this.graphicPixels) {
             if(!this.orderMode) {
                 graphicPixel.setBackground(this.ledControl.getColorAt(graphicPixel.getPixelX(), graphicPixel.getPixelY()));

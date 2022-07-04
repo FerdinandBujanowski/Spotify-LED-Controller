@@ -13,18 +13,23 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.function.Function;
 
- public class LedControl implements Serializable, LedRequestAcceptor, LedNodeCommunication {
+public class LedControl implements Serializable, LedRequestAcceptor, LedNodeCommunication {
 
-    ArrayList<Point> pixels;
-    LogicMask pixelMask;
-    ArrayList<LogicLayer> logicLayers;
+    private ArrayList<Point> pixels;
+    private LogicMask pixelMask;
+    private ArrayList<LogicLayer> logicLayers;
 
-    LedGraphicUnit ledGraphicUnit;
+    private LedGraphicUnit ledGraphicUnit;
+
+    private ColorSender colorSender;
 
     public LedControl() {
         this.pixels = new ArrayList<>();
         this.pixelMask = new LogicMask();
         this.logicLayers = new ArrayList<>();
+
+        this.colorSender = new ColorSender("COM3");
+        this.colorSender.openPort();
     }
 
     public void reinitialize(LedSaveUnit ledSaveUnit) {
@@ -138,7 +143,15 @@ import java.util.function.Function;
         } else return new Color(0, 0, 0);
      }
 
-     @Override
+    @Override
+    public void updatePort() {
+        for(int i = 0; i < this.pixels.size(); i++) {
+            this.colorSender.addCommand(i, this.getColorAt(this.pixels.get(i).x, this.pixels.get(i).y));
+        }
+        this.colorSender.flushCommands();
+    }
+
+    @Override
      public SerializableFunction<Object, Integer> updateTextureFunction(int layerIndex) {
          return this.logicLayers.get(layerIndex)::updateTexture;
      }

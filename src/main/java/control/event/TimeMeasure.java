@@ -4,14 +4,14 @@ import java.io.Serializable;
 
 public class TimeMeasure implements Serializable {
 
-    private int beatsPerBar;
-    private float beatsPerMinute;
+    private final int beatsPerBar;
+    private final float beatsPerMinute;
 
-    private int msStart;
-    private int barsDuration;
+    private final int msStart;
+    private final int barsDuration;
 
-    private int lengthOneBeat;
-    private int lengthOneBar;
+    private final int lengthOneBeat;
+    private final int lengthOneBar;
 
     public TimeMeasure(int beatsPerBar, float beatsPerMinute, int msStart, int barsDuration) {
         this.beatsPerBar = beatsPerBar;

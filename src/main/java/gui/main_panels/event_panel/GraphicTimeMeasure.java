@@ -24,7 +24,7 @@ public class GraphicTimeMeasure extends GraphicEvent {
                 0,
                 null,
                 timeMeasure.getMsStart(),
-                timeMeasure.getLengthOneBar() * timeMeasure.getBarsDuration(),
+                (timeMeasure.getLengthOneBar() * timeMeasure.getBarsDuration()) - (2 * (int)eventGraphicUnit.getEventWidthDivision()),
                 eventGraphicUnit,
                 eventRequestAcceptor
         );
@@ -58,7 +58,7 @@ public class GraphicTimeMeasure extends GraphicEvent {
 
     public void calculateHoveredBarX(int pixelX) {
         int ms = (int)Math.round(pixelX * eventGraphicUnit.getEventWidthDivision());
-        hoveredBar = (int)Math.ceil((double)ms / timeMeasure.getLengthOneBar());
+        hoveredBar = (int)Math.round((double)ms / timeMeasure.getLengthOneBar());
     }
 
     @Override
@@ -66,11 +66,11 @@ public class GraphicTimeMeasure extends GraphicEvent {
         g.setColor(Color.MAGENTA);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
         g.setColor(Color.MAGENTA.darker());
-        g.fillRect(2, 2, this.getWidth() - 4, this.getHeight() - 4);
+        g.fillRect(3, 3, this.getWidth() - 6, this.getHeight() - 6);
 
         int totalBeats = this.timeMeasure.getBeatsPerBar() * this.timeMeasure.getBarsDuration();
         double msSingleBeat = 1000.0 / (this.timeMeasure.getBeatsPerMinute() / 60.0);
-        for(int i = 0; i < totalBeats; i++) {
+        for(int i = 1; i < totalBeats; i++) {
             g.setColor(i % this.timeMeasure.getBeatsPerBar() == 0 ? Color.WHITE : Color.GRAY);
             int x = (int)Math.floor(i * msSingleBeat / this.eventGraphicUnit.getEventWidthDivision());
             g.fillRect(x, 0, 1, this.getHeight());
@@ -91,6 +91,10 @@ public class GraphicTimeMeasure extends GraphicEvent {
             int x = (int)Math.round(this.hoveredBar * this.timeMeasure.getLengthOneBar() / this.eventGraphicUnit.getEventWidthDivision());
             g.fillRect(x - 2, 0, 4, this.getHeight());
         }
+    }
+
+    public void resetHoveredBar() {
+        this.hoveredBar = 0;
     }
 
     public TimeMeasure getTimeMeasure() {

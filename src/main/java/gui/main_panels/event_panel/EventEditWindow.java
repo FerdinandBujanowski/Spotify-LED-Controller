@@ -70,6 +70,13 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 }
                 repaint();
             }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                for(GraphicTimeMeasure graphicTimeMeasure : graphicTimeMeasures) {
+                    graphicTimeMeasure.resetHoveredBar();
+                    repaint();
+                }
+            }
         });
         this.addKeyListener(new KeyAdapter() {
             @Override
