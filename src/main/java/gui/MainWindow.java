@@ -26,8 +26,6 @@ import java.util.ArrayList;
 
 public class MainWindow extends JFrame {
 
-    private Dimension dimension;
-
     private SpotifyPlayerPanel spotifyPlayerPanel;
 
     private NodeEditWindow nodeEditWindow;
@@ -42,23 +40,20 @@ public class MainWindow extends JFrame {
 
     JSplitPane splitPane;
 
-    private JMenu songMenu, nodeMenu, functionMenu, ledMenu;
-    private JMenu addFunctionMenu;
-    private JMenuItem createFunctionMenuItem;
-    private ArrayList<JMenuItem> functionItemList;
-    private JMenu createTrackNodeMenu;
+    private final JMenu songMenu, nodeMenu, functionMenu, ledMenu, microControllerMenu, addFunctionMenu;
+    private final ArrayList<JMenuItem> functionItemList;
+    private final JMenu createTrackNodeMenu;
 
     private boolean bProjectOpen;
 
     public MainWindow(Dimension dimension, String title, SongControl songControl, EventControl eventControl, NodeControl nodeControl, LedControl ledControl) {
         super(title);
 
-        this.dimension = dimension;
         this.setIconImage(new ImageIcon("images\\icon\\icon.png").getImage());
         this.bProjectOpen = false;
         this.setResizable(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.getContentPane().setPreferredSize(this.dimension);
+        this.getContentPane().setPreferredSize(dimension);
         this.splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {
             @Override
             public int getDividerLocation() {
@@ -186,8 +181,8 @@ public class MainWindow extends JFrame {
         this.songMenu.add(createTrackNodeMenu);
         this.songMenu.setEnabled(false);
         this.jMenuBar.add(this.songMenu);
-        this.nodeMenu = new JMenu("Node");
 
+        this.nodeMenu = new JMenu("Node");
         ArrayList<String> nodeCategories = new ArrayList<>();
         for(NodeType nodeType : NodeType.values()) {
             if(!nodeCategories.contains(nodeType.getCategoryName())) {
@@ -276,12 +271,12 @@ public class MainWindow extends JFrame {
         jMenuBar.add(this.nodeMenu);
         this.nodeMenu.setEnabled(false);
         this.functionMenu = new JMenu("Function");
-        this.createFunctionMenuItem = new JMenuItem("Create Function");
+        JMenuItem createFunctionMenuItem = new JMenuItem("Create Function");
         this.addFunctionMenu = new JMenu("Add Function");
         JMenuItem cleanUpCanvas = new JMenuItem("Clean up Canvas");
         this.functionItemList = new ArrayList<>();
 
-        this.createFunctionMenuItem.addActionListener(new ActionListener() {
+        createFunctionMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String functionName = JOptionPane.showInputDialog("Create Function");
@@ -427,6 +422,32 @@ public class MainWindow extends JFrame {
 
         this.jMenuBar.add(this.ledMenu);
         this.ledMenu.setEnabled(false);
+
+        this.microControllerMenu = new JMenu("Micro Controller");
+
+        JMenuItem refreshPortItem = new JMenuItem("Refresh Ports");
+        this.microControllerMenu.add(refreshPortItem);
+        this.microControllerMenu.add(new JSeparator());
+
+        JMenu availablePortsMenu = new JMenu("Available Ports");
+
+        refreshPortItem.addActionListener(e -> {
+            availablePortsMenu.removeAll();
+            String[] currentPortNames = ledControl.onGetPortsRequest();
+            for(int i = 0; i < currentPortNames.length; i++) {
+                JMenuItem newPortItem = new JMenuItem(currentPortNames[i]);
+                int finalI = i;
+                newPortItem.addActionListener(a -> {
+                    ledControl.onOpenPortRequest(finalI);
+                });
+                availablePortsMenu.add(newPortItem);
+            }
+        });
+        this.microControllerMenu.add(availablePortsMenu);
+
+        this.jMenuBar.add(this.microControllerMenu);
+        this.microControllerMenu.setEnabled(false);
+
         this.pack();
         this.setCorrectLocation();
 
@@ -731,6 +752,7 @@ public class MainWindow extends JFrame {
         this.nodeMenu.setEnabled(true);
         this.functionMenu.setEnabled(true);
         this.ledMenu.setEnabled(true);
+        this.microControllerMenu.setEnabled(true);
 
         this.pack();
         this.repaint();

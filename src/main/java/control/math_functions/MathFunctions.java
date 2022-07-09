@@ -3,7 +3,6 @@ package control.math_functions;
 import java.io.Serializable;
 
 public abstract class MathFunctions implements Serializable {
-
     public static double getBezier(double currentX, boolean negative) {
         if(!negative) {
             return (Math.cos(currentX * Math.PI) + 1) / 2;

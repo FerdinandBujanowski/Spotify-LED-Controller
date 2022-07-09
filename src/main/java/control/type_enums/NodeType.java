@@ -36,7 +36,7 @@ public enum NodeType {
     PROBABILITY_BRANCH_NODE("Probability Branch", "Branch", ProbabilityBranchNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
 
     //COLOR
-    CONSTANT_COLOR_NODE("Constant Color", "Color", ConstantColorNode.class, new InputDialogType[] { InputDialogType.COLOR_TYPE_INPUT }),
+    CONSTANT_COLOR_NODE("Constant Color", "Color", ConstantColorNode.class, new InputDialogType[] { InputDialogType.COLOR_TYPE_INPUT }, true),
     CREATE_COLOR_NODE("Create Color", "Color", CreateColorNode.class),
     SPLIT_COLOR_NODE("Split Color", "Color", SplitColorNode.class),
 

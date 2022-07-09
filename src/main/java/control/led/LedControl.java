@@ -16,6 +16,7 @@ import java.util.function.Function;
 public class LedControl implements Serializable, LedRequestAcceptor, LedNodeCommunication {
 
     private ArrayList<Point> pixels;
+    private ArrayList<Color> lastUpdatedColors;
     private LogicMask pixelMask;
     private ArrayList<LogicLayer> logicLayers;
 
@@ -25,11 +26,11 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
 
     public LedControl() {
         this.pixels = new ArrayList<>();
+        this.lastUpdatedColors = new ArrayList<>();
         this.pixelMask = new LogicMask();
         this.logicLayers = new ArrayList<>();
 
-        this.colorSender = new ColorSender("COM3");
-        this.colorSender.openPort();
+        this.colorSender = new ColorSender();
     }
 
     public void reinitialize(LedSaveUnit ledSaveUnit) {
@@ -64,6 +65,7 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
             this.pixels.add(newPixel);
             this.pixelMask.setIntensityAt(x, y, 1.0);
             this.ledGraphicUnit.addPixel(newIndex, x, y);
+            this.lastUpdatedColors.add(Color.BLACK);
         } else {
             throw new Exception("Pixel already set");
         }
@@ -140,13 +142,28 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
      public Color getColorAt(int x, int y) {
         if(this.logicLayers.size() > 0) {
             return this.logicLayers.get(this.logicLayers.size() - 1).getColorAt(x, y);
-        } else return new Color(0, 0, 0);
+        } else return Color.BLACK;
      }
 
     @Override
+    public String[] onGetPortsRequest() {
+        return this.colorSender.getAvailablePortList();
+    }
+
+    @Override
+    public void onOpenPortRequest(int index) {
+        this.colorSender.openPort(index);
+    }
+
+    @Override
     public void updatePort() {
+        if(!this.colorSender.isPortAvailable()) return;
         for(int i = 0; i < this.pixels.size(); i++) {
-            this.colorSender.addCommand(i, this.getColorAt(this.pixels.get(i).x, this.pixels.get(i).y));
+            Point currentPixel = this.pixels.get(i);
+            if(!this.getColorAt(currentPixel.x, currentPixel.y).equals(this.lastUpdatedColors.get(i))) {
+                this.lastUpdatedColors.set(i, this.getColorAt(currentPixel.x, currentPixel.y));
+                this.colorSender.addCommand(i, this.lastUpdatedColors.get(i));
+            }
         }
         this.colorSender.flushCommands();
     }

@@ -11,20 +11,37 @@ public class ColorSender {
     private SerialPort serialPort;
     private Stack<String> commands;
 
-    public ColorSender(String portName) {
+    private boolean open;
+
+    public ColorSender() {
         this.commands = new Stack<>();
 
-        this.serialPort = SerialPort.getCommPort(portName);
-        this.serialPort.setComPortParameters(500000, 8, 1, 0);
-        this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
+        this.open = false;
     }
 
-    public void openPort() {
-        if (this.serialPort.openPort()) {
-            System.out.println("Port is open :)");
-        } else {
-            System.out.println("Failed to open port :(");
+    public String[] getAvailablePortList() {
+        String[] availablePortList = new String[SerialPort.getCommPorts().length];
+        for(int i = 0; i < availablePortList.length; i++) {
+            availablePortList[i] = SerialPort.getCommPorts()[i].getPortDescription();
         }
+        return availablePortList;
+    }
+
+    public void openPort(int portIndex) {
+        this.serialPort = SerialPort.getCommPorts()[portIndex];
+        this.serialPort.setComPortParameters(500000, 8, 1, 0);
+        this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
+
+        this.open = this.serialPort.openPort();
+        if(this.open) {
+            System.out.println("Port " + this.serialPort.getDescriptivePortName() + " is open");
+        } else {
+            System.out.println("Failed to open port " + this.serialPort.getDescriptivePortName());
+        }
+    }
+
+    public boolean isPortAvailable() {
+        return this.serialPort != null && this.open;
     }
 
     public void addCommand(int ledNumber, Color color) {
@@ -61,10 +78,11 @@ public class ColorSender {
     }
 
     public void closePort() {
-        if (this.serialPort.closePort()) {
-            System.out.println("Port is closed :)");
+        this.open = !this.serialPort.closePort();
+        if (!this.open) {
+            System.out.println("Port is closed");
         } else {
-            System.out.println("Failed to close port :(");
+            System.out.println("Failed to close port");
         }
     }
 }

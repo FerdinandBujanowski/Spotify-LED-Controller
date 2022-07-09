@@ -23,6 +23,7 @@ public interface EventRequestAcceptor {
     TimeMeasure getCorrespondingTimeMeasure(int ms);
     void onAddTimeMeasureRequest(int beatsPerBar, float beatsPerMinute, int msStart, int barsDuration);
     void onSplitTimeMeasureRequest(int msStart, int barsInto);
+    void onEditTimeMeasureRequest(int msStartOld, TimeMeasure newTimeMeasureData);
 
     void onAddTrackRequest();
     void onUpdateTrackRequest(int trackIndex, boolean deleted);

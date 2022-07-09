@@ -141,6 +141,11 @@ public class EventControl implements EventRequestAcceptor, Serializable {
     }
 
     @Override
+    public void onEditTimeMeasureRequest(int msStartOld, TimeMeasure newTimeMeasureData) {
+
+    }
+
+    @Override
     public void onAddTrackRequest() {
         //TODO: hier alle möglichen Fehler abfangen
         //this.eventWindow.updateBounds();

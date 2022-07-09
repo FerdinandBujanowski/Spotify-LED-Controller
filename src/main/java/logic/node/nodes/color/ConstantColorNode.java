@@ -2,6 +2,8 @@ package logic.node.nodes.color;
 
 import control.type_enums.JointType;
 import control.type_enums.NodeType;
+import logic.led.LogicMask;
+import logic.led.LogicTexture;
 import logic.node.LogicNode;
 import logic.node.joint.InputJoint;
 import logic.node.joint.OutputJoint;
@@ -32,5 +34,19 @@ public class ConstantColorNode extends LogicNode {
     @Override
     public ColorJointDataType[] function(InputJoint[] inputJoints) {
         return new ColorJointDataType[] { new ColorJointDataType(this.color) };
+    }
+
+    @Override
+    public Double[][] getMaskValues(Integer nullInteger) {
+        LogicMask logicMask = new LogicMask();
+        logicMask.setIntensityAt(0, 0, 1);
+        return logicMask.getValues();
+    }
+
+    @Override
+    public Color[][] getTextureColorValues(Integer nullInteger) {
+        LogicTexture logicTexture = new LogicTexture();
+        logicTexture.setIntensityAt(0, 0, 1, this.color);
+        return logicTexture.getColorValues();
     }
 }

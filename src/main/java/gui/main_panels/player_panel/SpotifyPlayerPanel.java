@@ -31,6 +31,8 @@ public class SpotifyPlayerPanel extends JPanel {
 
     private JLabel songImageLabel;
 
+    private final JButton exportTimeMeasureButton;
+
     public SpotifyPlayerPanel(SongControl songControl, Dimension windowDimension) {
         super(null);
 
@@ -146,20 +148,29 @@ public class SpotifyPlayerPanel extends JPanel {
         this.currentDevicesText.setBackground(Color.BLUE);
         this.add(this.currentDevicesText);
 
+        //Export Time Measures Button
+        this.exportTimeMeasureButton = new JButton("Generate Time Measures");
+        this.exportTimeMeasureButton.setEnabled(false);
+        this.exportTimeMeasureButton.addActionListener(e -> {
+            //TODO
+        });
+        this.add(this.exportTimeMeasureButton);
+
         this.resizeComponents(windowDimension);
     }
 
     public void resizeComponents(Dimension dimension) {
-        this.searchSongButton.setBounds((dimension.width / 2) + 51, 60, 100, 20);
-        this.searchSongField.setBounds((dimension.width / 2) - 150, 60, 200, 20);
-        this.connectToSpotifyButton.setBounds((dimension.width - 200) / 2, 30, 200, 20);
-        this.connectedLabel.setBounds((dimension.width - 200) / 2, 5, 200, 20);
-        this.selectSongBox.setBounds((dimension.width / 2) - 150, 85, 200, 20);
-        this.selectSongButton.setBounds((dimension.width / 2) + 51, 85, 100, 20);
+        this.searchSongButton.setBounds((dimension.width / 2) + 51, 60, 100, 25);
+        this.searchSongField.setBounds((dimension.width / 2) - 150, 60, 200, 25);
+        this.connectToSpotifyButton.setBounds((dimension.width - 200) / 2, 30, 200, 25);
+        this.connectedLabel.setBounds((dimension.width - 200) / 2, 5, 200, 25);
+        this.selectSongBox.setBounds((dimension.width / 2) - 150, 85, 200, 25);
+        this.selectSongButton.setBounds((dimension.width / 2) + 51, 85, 100, 25);
         this.songImageLabel.setBounds((dimension.width - 300) / 2, 120, 300, 300);
-        this.songConnectedLabel.setBounds(dimension.width / 2 - 150, 430, 150, 20);
+        this.songConnectedLabel.setBounds(dimension.width / 2 - 150, 430, 150, 25);
         this.songConnectButton.setBounds(dimension.width / 2, 430, 150, 20);
         this.currentDevicesText.setBounds((dimension.width) / 6 - 100, 5, 200, 100);
+        this.exportTimeMeasureButton.setBounds((dimension.width * 5 / 6) - 100, 50, 200, 25);
 
     }
 
@@ -172,17 +183,21 @@ public class SpotifyPlayerPanel extends JPanel {
             this.searchSongButton.setEnabled(true);
             this.selectSongBox.setEnabled(true);
             this.selectSongButton.setEnabled(true);
-            this.songConnectButton.setEnabled(true);
             this.currentDevicesText.setText("<html>Available Devices: " + this.songControl.getDeviceNameList() + "</html>");
-
         } else {
             this.connectedLabel.setText("[not connected]");
             this.searchSongField.setEnabled(false);
             this.searchSongButton.setEnabled(false);
             this.selectSongBox.setEnabled(false);
             this.selectSongButton.setEnabled(false);
-            this.songConnectButton.setEnabled(false);
             this.currentDevicesText.setText("[devices]");
+        }
+        if(this.songControl.isSongSelected()) {
+            this.songConnectButton.setEnabled(true);
+            this.exportTimeMeasureButton.setEnabled(true);
+        } else {
+            this.songConnectButton.setEnabled(false);
+            this.exportTimeMeasureButton.setEnabled(false);
         }
         if(!this.songControl.isSongPlaying()) {
             this.songConnectedLabel.setText("[not connected]");

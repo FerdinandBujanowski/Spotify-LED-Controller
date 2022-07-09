@@ -22,5 +22,7 @@ public interface LedRequestAcceptor {
     int getFinalDegree();
     Color getColorAt(int x, int y);
 
+    String[] onGetPortsRequest();
+    void onOpenPortRequest(int index);
     void updatePort();
 }
