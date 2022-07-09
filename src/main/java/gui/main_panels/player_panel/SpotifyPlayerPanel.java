@@ -2,6 +2,7 @@ package gui.main_panels.player_panel;
 
 import com.wrapper.spotify.exceptions.detailed.NotFoundException;
 import control.event.EventControl;
+import control.event.EventSongCommunication;
 import control.song.SongControl;
 import control.song.SongRequestAcceptor;
 
@@ -14,6 +15,7 @@ import java.awt.image.BufferedImage;
 public class SpotifyPlayerPanel extends JPanel {
 
     private final SongRequestAcceptor songControl;
+    private final EventSongCommunication eventSongCommunication;
 
     private final JLabel connectedLabel;
     private final JButton connectToSpotifyButton;
@@ -34,13 +36,14 @@ public class SpotifyPlayerPanel extends JPanel {
 
     private final JButton exportTimeMeasureButton;
 
-    public SpotifyPlayerPanel(SongRequestAcceptor songControl, Dimension windowDimension) {
+    public SpotifyPlayerPanel(SongRequestAcceptor songControl, EventSongCommunication eventSongCommunication, Dimension windowDimension) {
         super(null);
 
         this.setOpaque(true);
         this.setBackground(new Color(25, 20, 20));
 
         this.songControl = songControl;
+        this.eventSongCommunication = eventSongCommunication;
 
         //Connected Label
         this.connectedLabel = new JLabel("", SwingConstants.CENTER);
@@ -153,7 +156,8 @@ public class SpotifyPlayerPanel extends JPanel {
         this.exportTimeMeasureButton = new JButton("Generate Time Measures");
         this.exportTimeMeasureButton.setEnabled(false);
         this.exportTimeMeasureButton.addActionListener(e -> {
-            //TODO
+            //TODO abfragen ob WIRKLICH importieren (löscht die anderen TimeMeasures)
+            this.eventSongCommunication.importTimeMeasure(this.songControl.generateTimeMeasure());
         });
         this.add(this.exportTimeMeasureButton);
 

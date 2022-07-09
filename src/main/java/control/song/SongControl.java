@@ -90,44 +90,9 @@ public class SongControl implements SongRequestAcceptor {
                     this.spotifyWebHandler.getSpotifyApi().getAudioAnalysisForTrack(this.songId).build();
             try {
                 this.selectedSongAnalysis = getAudioAnalysisForTrackRequest.execute();
-
-                //TODO : export beats / bars tracks to EventPanel IF USER WANTS TO
-                /**
-                this.logicTracks.add(new LogicTrack());
-                for(AudioAnalysisMeasure bar : this.selectedSongAnalysis.getBars()) {
-                    this.logicTracks.get(0).addEventToTrack(
-                            (int)(bar.getStart() * 1000),
-                            (int)((bar.getDuration()) * 1000),
-                            eventWindow.getDefaultCurveType(),
-                            -1
-                    );
-                }
-
-                float beatDurationSum = 0;
-                this.logicTracks.add(new LogicTrack());
-                for(AudioAnalysisMeasure beat : this.selectedSongAnalysis.getBeats()) {
-                    beatDurationSum += beat.getDuration();
-                    this.logicTracks.get(1).addEventToTrack(
-                            (int)(beat.getStart() * 1000),
-                            (int)(beat.getDuration() * 1000),
-                            eventWindow.getDefaultCurveType(),
-                            -1
-                    );
-                }
                 GetAudioFeaturesForTrackRequest getAudioFeaturesForTrackRequest =
                         this.spotifyWebHandler.getSpotifyApi().getAudioFeaturesForTrack(this.songId).build();
                 this.selectedSongFeatures = getAudioFeaturesForTrackRequest.execute();
-
-                this.timeMeasures.add(new TimeMeasure(
-                        this.selectedSongFeatures.getTimeSignature(),
-                        this.selectedSongFeatures.getTempo(),
-                        (int)(this.selectedSongAnalysis.getBeats()[0].getStart() * 1000),
-                        this.selectedSongAnalysis.getBeats().length
-                ));
-                if(this.eventWindow != null) {
-                    this.eventWindow.syncTracks(this.getTrackTimes());
-                }
-                 **/
 
             } catch (IOException | SpotifyWebApiException | ParseException e) {
                 e.printStackTrace();
@@ -315,6 +280,16 @@ public class SongControl implements SongRequestAcceptor {
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public TimeMeasure generateTimeMeasure() {
+        return new TimeMeasure(
+                this.selectedSongFeatures.getTimeSignature(),
+                this.selectedSongFeatures.getTempo(),
+                (int)(this.selectedSongAnalysis.getBeats()[0].getStart() * 1000),
+                this.selectedSongAnalysis.getBeats().length
+        );
     }
 
     @Override

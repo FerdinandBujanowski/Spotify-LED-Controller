@@ -1,6 +1,7 @@
 package control.song;
 
 import com.wrapper.spotify.exceptions.detailed.NotFoundException;
+import control.event.TimeMeasure;
 
 import javax.swing.*;
 
@@ -26,4 +27,6 @@ public interface SongRequestAcceptor {
     int getCurrentSongMs();
     void setCurrentSongMs(int newMs);
     void onSkipTo(int ms);
+
+    TimeMeasure generateTimeMeasure();
 }

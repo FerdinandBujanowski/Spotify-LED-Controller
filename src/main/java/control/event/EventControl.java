@@ -9,7 +9,7 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class EventControl implements EventRequestAcceptor, Serializable {
+public class EventControl implements EventRequestAcceptor, EventSongCommunication, Serializable {
 
     private EventGraphicUnit eventWindow;
     private ArrayList<LogicTrack> logicTracks;
@@ -202,5 +202,15 @@ public class EventControl implements EventRequestAcceptor, Serializable {
 
     public EventSaveUnit createEventSaveUnit() {
         return new EventSaveUnit(this.logicTracks, this.timeMeasures);
+    }
+
+    @Override
+    public void importTimeMeasure(TimeMeasure timeMeasure) {
+        while(!this.timeMeasures.isEmpty()) {
+            this.eventWindow.removeTimeMeasure(this.timeMeasures.get(0).getMsStart());
+            this.timeMeasures.remove(0);
+        }
+        this.timeMeasures.add(timeMeasure);
+        this.eventWindow.addTimeMeasure(timeMeasure);
     }
 }

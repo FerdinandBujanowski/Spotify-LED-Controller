@@ -692,7 +692,7 @@ public class MainWindow extends JFrame {
 
     private void newProject(SongControl songControl, EventControl eventControl, NodeControl nodeControl, LedControl ledControl, Dimension dimension) {
 
-        this.spotifyPlayerPanel = new SpotifyPlayerPanel(songControl, dimension);
+        this.spotifyPlayerPanel = new SpotifyPlayerPanel(songControl, eventControl, dimension);
         this.eventEditWindow = new EventEditWindow(eventControl);
         this.nodeEditWindow = new NodeEditWindow(nodeControl);
         this.functionTabbedPane = new FunctionTabbedPane(nodeControl);
