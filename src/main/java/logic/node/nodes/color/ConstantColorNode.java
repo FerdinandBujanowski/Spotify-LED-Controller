@@ -29,6 +29,11 @@ public class ConstantColorNode extends LogicNode {
                 new Object[] { color }
         );
         this.color = color;
+        this.getOutputJoints()[0].getJointDataType().setData(this.color);
+    }
+
+    public ConstantColorNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, NodeType nodeType) {
+        super(nodeIndex, inputJoints, outputJoints, nodeType);
     }
 
     @Override
@@ -46,7 +51,7 @@ public class ConstantColorNode extends LogicNode {
     @Override
     public Color[][] getTextureColorValues(Integer nullInteger) {
         LogicTexture logicTexture = new LogicTexture();
-        logicTexture.setIntensityAt(0, 0, 1, this.color);
+        logicTexture.setIntensityAt(0, 0, 1, (Color) this.getOutputJoints()[0].getJointDataType().getData());
         return logicTexture.getColorValues();
     }
 }

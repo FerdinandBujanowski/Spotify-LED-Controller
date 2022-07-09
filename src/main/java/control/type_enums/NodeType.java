@@ -37,7 +37,7 @@ public enum NodeType {
 
     //COLOR
     CONSTANT_COLOR_NODE("Constant Color", "Color", ConstantColorNode.class, new InputDialogType[] { InputDialogType.COLOR_TYPE_INPUT }, true),
-    CREATE_COLOR_NODE("Create Color", "Color", CreateColorNode.class),
+    CREATE_COLOR_NODE("Create Color", "Color", CreateColorNode.class, true),
     SPLIT_COLOR_NODE("Split Color", "Color", SplitColorNode.class),
 
     //COMPARE
