@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 
-public class SongControl {
+public class SongControl implements SongRequestAcceptor {
 
     SpotifyWebHandler spotifyWebHandler;
     private boolean spotifyConnected;
@@ -70,45 +70,6 @@ public class SongControl {
         this.songSelected = true;
     }
 
-    public void connectToSpotify() {
-        spotifyWebHandler.init();
-        if(spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
-            GetCurrentUsersProfileRequest currentUsersProfileRequest = spotifyWebHandler.getSpotifyApi().getCurrentUsersProfile().build();
-            try {
-                this.lastConnectedUser = currentUsersProfileRequest.execute();
-
-                this.currentAvailableDevices = spotifyWebHandler.getSpotifyApi().getUsersAvailableDevices().build()
-                        .execute();
-
-                this.spotifyConnected = true;
-            } catch (IOException | SpotifyWebApiException | ParseException e) {
-                this.spotifyConnected = false;
-            }
-        }
-    }
-    public String getLastConnectedUserName() {
-        return lastConnectedUser.getDisplayName();
-    }
-
-    public String[] searchSongByName(String input) {
-        SearchTracksRequest searchTracksRequest = spotifyWebHandler.getSpotifyApi().searchTracks(input).build();
-        try {
-            Track[] tracks = searchTracksRequest.execute().getItems();
-            this.lastSearchedSongList = tracks;
-            return Arrays.copyOf(
-                    Arrays.stream(tracks).map(e -> e.getName() + " by " + e.getArtists()[0].getName()).toArray(),
-                    tracks.length,
-                    String[].class
-            );
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            e.printStackTrace();
-        }
-        return new String[] {};
-    }
-
-    public void selectSongBySearchedList(int selectedListIndex) {
-        this.selectSong(this.lastSearchedSongList[selectedListIndex]);
-    }
     public void selectSong(Track track) {
         if(!this.songId.equals(track.getId())) {
             this.songId = track.getId();
@@ -173,10 +134,6 @@ public class SongControl {
             }
         }
     }
-    public ImageIcon getAlbumImage() {
-        return this.albumImage;
-    }
-
     public void updatePlayingState() {
         if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
             GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
@@ -199,7 +156,6 @@ public class SongControl {
             }
         }
     }
-
     public int getUpdatedSongMs() {
         if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
             GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
@@ -215,39 +171,6 @@ public class SongControl {
         return 0;
     }
 
-    public void setCurrentSongMs(int newMs) {
-        this.currentSongMs = newMs;
-    }
-
-    public boolean isSpotifyConnected() {
-        return this.spotifyConnected;
-    }
-
-    public boolean isSongSelected() {
-        return this.songSelected;
-    }
-
-    public boolean isSongPlaying() {
-        return this.songPlaying;
-    }
-
-    public boolean isSongPaused() {
-        return this.songPaused;
-    }
-
-    public boolean isSongSynced() {
-        return false;
-    }
-
-    public String getDeviceNameList() {
-        String output = "";
-        for(Device device : this.currentAvailableDevices) {
-            output += ("<br/>" + device.getName());
-        }
-        if(output.equals("")) return "[no devices]";
-        else return output;
-    }
-
     public CurrentlyPlayingContext onGetCurrentPlayingTrack() {
         GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
                 this.spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
@@ -260,16 +183,58 @@ public class SongControl {
         return currentlyPlayingContext;
     }
 
-    private void onPausePlayback() {
-        PauseUsersPlaybackRequest pauseUsersPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().pauseUsersPlayback().build();
+    @Override
+    public void connectToSpotify() {
+        spotifyWebHandler.init();
+        if(spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
+            GetCurrentUsersProfileRequest currentUsersProfileRequest = spotifyWebHandler.getSpotifyApi().getCurrentUsersProfile().build();
+            try {
+                this.lastConnectedUser = currentUsersProfileRequest.execute();
+
+                this.currentAvailableDevices = spotifyWebHandler.getSpotifyApi().getUsersAvailableDevices().build()
+                        .execute();
+
+                this.spotifyConnected = true;
+            } catch (IOException | SpotifyWebApiException | ParseException e) {
+                this.spotifyConnected = false;
+            }
+        }
+    }
+    @Override
+    public String[] searchSongByName(String input) {
+        SearchTracksRequest searchTracksRequest = spotifyWebHandler.getSpotifyApi().searchTracks(input).build();
         try {
-            pauseUsersPlaybackRequest.execute();
-            this.songPaused = true;
+            Track[] tracks = searchTracksRequest.execute().getItems();
+            this.lastSearchedSongList = tracks;
+            return Arrays.copyOf(
+                    Arrays.stream(tracks).map(e -> e.getName() + " by " + e.getArtists()[0].getName()).toArray(),
+                    tracks.length,
+                    String[].class
+            );
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
         }
+        return new String[] {};
+    }
+    @Override
+    public String getLastConnectedUserName() {
+        return lastConnectedUser.getDisplayName();
+    }
+    @Override
+    public String getDeviceNameList() {
+        String output = "";
+        for(Device device : this.currentAvailableDevices) {
+            output += ("<br/>" + device.getName());
+        }
+        if(output.equals("")) return "[no devices]";
+        else return output;
+    }
+    @Override
+    public void selectSongBySearchedList(int selectedListIndex) {
+        this.selectSong(this.lastSearchedSongList[selectedListIndex]);
     }
 
+    @Override
     public void onStartPlayback() throws NotFoundException {
         StartResumeUsersPlaybackRequest startUsersPlayback = this.spotifyWebHandler.getSpotifyApi().startResumeUsersPlayback()
                 .uris(JsonParser.parseString("[\"spotify:track:" + this.songId + "\"]").getAsJsonArray())
@@ -281,7 +246,15 @@ public class SongControl {
             e.printStackTrace();
         }
     }
-
+    private void onPausePlayback() {
+        PauseUsersPlaybackRequest pauseUsersPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().pauseUsersPlayback().build();
+        try {
+            pauseUsersPlaybackRequest.execute();
+            this.songPaused = true;
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
     private void onResumePlayback() {
         StartResumeUsersPlaybackRequest resumeUsersPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().startResumeUsersPlayback().build();
         try {
@@ -293,7 +266,7 @@ public class SongControl {
             e.printStackTrace();
         }
     }
-
+    @Override
     public void onTogglePlayback() {
         if(this.songSelected && this.songPlaying) {
             if(this.songPaused) {
@@ -304,6 +277,36 @@ public class SongControl {
         }
     }
 
+    @Override
+    public boolean isSpotifyConnected() {
+        return this.spotifyConnected;
+    }
+    @Override
+    public boolean isSongSelected() {
+        return this.songSelected;
+    }
+    @Override
+    public boolean isSongPlaying() {
+        return this.songPlaying;
+    }
+    @Override
+    public boolean isSongPaused() {
+        return this.songPaused;
+    }
+    @Override
+    public boolean isSongSynced() {
+        return false;
+    }
+
+    @Override
+    public int getCurrentSongMs() {
+        return this.currentSongMs;
+    }
+    @Override
+    public void setCurrentSongMs(int newMs) {
+        this.currentSongMs = newMs;
+    }
+    @Override
     public void onSkipTo(int ms) {
         SeekToPositionInCurrentlyPlayingTrackRequest request =
                 this.spotifyWebHandler.getSpotifyApi().seekToPositionInCurrentlyPlayingTrack(ms).build();
@@ -314,7 +317,8 @@ public class SongControl {
         }
     }
 
-    public int getCurrentSongMs() {
-        return this.currentSongMs;
+    @Override
+    public ImageIcon getAlbumImage() {
+        return this.albumImage;
     }
 }

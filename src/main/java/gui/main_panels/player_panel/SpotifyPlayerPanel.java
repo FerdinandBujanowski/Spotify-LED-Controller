@@ -3,6 +3,7 @@ package gui.main_panels.player_panel;
 import com.wrapper.spotify.exceptions.detailed.NotFoundException;
 import control.event.EventControl;
 import control.song.SongControl;
+import control.song.SongRequestAcceptor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +13,7 @@ import java.awt.image.BufferedImage;
 
 public class SpotifyPlayerPanel extends JPanel {
 
-    private SongControl songControl;
+    private final SongRequestAcceptor songControl;
 
     private final JLabel connectedLabel;
     private final JButton connectToSpotifyButton;
@@ -33,7 +34,7 @@ public class SpotifyPlayerPanel extends JPanel {
 
     private final JButton exportTimeMeasureButton;
 
-    public SpotifyPlayerPanel(SongControl songControl, Dimension windowDimension) {
+    public SpotifyPlayerPanel(SongRequestAcceptor songControl, Dimension windowDimension) {
         super(null);
 
         this.setOpaque(true);
