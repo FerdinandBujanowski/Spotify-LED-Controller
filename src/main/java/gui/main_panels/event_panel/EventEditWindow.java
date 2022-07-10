@@ -1,7 +1,6 @@
 package gui.main_panels.event_panel;
 
 import control.event.*;
-import control.node.ThreeCoordinatePoint;
 import control.type_enums.CurveType;
 import control.type_enums.TimeSignature;
 
@@ -12,12 +11,12 @@ import java.util.ArrayList;
 
 public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
-    private EventRequestAcceptor eventControl;
+    private final EventRequestAcceptor eventControl;
 
-    private ArrayList<GraphicTimeMeasure> graphicTimeMeasures;
-    private ArrayList<JLabel> trackLabels;
-    private ArrayList<ArrayList<GraphicEvent>> graphicEvents;
-    private JLabel cursorLabel;
+    private final ArrayList<GraphicTimeMeasure> graphicTimeMeasures;
+    private final ArrayList<JLabel> trackLabels;
+    private final ArrayList<ArrayList<GraphicEvent>> graphicEvents;
+    private final JLabel cursorLabel;
 
     private double eventWidthDivision = 20;
     private TimeSignature barRoster;
@@ -25,7 +24,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     private CurveType defaultCurveType;
     private boolean curveBrush;
 
-    private ArrayList<Point> selectedEvents, copiedEvents;
+    private final ArrayList<Point> selectedEvents;
+    private final ArrayList<Point> copiedEvents;
     private boolean toggleShift, toggleCtrl, toggleG;
     private boolean initiateToggleG;
     private int movingOffset;
@@ -121,9 +121,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
     public void onKeyPressed(KeyEvent e) {
         switch(e.getKeyCode()) {
-            case KeyEvent.VK_ESCAPE -> {
-                this.curveBrush = false;
-            }
+            case KeyEvent.VK_ESCAPE -> this.curveBrush = false;
             case KeyEvent.VK_SHIFT -> {
                 if(!this.toggleCtrl) {
                     this.toggleShift = true;
