@@ -177,6 +177,21 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     }
 
     @Override
+    public ArrayList<Point> onCopyEventsRequest(ArrayList<Point> indexes) {
+        ArrayList<Point> newIndexes = new ArrayList<>();
+        for(Point index : indexes) {
+            Point eventTime = this.logicTracks.get(index.x).getEventTime(index.y);
+            CurveType curveType = this.logicTracks.get(index.x).getCurveTypeAt(index.y);
+
+            Point newIndex = new Point(index.x, this.logicTracks.get(index.x).getCurrentEventCount());
+            this.onAddEventToTrackRequest(newIndex.x, eventTime.x, eventTime.y, curveType);
+
+            newIndexes.add(newIndex);
+        }
+        return newIndexes;
+    }
+
+    @Override
     public void onUpdateEventRequest(int trackIndex, int eventIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew) {
         if(trackIndex == 0) {
 

@@ -53,6 +53,14 @@ public class LogicTrack implements Serializable {
         return eventA.getMsStart() < eventE.getMsStart() && (eventA.getMsStart() + eventA.getMsDuration()) > eventE.getMsStart();
     }
 
+    public int getCurrentEventCount() {
+        return this.eventArrayList.size();
+    }
+
+    public CurveType getCurveTypeAt(int eventIndex) {
+        return this.eventArrayList.get(eventIndex).getCurveType();
+    }
+
     public int getEventIndex(int ms) {
         for(int i = 0; i < this.eventArrayList.size(); i++) {
             LogicEvent event = this.eventArrayList.get(i);

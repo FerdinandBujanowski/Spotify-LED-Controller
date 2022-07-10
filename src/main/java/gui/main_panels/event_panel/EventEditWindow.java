@@ -7,10 +7,7 @@ import control.type_enums.TimeSignature;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class EventEditWindow extends JPanel implements EventGraphicUnit {
@@ -25,12 +22,13 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     private double eventWidthDivision = 20;
     private TimeSignature barRoster;
 
-    private boolean toggleShift, toggleCtrl, toggleG;
-
     private CurveType defaultCurveType;
     private boolean curveBrush;
 
-    private ArrayList<Point> selectedEvents;
+    private ArrayList<Point> selectedEvents, copiedEvents;
+    private boolean toggleShift, toggleCtrl, toggleG;
+    private boolean initiateToggleG;
+    private int movingOffset;
 
     public EventEditWindow(EventRequestAcceptor eventControl) {
         super(null);
@@ -51,12 +49,11 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
         this.barRoster = TimeSignature.ONE_FOUR;
 
-        this.toggleCtrl = false;
-
         this.defaultCurveType = CurveType.CONSTANT;
         this.curveBrush = false;
 
         this.selectedEvents = new ArrayList<>();
+        this.copiedEvents = new ArrayList<>();
 
         this.setOpaque(true);
         this.setBackground(new Color(25, 20, 20));
@@ -83,6 +80,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                     graphicTimeMeasure.resetHoveredBar();
                     repaint();
                 }
+            }
+        });
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                handleG(e.getX());
             }
         });
         this.addKeyListener(new KeyAdapter() {
@@ -133,6 +136,29 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             }
             case KeyEvent.VK_G -> {
                 this.toggleG = !this.toggleG;
+                initiateToggleG = true;
+
+            }
+            case KeyEvent.VK_C -> {
+                if(this.toggleCtrl) {
+                    this.copiedEvents.removeAll(this.copiedEvents);
+                    this.copiedEvents.addAll(this.selectedEvents);
+                }
+            }
+            case KeyEvent.VK_V -> {
+                if(this.toggleCtrl) {
+                    ArrayList<Point> newEventIndexes = this.eventControl.onCopyEventsRequest(this.copiedEvents);
+                    this.removeWholeSelection();
+                    this.selectedEvents.addAll(newEventIndexes);
+                    for(Point currentEvent : newEventIndexes) {
+                        GraphicEvent graphicEvent = this.findGraphicEvent(currentEvent.x, currentEvent.y);
+                        if(graphicEvent != null) {
+                            graphicEvent.setInSelection(true);
+                        }
+                    }
+                    this.toggleG = true;
+                    this.initiateToggleG = true;
+                }
             }
             case KeyEvent.VK_PLUS -> {
                 if(this.toggleCtrl) {
@@ -174,6 +200,33 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         updateBounds();
         this.setLocation((int)Math.round(oldX / this.eventWidthDivision), 0);
         repaint();
+    }
+
+    private void handleG(int x) {
+        if(!this.toggleG) return;
+
+        if(this.initiateToggleG) {
+            this.initiateToggleG = false;
+            this.movingOffset = this.getClosestEventTime(x).x;
+        }
+        int relativeMovement = this.getClosestEventTime(x).x - this.movingOffset;
+        if(relativeMovement == 0) return;
+
+        for(Point selectedEvent : this.selectedEvents) {
+            GraphicEvent graphicEvent = this.findGraphicEvent(selectedEvent.x, selectedEvent.y);
+            if(graphicEvent != null) {
+                this.eventControl.onUpdateEventRequest(
+                        selectedEvent.x,
+                        selectedEvent.y,
+                        graphicEvent.getEventTime().x,
+                        false,
+                        graphicEvent.getCurveType(),
+                        graphicEvent.getEventTime().x + relativeMovement,
+                        graphicEvent.getEventTime().y
+                );
+            }
+        }
+        this.movingOffset = this.movingOffset + relativeMovement;
     }
 
     @Override
@@ -285,8 +338,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
        JLabel trackLabel = new JLabel();
        trackLabel.setOpaque(true);
-        this.setBackground(new Color(25, 20, 20));
-
+       this.setBackground(new Color(25, 20, 20));
 
        this.setPreferredSize(new Dimension(
                this.getPreferredSize().width,
@@ -309,6 +361,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                        );
                    }
                }
+           }
+       });
+       trackLabel.addMouseMotionListener(new MouseMotionAdapter() {
+           @Override
+           public void mouseMoved(MouseEvent e) {
+               handleG(e.getX());
            }
        });
 
