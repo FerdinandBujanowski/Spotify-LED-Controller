@@ -23,6 +23,7 @@ public class GraphicEvent extends JLabel {
     private boolean selected;
     private boolean leftHovered, rightHovered;
     private int lastMovement;
+    private int differenceOnClicked;
 
     public GraphicEvent(int trackIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, EventRequestAcceptor songControl) {
         this.trackIndex = trackIndex;
@@ -35,6 +36,7 @@ public class GraphicEvent extends JLabel {
         this.leftHovered = false;
         this.rightHovered = false;
         this.lastMovement = 0;
+        this.differenceOnClicked = 0;
 
         this.setOpaque(true);
         this.setBackground(curveType != null ? curveType.getColor() : Color.WHITE);
@@ -44,6 +46,12 @@ public class GraphicEvent extends JLabel {
             @Override
             public void mousePressed(MouseEvent e) {
                 if(!eventGraphicUnit.getCurveBrush()) {
+
+                    int x = getX() + e.getX();
+                    Point newTime = eventGraphicUnit.getClosestEventTime(x);
+                    Point startTime = eventGraphicUnit.getClosestEventTime(getX());
+                    differenceOnClicked = newTime.x - startTime.x;
+
                     if(leftHovered) {
                         lastMovement = -1;
                     }
@@ -71,6 +79,7 @@ public class GraphicEvent extends JLabel {
                                 eventTime.y
                         );
                     } else if(e.getButton() == MouseEvent.BUTTON1) {
+
                         if(e.getClickCount() == 2) {
                             songControl.onUpdateEventRequest(
                                     trackIndex,
@@ -139,13 +148,13 @@ public class GraphicEvent extends JLabel {
                             eventTime.x,
                             (newTime.x + newTime.y) - eventTime.x
                     );
-                } else if(lastMovement == 0 && newTime.x != eventTime.x) {
+                } else if(lastMovement == 0 && newTime.x != (eventTime.x + differenceOnClicked)) {
                     songControl.onUpdateEventRequest(
                             trackIndex,
                             eventTime.x,
                             false,
                             getCurveType(),
-                            newTime.x,
+                            newTime.x - differenceOnClicked,
                             eventTime.y
                     );
                 }
