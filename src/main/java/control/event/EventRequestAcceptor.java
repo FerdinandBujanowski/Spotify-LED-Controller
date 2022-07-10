@@ -29,6 +29,6 @@ public interface EventRequestAcceptor {
     void onUpdateTrackRequest(int trackIndex, boolean deleted);
 
     void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType);
-    void onUpdateEventRequest(int trackIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew);
+    void onUpdateEventRequest(int trackIndex, int eventIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew);
     Point getUpdatedEventTime(int trackIndex, int eventIndex);
 }

@@ -33,7 +33,7 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     }
 
     public int getTrackCount() {
-        return this.logicTracks.size();
+        return this.logicTracks.size() - 1;
     }
 
     public double[] getTrackIntensitiesAt(int ms) {
@@ -177,13 +177,10 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     }
 
     @Override
-    public void onUpdateEventRequest(int trackIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew) {
+    public void onUpdateEventRequest(int trackIndex, int eventIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew) {
         if(trackIndex == 0) {
 
         }
-        int eventIndex = this.logicTracks.get(trackIndex).getEventIndex(msStartOld);
-        if(eventIndex == -1) return;
-
         this.logicTracks.get(trackIndex).removeEventAtIndex(eventIndex);
         if(deleted) {
             this.eventWindow.deleteEvent(trackIndex, eventIndex);
@@ -191,7 +188,7 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
         else {
             this.logicTracks.get(trackIndex).addEventToTrack(msStartNew, msDurationNew, curveType, eventIndex);
             Point updatedEventTime = this.getUpdatedEventTime(trackIndex, eventIndex);
-            this.eventWindow.editEvent(trackIndex, msStartOld, updatedEventTime.x, updatedEventTime.y, curveType);
+            this.eventWindow.editEvent(trackIndex, eventIndex, updatedEventTime.x, updatedEventTime.y, curveType);
         }
     }
 

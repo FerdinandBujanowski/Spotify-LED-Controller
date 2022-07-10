@@ -19,6 +19,7 @@ public class LogicTrack implements Serializable {
         try {
             LogicEvent event = new LogicEvent(msStart, msDuration);
             LogicEvent overlappingEvent = this.getOverlappingEvent(event);
+            /*
             while(overlappingEvent != null) {
                 if(event.getMsStart() >= overlappingEvent.getMsStart()) {
                     event.updateEventTime(overlappingEvent.getMsStart(), overlappingEvent.getMsDuration());
@@ -27,6 +28,7 @@ public class LogicTrack implements Serializable {
                 }
                 overlappingEvent = this.getOverlappingEvent(event);
             }
+             */
             event.setCurveType(curveType);
             if(eventIndex == -1) {
                 this.eventArrayList.add(event);

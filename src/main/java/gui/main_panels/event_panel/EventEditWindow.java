@@ -1,6 +1,7 @@
 package gui.main_panels.event_panel;
 
 import control.event.*;
+import control.node.ThreeCoordinatePoint;
 import control.type_enums.CurveType;
 import control.type_enums.TimeSignature;
 
@@ -24,10 +25,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     private double eventWidthDivision = 20;
     private TimeSignature barRoster;
 
-    private boolean toggleCtrl;
+    private boolean toggleShift, toggleCtrl, toggleG;
 
     private CurveType defaultCurveType;
     private boolean curveBrush;
+
+    private ArrayList<Point> selectedEvents;
 
     public EventEditWindow(EventRequestAcceptor eventControl) {
         super(null);
@@ -53,12 +56,16 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         this.defaultCurveType = CurveType.CONSTANT;
         this.curveBrush = false;
 
+        this.selectedEvents = new ArrayList<>();
+
         this.setOpaque(true);
         this.setBackground(new Color(25, 20, 20));
 
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                toggleG = false;
+                removeWholeSelection();
                 requestFocus();
                 repaint();
             }
@@ -101,14 +108,11 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         this.repaint();
     }
 
-    public GraphicEvent findGraphicEvent(int trackIndex, int ms) {
-        for(GraphicEvent graphicEvent : this.graphicEvents.get(trackIndex)) {
-            Point eventTime = graphicEvent.getEventTime();
-            if(ms >= eventTime.x && ms < eventTime.x + eventTime.y) {
-                return graphicEvent;
-            }
+    public GraphicEvent findGraphicEvent(int trackIndex, int eventIndex) {
+        if(this.graphicEvents.size() <= trackIndex || this.graphicEvents.get(trackIndex).size() <= eventIndex) {
+            return null;
         }
-        return null;
+        return this.graphicEvents.get(trackIndex).get(eventIndex);
     }
 
     public void onKeyPressed(KeyEvent e) {
@@ -116,7 +120,20 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             case KeyEvent.VK_ESCAPE -> {
                 this.curveBrush = false;
             }
-            case KeyEvent.VK_CONTROL -> this.toggleCtrl = true;
+            case KeyEvent.VK_SHIFT -> {
+                if(!this.toggleCtrl) {
+                    this.toggleShift = true;
+                }
+            }
+            case KeyEvent.VK_CONTROL -> {
+                if(!this.toggleShift) {
+                    this.toggleCtrl = true;
+                    this.repaint();
+                }
+            }
+            case KeyEvent.VK_G -> {
+                this.toggleG = !this.toggleG;
+            }
             case KeyEvent.VK_PLUS -> {
                 if(this.toggleCtrl) {
                     zoom(true);
@@ -130,8 +147,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
         }
     }
     public void onKeyReleased(KeyEvent e) {
-        switch(e.getKeyCode()) {
-            case KeyEvent.VK_CONTROL -> this.toggleCtrl = false;
+        if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            this.toggleShift = false;
+        }
+        if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            this.toggleCtrl = false;
+            this.repaint();
         }
     }
 
@@ -294,7 +315,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
        this.trackLabels.add(trackLabel);
        this.add(trackLabel);
 
-        JLabel numberLabel = new JLabel("" + this.trackLabels.size());
+        JLabel numberLabel = new JLabel("" + (this.trackLabels.size() - 1));
         numberLabel.setBounds(
                 5,
                 5 + ((this.trackLabels.size() - 1) * 50),
@@ -317,7 +338,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
     @Override
     public void addEventToTrack(int trackNumber, int msStart, int msDuration, CurveType curveType) {
-        GraphicEvent graphicEvent = new GraphicEvent(trackNumber, curveType, msStart, msDuration, this, this.eventControl);
+        int newEventIndex = this.graphicEvents.get(trackNumber).size();
+        GraphicEvent graphicEvent = new GraphicEvent(trackNumber, newEventIndex, curveType, msStart, msDuration, this, this.eventControl);
 
         this.graphicEvents.get(trackNumber).add(graphicEvent);
         this.add(graphicEvent);
@@ -333,8 +355,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
-    public void editEvent(int trackIndex, int msStartOld, int msStartNew, int msDurationNew, CurveType curveTypeNew) {
-        GraphicEvent graphicEvent = this.findGraphicEvent(trackIndex, msStartOld);
+    public void editEvent(int trackIndex, int eventIndex, int msStartNew, int msDurationNew, CurveType curveTypeNew) {
+        GraphicEvent graphicEvent = this.findGraphicEvent(trackIndex, eventIndex);
         graphicEvent.updateEventTime(msStartNew, msDurationNew);
         graphicEvent.setCurveType(curveTypeNew);
         graphicEvent.updateBounds();
@@ -380,14 +402,6 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
-    public void onSelectRequest(int trackIndex, int msStart) {
-        GraphicEvent graphicEvent = this.findGraphicEvent(trackIndex, msStart);
-        if(graphicEvent != null) {
-
-        }
-    }
-
-    @Override
     public CurveType getDefaultCurveType() {
         return this.defaultCurveType;
     }
@@ -403,5 +417,37 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     @Override
     public void setCurveBrush(boolean curveBrush) {
         this.curveBrush = curveBrush;
+    }
+
+    @Override
+    public void onSelectionEvent(int trackIndex, int eventIndex) {
+        GraphicEvent graphicEvent = this.findGraphicEvent(trackIndex, eventIndex);
+        if(graphicEvent == null) return;
+
+        Point selection = new Point(trackIndex, eventIndex);
+
+        if(this.toggleShift) {
+            if(!this.selectedEvents.contains(selection)) {
+                this.selectedEvents.add(selection);
+                graphicEvent.setInSelection(true);
+            }
+        } else if(this.toggleCtrl) {
+            this.selectedEvents.remove(selection);
+            graphicEvent.setInSelection(false);
+        } else {
+            this.removeWholeSelection();
+            this.selectedEvents.add(selection);
+            graphicEvent.setInSelection(true);
+        }
+        this.repaint();
+    }
+
+    private void removeWholeSelection() {
+        this.selectedEvents.removeAll(this.selectedEvents);
+        for(ArrayList<GraphicEvent> allGraphicEvents : this.graphicEvents) {
+            for(GraphicEvent everyGraphicEvent : allGraphicEvents) {
+                everyGraphicEvent.setInSelection(false);
+            }
+        }
     }
 }

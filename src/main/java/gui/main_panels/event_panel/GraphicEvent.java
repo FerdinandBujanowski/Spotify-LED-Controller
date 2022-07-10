@@ -17,26 +17,30 @@ public class GraphicEvent extends JLabel {
     private EventRequestAcceptor songControl;
 
     private CurveType curveType;
-    private int trackIndex;
+    private final int trackIndex, eventIndex;
     private Point eventTime;
 
-    private boolean selected;
     private boolean leftHovered, rightHovered;
     private int lastMovement;
     private int differenceOnClicked;
 
-    public GraphicEvent(int trackIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, EventRequestAcceptor songControl) {
+    private boolean inSelection;
+
+    public GraphicEvent(int trackIndex, int eventIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, EventRequestAcceptor songControl) {
         this.trackIndex = trackIndex;
+        this.eventIndex = eventIndex;
+
         this.curveType = curveType;
         this.eventTime = new Point();
         this.eventGraphicUnit = eventGraphicUnit;
         this.songControl = songControl;
-        
-        this.selected = false;
+
         this.leftHovered = false;
         this.rightHovered = false;
         this.lastMovement = 0;
         this.differenceOnClicked = 0;
+
+        this.inSelection = false;
 
         this.setOpaque(true);
         this.setBackground(curveType != null ? curveType.getColor() : Color.WHITE);
@@ -46,6 +50,8 @@ public class GraphicEvent extends JLabel {
             @Override
             public void mousePressed(MouseEvent e) {
                 if(!eventGraphicUnit.getCurveBrush()) {
+
+                    eventGraphicUnit.onSelectionEvent(trackIndex, eventIndex);
 
                     int x = getX() + e.getX();
                     Point newTime = eventGraphicUnit.getClosestEventTime(x);
@@ -72,6 +78,7 @@ public class GraphicEvent extends JLabel {
 
                         songControl.onUpdateEventRequest(
                                 trackIndex,
+                                eventIndex,
                                 eventTime.x,
                                 false,
                                 newCurveType,
@@ -83,6 +90,7 @@ public class GraphicEvent extends JLabel {
                         if(e.getClickCount() == 2) {
                             songControl.onUpdateEventRequest(
                                     trackIndex,
+                                    eventIndex,
                                     eventTime.x,
                                     true,
                                     getCurveType(),
@@ -95,6 +103,7 @@ public class GraphicEvent extends JLabel {
                     if(e.getButton() == MouseEvent.BUTTON1) {
                         songControl.onUpdateEventRequest(
                                 trackIndex,
+                                eventIndex,
                                 eventTime.x,
                                 false,
                                 eventGraphicUnit.getDefaultCurveType(),
@@ -133,6 +142,7 @@ public class GraphicEvent extends JLabel {
                 if(lastMovement == -1 && newTime.x < (eventTime.x + eventTime.y) && eventTime.x != newTime.x) {
                     songControl.onUpdateEventRequest(
                             trackIndex,
+                            eventIndex,
                             eventTime.x,
                             false,
                             getCurveType(),
@@ -142,6 +152,7 @@ public class GraphicEvent extends JLabel {
                 } else if(lastMovement == 1 && (newTime.x + newTime.y) > eventTime.x && newTime.x != (eventTime.x + eventTime.y - newTime.y)) {
                     songControl.onUpdateEventRequest(
                             trackIndex,
+                            eventIndex,
                             eventTime.x,
                             false,
                             getCurveType(),
@@ -151,6 +162,7 @@ public class GraphicEvent extends JLabel {
                 } else if(lastMovement == 0 && newTime.x != (eventTime.x + differenceOnClicked)) {
                     songControl.onUpdateEventRequest(
                             trackIndex,
+                            eventIndex,
                             eventTime.x,
                             false,
                             getCurveType(),
@@ -229,12 +241,21 @@ public class GraphicEvent extends JLabel {
         return this.lastMovement;
     }
 
+    public void setInSelection(boolean inSelection) {
+        this.inSelection = inSelection;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         g.setColor(Color.BLACK);
         g.drawRect(0, 0, this.getSize().width, this.getSize().height);
+
+        if(this.inSelection) {
+            g.setColor(Color.BLUE);
+            g.fillRect(0, 0, this.getWidth(), this.getHeight());
+        }
 
         g.setColor(this.curveType.getColor().darker());
         g.fillRect(2, 2, this.getWidth() - 4, this.getHeight() - 4);

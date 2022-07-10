@@ -802,7 +802,7 @@ public class MainWindow extends JFrame {
                 this.createTrackNodeMenu.remove(0);
             }
             for(int i = 0; i < eventControl.getTrackCount(); i++) {
-                String trackName = "Track " + (i + 1);
+                String trackName = "Track " + i;
                 JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, i, nodeControl);
                 this.createTrackNodeMenu.add(newTrackNodeItem);
             }

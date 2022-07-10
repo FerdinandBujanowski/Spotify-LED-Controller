@@ -17,17 +17,18 @@ public interface EventGraphicUnit {
 
     void addEventToTrack(int trackIndex, int msStart, int msDuration, CurveType curveType);
     void deleteEvent(int trackIndex, int oldEventIndex);
-    void editEvent(int trackIndex, int msStartOld, int msStartNew, int msDurationNew, CurveType curveTypeNew);
+    void editEvent(int trackIndex, int eventIndex, int msStartNew, int msDurationNew, CurveType curveTypeNew);
     //...
     void tick(int ms);
 
     double getEventWidthDivision();
     Point getClosestEventTime(int pixelInPanel);
-    void onSelectRequest(int trackIndex, int msStart);
 
     CurveType getDefaultCurveType();
     void setDefaultCurveType(CurveType curveType);
 
     boolean getCurveBrush();
     void setCurveBrush(boolean curveBrush);
+
+    void onSelectionEvent(int trackIndex, int eventIndex);
 }

@@ -21,7 +21,7 @@ public class GraphicTimeMeasure extends GraphicEvent {
 
     public GraphicTimeMeasure(TimeMeasure timeMeasure, EventRequestAcceptor eventRequestAcceptor, EventGraphicUnit eventGraphicUnit) {
         super(
-                0,
+                0, 0,
                 null,
                 timeMeasure.getMsStart(),
                 (timeMeasure.getLengthOneBar() * timeMeasure.getBarsDuration()) - (2 * (int)eventGraphicUnit.getEventWidthDivision()),
