@@ -92,6 +92,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             @Override
             public void keyPressed(KeyEvent e) {
                 onKeyPressed(e);
+                repaint();
             }
             @Override
             public void keyReleased(KeyEvent e) {
@@ -137,7 +138,6 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             case KeyEvent.VK_G -> {
                 this.toggleG = !this.toggleG;
                 initiateToggleG = true;
-
             }
             case KeyEvent.VK_C -> {
                 if(this.toggleCtrl) {
@@ -158,6 +158,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                     }
                     this.toggleG = true;
                     this.initiateToggleG = true;
+                }
+            }
+            case KeyEvent.VK_A -> {
+                if(this.toggleCtrl) {
+                    this.removeWholeSelection();
+                    this.selectAllTracks();
                 }
             }
             case KeyEvent.VK_PLUS -> {
@@ -506,6 +512,23 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             for(GraphicEvent everyGraphicEvent : allGraphicEvents) {
                 everyGraphicEvent.setInSelection(false);
             }
+        }
+    }
+
+    private void selectWholeTrack(int trackIndex) {
+        ArrayList<GraphicEvent> currentTrack = this.graphicEvents.get(trackIndex);
+        for(int i = 0; i < currentTrack.size(); i++) {
+            Point selection = new Point(trackIndex, i);
+            if(!this.selectedEvents.contains(selection)) {
+                this.selectedEvents.add(selection);
+                currentTrack.get(i).setInSelection(true);
+            }
+        }
+    }
+
+    private void selectAllTracks() {
+        for(int i = 0; i < this.graphicEvents.size(); i++) {
+            this.selectWholeTrack(i);
         }
     }
 }
