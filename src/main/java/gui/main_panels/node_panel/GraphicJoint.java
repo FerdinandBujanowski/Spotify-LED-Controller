@@ -47,6 +47,8 @@ public class GraphicJoint extends JPanel {
     public void paintComponent(Graphics g) {
         g.setColor(this.hover ? Color.WHITE : this.color);
         g.fillOval(0, 0, this.getWidth(), this.getHeight());
+        g.setColor(g.getColor().darker());
+        g.drawOval(0, 0, this.getWidth(), this.getHeight());
     }
 
     public Color getColor() {

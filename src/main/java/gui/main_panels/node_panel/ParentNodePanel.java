@@ -28,6 +28,8 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
 
     private boolean currentlyMoving;
     private int lastClickedX, lastClickedY;
+    private boolean gridActive;
+    private Point gridOffset;
 
     private double zoomFactor;
     private JLabel zoomLabel;
@@ -49,6 +51,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         this.currentlyMoving = false;
         this.lastClickedX = 0;
         this.lastClickedY = 0;
+        this.gridOffset = new Point(0, 0);
 
         this.zoomFactor = 1;
         this.zoomLabel = new JLabel();
@@ -87,6 +90,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
                     moveEverything(relativeMovement);
                     lastClickedX = e.getX();
                     lastClickedY = e.getY();
+                    repaint();
                 }
             }
 
@@ -193,12 +197,23 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             }
         }
 
-        if(this.toggleCtrl) {
-            ArrayList<ArrayList<Integer>> nodeSets = this.nodeControl.getNodeSets(this.getFunctionIndex());
-            for(ArrayList<Integer> nodeSet : nodeSets) {
-                Point[] bounds = this.getNodeSetBounds(nodeSet);
-                g.setColor(Color.GRAY);
-                g.drawRect(bounds[0].x, bounds[0].y, bounds[1].x - bounds[0].x, bounds[1].y - bounds[0].y);
+        if(this.gridActive && this.graphicNodes.size() > 0) {
+            GraphicNode sampleGraphicNode = this.graphicNodes.get(0);
+            if(sampleGraphicNode == null) return;
+            g.setColor(Color.GRAY);
+
+            int pieceX = sampleGraphicNode.getWidth() / 2;
+            int pieceY = sampleGraphicNode.getWidth() / 8;
+            this.gridOffset.setLocation(
+                    this.gridOffset.x % pieceX,
+                    this.gridOffset.y % pieceY
+            );
+
+            for(int x = this.gridOffset.x; x < this.getWidth(); x += pieceX) {
+                g.fillRect(x, 0, 1, this.getHeight());
+            }
+            for(int y = this.gridOffset.y; y < this.getHeight(); y += pieceY) {
+                g.fillRect(0, y, this.getWidth(), 1);
             }
         }
     }
@@ -207,6 +222,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         for(GraphicNode graphicNode : this.graphicNodes) {
             this.moveGraphicNode(graphicNode, relativeMovement);
         }
+        gridOffset.setLocation(gridOffset.x + relativeMovement.x, gridOffset.y + relativeMovement.y);
         this.repaint();
     }
 
@@ -403,6 +419,10 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             this.selectedNodeIndexes.add(nodeIndex);
         }
         this.repaint();
+    }
+
+    public void setGridActive(boolean gridActive) {
+        this.gridActive = gridActive;
     }
 
     public void onMouseMoved(Point location) {

@@ -274,6 +274,7 @@ public class MainWindow extends JFrame {
         JMenuItem createFunctionMenuItem = new JMenuItem("Create Function");
         this.addFunctionMenu = new JMenu("Add Function");
         JMenuItem cleanUpCanvas = new JMenuItem("Clean up Canvas");
+        JCheckBoxMenuItem gridMenuItem = new JCheckBoxMenuItem("Grid Active");
         this.functionItemList = new ArrayList<>();
 
         createFunctionMenuItem.addActionListener(new ActionListener() {
@@ -324,12 +325,20 @@ public class MainWindow extends JFrame {
                 }
             }
         });
+
+        gridMenuItem.addActionListener(e -> {
+            nodeEditWindow.setGridActive(gridMenuItem.isSelected());
+            nodeEditWindow.repaint();
+        });
+
         this.functionMenu.add(createFunctionMenuItem);
         this.functionMenu.add(addFunctionMenu);
         this.functionMenu.add(new JSeparator());
         this.functionMenu.add(cleanUpCanvas);
+        this.functionMenu.add(gridMenuItem);
         jMenuBar.add(this.functionMenu);
         this.functionMenu.setEnabled(false);
+
         this.ledMenu = new JMenu("LED");
         JMenuItem addLayerMenuItem = new JMenuItem("Add Layer");
         addLayerMenuItem.addActionListener(new ActionListener() {
@@ -427,7 +436,6 @@ public class MainWindow extends JFrame {
 
         JMenuItem refreshPortItem = new JMenuItem("Refresh Ports");
         this.microControllerMenu.add(refreshPortItem);
-        this.microControllerMenu.add(new JSeparator());
 
         JMenu availablePortsMenu = new JMenu("Available Ports");
 
@@ -444,6 +452,19 @@ public class MainWindow extends JFrame {
             }
         });
         this.microControllerMenu.add(availablePortsMenu);
+        this.microControllerMenu.add(new JSeparator());
+
+        JMenuItem uploadColorsItem = new JMenuItem("Upload Current Colors");
+        uploadColorsItem.addActionListener(e -> {
+            ledControl.updatePort();
+        });
+        this.microControllerMenu.add(uploadColorsItem);
+
+        JCheckBoxMenuItem updateEveryTickItem = new JCheckBoxMenuItem("Update Colors Every Tick");
+        updateEveryTickItem.addActionListener(e -> {
+            this.ledEditWindow.setUpdatePortWhenRepaint(updateEveryTickItem.isSelected());
+        });
+        this.microControllerMenu.add(updateEveryTickItem);
 
         this.jMenuBar.add(this.microControllerMenu);
         this.microControllerMenu.setEnabled(false);
@@ -452,7 +473,7 @@ public class MainWindow extends JFrame {
         this.setCorrectLocation();
 
         newProject.addActionListener(e -> {
-            if(bProjectOpen) {
+            if(this.bProjectOpen) {
                 //TODO: Abfangen, dass im Zweifelsfall das geöffnete Programm nicht gespeichert wird
             }
             newProject(songControl, eventControl, nodeControl, ledControl, dimension);

@@ -17,6 +17,8 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     private boolean drawOnlyLedPixels;
     private boolean showIndexes;
     private boolean orderMode;
+    private boolean updatePortWhenRepaint;
+
     private TwoIntegerCorrespondence newOrderCorrespondence;
 
     ArrayList<ThreeCoordinatePoint> newOrder;
@@ -98,6 +100,10 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     public void onKeyPressed(KeyEvent e) {
 
+    }
+
+    public void setUpdatePortWhenRepaint(boolean updatePortWhenRepaint) {
+        this.updatePortWhenRepaint = updatePortWhenRepaint;
     }
 
     @Override
@@ -202,7 +208,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.ledControl.updatePort();
+        if(this.updatePortWhenRepaint) this.ledControl.updatePort();
         for(GraphicPixel graphicPixel : this.graphicPixels) {
             if(!this.orderMode) {
                 graphicPixel.setBackground(this.ledControl.getColorAt(graphicPixel.getPixelX(), graphicPixel.getPixelY()));
