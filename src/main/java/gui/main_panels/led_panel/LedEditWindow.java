@@ -86,6 +86,31 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         };
         this.add(this.pixelPanel);
 
+        LedEditWindow that = this;
+        this.pixelPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount() == 2) {
+                    Point clickPosition = getClosestCoordinates(pixelPanel.getX() + e.getX(), pixelPanel.getY() + e.getY());
+                    try {
+                        ledControl.addPixel(clickPosition.x, clickPosition.y);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                that.getMouseListeners()[0].mousePressed(e);
+            }
+        });
+        this.pixelPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                handleG(pixelPanel.getX() + e.getX(), pixelPanel.getY() + e.getY());
+            }
+        });
+
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
