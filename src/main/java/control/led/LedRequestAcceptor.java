@@ -18,7 +18,7 @@ public interface LedRequestAcceptor {
     Point[] getPixels();
     Point getPixelAt(int pixelIndex);
     int getPixelIndex(int x, int y);
-    void onUpdatePixelRequest(int oldX, int oldY, int newX, int newY, boolean deleted);
+    void onUpdatePixelRequest(int pixelIndex, int newX, int newY, boolean deleted);
     int getFinalDegree();
     Color getColorAt(int x, int y);
 

@@ -38,14 +38,13 @@ public class GraphicPixel extends JLabel {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if(outsideOfBounds(e.getX(), e.getY()) && !orderMode) {
-                    int oldX = getPixelX(), oldY = getPixelY();
                     int newX = getPixelX(), newY = getPixelY();
                     if(e.getX() < 0) newX--;
                     else if(e.getX() > getWidth()) newX++;
                     if(e.getY() < 0) newY--;
                     else if(e.getY() > getHeight()) newY++;
 
-                    ledRequestAcceptor.onUpdatePixelRequest(oldX, oldY, newX, newY, false);
+                    ledRequestAcceptor.onUpdatePixelRequest(pixelIndex, newX, newY, false);
                 }
             }
         });

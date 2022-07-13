@@ -58,17 +58,13 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
     }
 
     @Override
-    public void addPixel(int x, int y) throws Exception {
+    public void addPixel(int x, int y) {
         Point newPixel = new Point(x, y);
-        if(!this.pixels.contains(newPixel)) {
-            int newIndex = this.pixels.size();
-            this.pixels.add(newPixel);
-            this.pixelMask.setIntensityAt(x, y, 1.0);
-            this.ledGraphicUnit.addPixel(newIndex, x, y);
-            this.lastUpdatedColors.add(Color.BLACK);
-        } else {
-            throw new Exception("Pixel already set");
-        }
+        int newIndex = this.pixels.size();
+        this.pixels.add(newPixel);
+        this.pixelMask.setIntensityAt(x, y, 1.0);
+        this.ledGraphicUnit.addPixel(newIndex, x, y);
+        this.lastUpdatedColors.add(Color.BLACK);
         this.ledGraphicUnit.updatePixelBounds();
     }
 
@@ -118,17 +114,19 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
      }
 
      @Override
-     public void onUpdatePixelRequest(int oldX, int oldY, int newX, int newY, boolean deleted) {
-         int pixelIndex = this.getPixelIndex(oldX, oldY);
-         if(pixelIndex == -1) return;
+     public void onUpdatePixelRequest(int pixelIndex, int newX, int newY, boolean deleted) {
 
-         this.pixelMask.setIntensityAt(oldX, oldY, 0);
+         Point oldPosition = this.pixels.get(pixelIndex);
          if(deleted) {
              this.ledGraphicUnit.deletePixel(pixelIndex);
-         } else if(this.getPixelIndex(newX, newY) == -1) {
+         } else {
              this.pixels.set(pixelIndex, new Point(newX, newY));
              this.pixelMask.setIntensityAt(newX, newY, 1);
              this.ledGraphicUnit.movePixel(pixelIndex, newX, newY);
+         }
+
+         if(this.getPixelIndex(oldPosition.x, oldPosition.y) == -1) {
+             this.pixelMask.setIntensityAt(oldPosition.x, oldPosition.y, 0);
          }
          this.pixelMask.cleanUp();
      }

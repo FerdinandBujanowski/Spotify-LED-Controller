@@ -137,6 +137,13 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 this.toggleG = !this.toggleG;
                 initiateToggleG = true;
             }
+            case KeyEvent.VK_J -> {
+                if(this.selectedEvents.size() > 0) {
+                    int lastSelectedTrack = this.selectedEvents.get(this.selectedEvents.size() - 1).x;
+                    this.removeWholeSelection();
+                    this.selectWholeTrack(lastSelectedTrack);
+                }
+            }
             case KeyEvent.VK_C -> {
                 if(this.toggleCtrl) {
                     this.copiedEvents.removeAll(this.copiedEvents);
