@@ -3,10 +3,14 @@ package gui.main_panels.led_panel;
 import control.led.*;
 import control.node.ThreeCoordinatePoint;
 import control.node.TwoIntegerCorrespondence;
+import gui.main_panels.node_panel.GraphicNode;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class LedEditWindow extends JPanel implements LedGraphicUnit {
@@ -19,9 +23,10 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     private boolean orderMode;
     private boolean updatePortWhenRepaint;
 
-    private TwoIntegerCorrespondence newOrderCorrespondence;
-
     ArrayList<ThreeCoordinatePoint> newOrder;
+
+    private ArrayList<Integer> selectedPixelIndexes, copiedPixelIndexes;
+    private boolean toggleShift, toggleCtrl, toggleG;
 
     private ArrayList<GraphicPixel> graphicPixels;
     private LayersPanel layersPanel;
@@ -38,9 +43,11 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         this.drawOnlyLedPixels = false;
         this.showIndexes = false;
         this.orderMode = false;
-        this.newOrderCorrespondence = new TwoIntegerCorrespondence();
 
         this.newOrder = new ArrayList<>();
+
+        this.selectedPixelIndexes = new ArrayList<>();
+        this.copiedPixelIndexes = new ArrayList<>();
 
         this.graphicPixels = new ArrayList<>();
         this.layersPanel = new LayersPanel(ledControl, this);
@@ -78,6 +85,27 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         };
         this.add(this.pixelPanel);
 
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                toggleG = false;
+                removeWholeSelection();
+                requestFocus();
+                repaint();
+            }
+        });
+
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                onKeyPressed(e);
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                onKeyReleased(e);
+            }
+        });
+
         this.setOpaque(true);
         this.setBackground(new Color(25, 20, 20));
         this.resizeComponents(windowDimension);
@@ -99,7 +127,60 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     public void onKeyPressed(KeyEvent e) {
+        switch(e.getKeyCode()) {
+            case KeyEvent.VK_SHIFT -> {
+                if(!this.toggleCtrl) {
+                    this.toggleShift = true;
+                }
+            }
+            case KeyEvent.VK_CONTROL -> {
+                if(!this.toggleShift) {
+                    this.toggleCtrl = true;
+                    this.repaint();
+                }
+            }
+            case KeyEvent.VK_G -> {
+                this.toggleG = !this.toggleG;
+            }
+            case KeyEvent.VK_C -> {
+                if(this.toggleCtrl) {
+                    this.copiedPixelIndexes.removeAll(this.copiedPixelIndexes);
+                    this.copiedPixelIndexes.addAll(this.selectedPixelIndexes);
+                }
+            }
+            case KeyEvent.VK_V -> {
+                if(this.toggleCtrl) {
+                    /*
+                    ArrayList<Integer> newNodeIndexes = this.nodeControl.copyNodes(this.copiedNodeIndexes, this.getFunctionIndex());
+                    this.selectedNodeIndexes.removeAll(this.selectedNodeIndexes);
+                    this.selectedNodeIndexes.addAll(newNodeIndexes);
+                    this.toggleG = true;
+                     */
+                }
+            }
+            case KeyEvent.VK_A -> {
+                if(this.toggleCtrl) {
+                    /*
+                    this.selectedNodeIndexes.removeAll(this.selectedNodeIndexes);
+                    for(GraphicNode graphicNode : this.graphicNodes) {
+                        this.selectedNodeIndexes.add(graphicNode.getIndexes().y);
+                        repaint();
+                    }
+                     */
+                }
+            }
+        }
+    }
 
+    public void onKeyReleased(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            this.toggleShift = false;
+            repaint();
+        }
+        if(e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            this.toggleCtrl = false;
+            this.repaint();
+        }
     }
 
     public void setUpdatePortWhenRepaint(boolean updatePortWhenRepaint) {
@@ -203,6 +284,33 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         GraphicPixel graphicPixel = this.graphicPixels.get(oldIndex);
         this.newOrder.add(new ThreeCoordinatePoint(this.newOrder.size(), graphicPixel.getPixelX(), graphicPixel.getPixelY()));
         this.graphicPixels.get(oldIndex).setOrdered(true);
+    }
+
+    @Override
+    public void handleSelection(int pixelIndex) {
+        if(this.graphicPixels.get(pixelIndex) == null) return;
+
+        if(this.toggleShift) {
+            if(!this.selectedPixelIndexes.contains(pixelIndex)) {
+                this.selectedPixelIndexes.add(pixelIndex);
+                this.graphicPixels.get(pixelIndex).setInSelection(true);
+            }
+        } else if(this.toggleCtrl) {
+            this.selectedPixelIndexes.remove((Integer) pixelIndex);
+            this.graphicPixels.get(pixelIndex).setInSelection(false);
+        } else {
+            this.removeWholeSelection();
+            this.selectedPixelIndexes.add(pixelIndex);
+            this.graphicPixels.get(pixelIndex).setInSelection(true);
+        }
+        repaint();
+    }
+
+    private void removeWholeSelection() {
+        while(!this.selectedPixelIndexes.isEmpty()) {
+            this.graphicPixels.get(this.selectedPixelIndexes.get(0)).setInSelection(false);
+            this.selectedPixelIndexes.remove(0);
+        }
     }
 
     @Override

@@ -114,10 +114,6 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
 
         this.selectedNodeIndexes = new ArrayList<>();
         this.copiedNodeIndexes = new ArrayList<>();
-        this.toggleShift = false;
-        this.toggleCtrl = false;
-        this.toggleG = false;
-
         this.requestFocus();
     }
 
@@ -293,7 +289,6 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             }
         }
     }
-
 
     public void onOutputNodeReleased(int nodeIndex, int outputJointIndex) throws FunctionNodeInUseException, JointConnectionFailedException {
         this.getNodeControl().updateOutputJointReleased(this.functionIndex, nodeIndex, outputJointIndex);

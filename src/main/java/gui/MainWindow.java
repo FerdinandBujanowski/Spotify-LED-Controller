@@ -618,40 +618,6 @@ public class MainWindow extends JFrame {
         });
 
         this.setFocusable(true);
-        this.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                switch(tabbedPane.getSelectedIndex()) {
-                    case 1 -> {
-                        eventEditWindow.onKeyPressed(e);
-                    }
-                    case 2 -> {
-                        nodeEditWindow.onKeyPressed(e);
-                    }
-                    case 3 -> {
-                        functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).onKeyPressed(e);
-                    }
-                    case 4 -> {
-                        ledEditWindow.onKeyPressed(e);
-                    }
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                switch(tabbedPane.getSelectedIndex()) {
-                    case 1 -> {
-                        eventEditWindow.onKeyReleased(e);
-                    }
-                    case 2 -> {
-                        nodeEditWindow.onKeyReleased(e);
-                    }
-                    case 3 -> {
-                        functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).onKeyReleased(e);
-                    }
-                }
-            }
-        });
 
         this.addComponentListener(new ComponentAdapter() {
             @Override

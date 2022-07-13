@@ -100,6 +100,17 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             }
         });
 
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                onKeyPressed(e);
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                onKeyReleased(e);
+            }
+        });
+
         eventControl.onAddTimeMeasureRequest(4, 60, 0, 16);
         eventControl.onAddTrackRequest();
     }

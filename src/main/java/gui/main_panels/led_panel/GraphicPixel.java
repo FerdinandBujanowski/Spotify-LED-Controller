@@ -16,6 +16,7 @@ public class GraphicPixel extends JLabel {
     private final int pixelIndex;
 
     private boolean orderMode, ordered;
+    private boolean inSelection;
 
     private final LedRequestAcceptor ledRequestAcceptor;
     private final LedGraphicUnit ledGraphicUnit;
@@ -54,6 +55,8 @@ public class GraphicPixel extends JLabel {
             public void mousePressed(MouseEvent e) {
                 if(orderMode) {
                     ledGraphicUnit.requestPixelOrdered(pixelIndex);
+                } else {
+                    ledGraphicUnit.handleSelection(pixelIndex);
                 }
             }
             @Override
@@ -81,7 +84,7 @@ public class GraphicPixel extends JLabel {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.WHITE);
+        g.setColor(this.inSelection ? Color.BLUE : Color.WHITE);
         g.drawRect(0, 0, this.getWidth() - 1, this.getHeight() - 1);
     }
 
@@ -108,5 +111,9 @@ public class GraphicPixel extends JLabel {
 
     public boolean isOrdered() {
         return this.ordered;
+    }
+
+    public void setInSelection(boolean inSelection) {
+        this.inSelection = inSelection;
     }
 }
