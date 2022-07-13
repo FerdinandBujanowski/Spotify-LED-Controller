@@ -7,15 +7,13 @@ import gui.main_panels.node_panel.GraphicNode;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     private LedRequestAcceptor ledControl;
+
     private int finalDegree;
     private int extraSpace;
     private boolean drawOnlyLedPixels;
@@ -27,6 +25,8 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     private ArrayList<Integer> selectedPixelIndexes, copiedPixelIndexes;
     private boolean toggleShift, toggleCtrl, toggleG;
+    private boolean initiateToggleG;
+    private Point movingOffset;
 
     private ArrayList<GraphicPixel> graphicPixels;
     private LayersPanel layersPanel;
@@ -48,6 +48,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
         this.selectedPixelIndexes = new ArrayList<>();
         this.copiedPixelIndexes = new ArrayList<>();
+        this.movingOffset = new Point();
 
         this.graphicPixels = new ArrayList<>();
         this.layersPanel = new LayersPanel(ledControl, this);
@@ -91,7 +92,15 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
                 toggleG = false;
                 removeWholeSelection();
                 requestFocus();
+                updatePixelBounds();
                 repaint();
+            }
+        });
+
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                handleG(e.getX(), e.getY());
             }
         });
 
@@ -141,6 +150,8 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
             }
             case KeyEvent.VK_G -> {
                 this.toggleG = !this.toggleG;
+                initiateToggleG = true;
+                if(!this.toggleG) this.updatePixelBounds();
             }
             case KeyEvent.VK_C -> {
                 if(this.toggleCtrl) {
@@ -160,14 +171,13 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
             }
             case KeyEvent.VK_A -> {
                 if(this.toggleCtrl) {
-                    /*
-                    this.selectedNodeIndexes.removeAll(this.selectedNodeIndexes);
-                    for(GraphicNode graphicNode : this.graphicNodes) {
-                        this.selectedNodeIndexes.add(graphicNode.getIndexes().y);
-                        repaint();
+                    this.removeWholeSelection();
+                    for(int i = 0; i < this.graphicPixels.size(); i++) {
+                        this.selectedPixelIndexes.add(i);
+                        this.graphicPixels.get(i).setInSelection(true);
                     }
-                     */
                 }
+                repaint();
             }
         }
     }
@@ -185,6 +195,21 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     public void setUpdatePortWhenRepaint(boolean updatePortWhenRepaint) {
         this.updatePortWhenRepaint = updatePortWhenRepaint;
+    }
+
+    private Point getClosestCoordinates(int x, int y) {
+        int pixelLength = (this.finalDegree * 2) + 1;
+        int step = (int)Math.round(this.pixelPanel.getWidth() / (double)pixelLength);
+
+        int xInPanel = (x - this.pixelPanel.getX() - this.extraSpace);
+        int yInPanel = (y - this.pixelPanel.getY() - this.extraSpace);
+
+        int pixelX = (xInPanel - (xInPanel % step)) / step - finalDegree;
+        if(xInPanel < 0) pixelX--;
+        int pixelY = (yInPanel - (yInPanel % step)) / step - finalDegree;
+        if(yInPanel < 0) pixelY--;
+
+        return new Point(pixelX, pixelY);
     }
 
     @Override
@@ -303,6 +328,29 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
             this.selectedPixelIndexes.add(pixelIndex);
             this.graphicPixels.get(pixelIndex).setInSelection(true);
         }
+        repaint();
+    }
+
+    @Override
+    public void handleG(int x, int y) {
+        if(!this.toggleG) return;
+
+        if(this.initiateToggleG) {
+            this.initiateToggleG = false;
+            this.movingOffset = this.getClosestCoordinates(x, y);
+        }
+        Point closestCoordinates = this.getClosestCoordinates(x, y);
+        Point relativeMovement = new Point(closestCoordinates.x - this.movingOffset.x, closestCoordinates.y - this.movingOffset.y);
+
+        if(relativeMovement.x == 0 && relativeMovement.y == 0) return;
+
+        for(int index : this.selectedPixelIndexes) {
+            GraphicPixel currentPixel = this.graphicPixels.get(index);
+            if(currentPixel != null) {
+                this.ledControl.onUpdatePixelRequest(index, currentPixel.getPixelX() + relativeMovement.x, currentPixel.getPixelY() + relativeMovement.y, false);
+            }
+        }
+        this.movingOffset.setLocation(this.movingOffset.x + relativeMovement.x, this.movingOffset.y + relativeMovement.y);
         repaint();
     }
 

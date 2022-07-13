@@ -13,6 +13,8 @@ public interface LedRequestAcceptor {
     void addPixel(int x, int y) throws Exception;
     void requestNewOrder(ArrayList<ThreeCoordinatePoint> newOrder);
 
+    ArrayList<Integer> onCopyLedsRequest(ArrayList<Integer> indexes);
+
     void enableLayer(int layerIndex, boolean isEnabled);
 
     Point[] getPixels();

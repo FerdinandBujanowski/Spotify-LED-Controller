@@ -18,4 +18,5 @@ public interface LedGraphicUnit {
     void requestPixelOrdered(int oldIndex);
 
     void handleSelection(int pixelIndex);
+    void handleG(int x, int y);
 }

@@ -48,6 +48,11 @@ public class GraphicPixel extends JLabel {
                     ledRequestAcceptor.onUpdatePixelRequest(pixelIndex, newX, newY, false);
                 }
             }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                ledGraphicUnit.handleG(getX() + e.getX(), getY() + e.getY());
+            }
         });
 
         this.addMouseListener(new MouseAdapter() {

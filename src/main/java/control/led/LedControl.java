@@ -81,7 +81,22 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
         this.ledGraphicUnit.updatePixelBounds();
      }
 
-     @Override
+    @Override
+    public ArrayList<Integer> onCopyLedsRequest(ArrayList<Integer> indexes) {
+        ArrayList<Integer> newIndexes = new ArrayList<>();
+
+        for(int index : indexes) {
+            Point oldPixel = this.pixels.get(index);
+            if(oldPixel != null) {
+                int newIndex = this.pixels.size();
+                this.addPixel(oldPixel.x, oldPixel.y);
+                newIndexes.add(newIndex);
+            }
+        }
+        return newIndexes;
+    }
+
+    @Override
      public void enableLayer(int layerIndex, boolean isEnabled) {
         this.logicLayers.get(layerIndex).setEnabled(isEnabled);
         this.ledGraphicUnit.updatePixelBounds();
