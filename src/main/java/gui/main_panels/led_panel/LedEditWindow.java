@@ -161,12 +161,14 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
             }
             case KeyEvent.VK_V -> {
                 if(this.toggleCtrl) {
-                    /*
-                    ArrayList<Integer> newNodeIndexes = this.nodeControl.copyNodes(this.copiedNodeIndexes, this.getFunctionIndex());
-                    this.selectedNodeIndexes.removeAll(this.selectedNodeIndexes);
-                    this.selectedNodeIndexes.addAll(newNodeIndexes);
+                    ArrayList<Integer> newIndexes = this.ledControl.onCopyLedsRequest(this.selectedPixelIndexes);
+                    this.removeWholeSelection();
+                    for(int index : newIndexes) {
+                        this.graphicPixels.get(index).setInSelection(true);
+                        this.selectedPixelIndexes.add(index);
+                    }
                     this.toggleG = true;
-                     */
+                    this.initiateToggleG = true;
                 }
             }
             case KeyEvent.VK_A -> {
