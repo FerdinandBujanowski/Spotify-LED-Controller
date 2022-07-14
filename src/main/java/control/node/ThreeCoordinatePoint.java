@@ -1,6 +1,8 @@
 package control.node;
 
+import java.awt.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class ThreeCoordinatePoint implements Serializable {
@@ -24,6 +26,17 @@ public class ThreeCoordinatePoint implements Serializable {
     }
     public int getZ() {
         return this.z;
+    }
+
+    public boolean containsYZ(Point point) {
+        return this.getY() == point.x && this.getZ() == point.y;
+    }
+
+    public static boolean listContainsYZ(ArrayList<ThreeCoordinatePoint> list, Point point) {
+        for(ThreeCoordinatePoint threeCoordinatePoint : list) {
+            if(threeCoordinatePoint.containsYZ(point)) return true;
+        }
+        return false;
     }
 
     @Override

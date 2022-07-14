@@ -333,9 +333,30 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
     @Override
     public void requestPixelOrdered(int oldIndex) {
-        GraphicPixel graphicPixel = this.graphicPixels.get(oldIndex);
-        this.newOrder.add(new ThreeCoordinatePoint(this.newOrder.size(), graphicPixel.getPixelX(), graphicPixel.getPixelY()));
-        this.graphicPixels.get(oldIndex).setOrdered(true);
+        if(this.toggleShift) {
+            ThreeCoordinatePoint lastOrderedPixel = this.newOrder.get(this.newOrder.size() - 1);
+            GraphicPixel lastPixel = this.graphicPixels.get(oldIndex);
+
+            System.out.println(lastOrderedPixel.getY() + " -> " + lastPixel.getPixelX() + ", " + lastOrderedPixel.getZ() + " -> " + lastPixel.getPixelY());
+            Point from = new Point(lastOrderedPixel.getY(), lastOrderedPixel.getZ());
+            Point to = new Point(lastPixel.getPixelX(), lastPixel.getPixelY());
+            for(int y = Math.min(from.y, to.y); y <= Math.max(from.y, to.y); y++) {
+                for(int x = Math.min(from.x, to.x); x <= Math.max(from.x, to.x); x++) {
+                    int pixelIndex = this.ledControl.getPixelIndex(x, y);
+                    if(pixelIndex != -1) {
+                        GraphicPixel currentGraphicPixel = this.graphicPixels.get(pixelIndex);
+                        if(!currentGraphicPixel.isOrdered()) {
+                            this.newOrder.add(new ThreeCoordinatePoint(this.newOrder.size(), x, y));
+                            currentGraphicPixel.setOrdered(true);
+                        }
+                    }
+                }
+            }
+        } else {
+            GraphicPixel graphicPixel = this.graphicPixels.get(oldIndex);
+            this.newOrder.add(new ThreeCoordinatePoint(this.newOrder.size(), graphicPixel.getPixelX(), graphicPixel.getPixelY()));
+            this.graphicPixels.get(oldIndex).setOrdered(true);
+        }
     }
 
     @Override
