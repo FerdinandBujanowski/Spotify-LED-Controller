@@ -294,6 +294,11 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     @Override
     public void deletePixel(int index) {
         this.remove(this.graphicPixels.get(index));
+        this.graphicPixels.remove(index);
+        for(int i = index; i < this.graphicPixels.size(); i++) {
+            this.graphicPixels.get(i).pushBackIndex();
+            this.graphicPixels.get(i).showIndex(this.showIndexes);
+        }
     }
 
     @Override

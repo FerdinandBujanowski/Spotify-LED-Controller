@@ -13,7 +13,7 @@ public class GraphicPixel extends JLabel {
 
     private int pixelX;
     private int pixelY;
-    private final int pixelIndex;
+    private int pixelIndex;
 
     private boolean orderMode, ordered;
     private boolean inSelection;
@@ -45,7 +45,7 @@ public class GraphicPixel extends JLabel {
                     if(e.getY() < 0) newY--;
                     else if(e.getY() > getHeight()) newY++;
 
-                    ledRequestAcceptor.onUpdatePixelRequest(pixelIndex, newX, newY, false);
+                    ledRequestAcceptor.onUpdatePixelRequest(getPixelIndex(), newX, newY, false);
                 }
             }
 
@@ -68,6 +68,12 @@ public class GraphicPixel extends JLabel {
             public void mouseReleased(MouseEvent e) {
                 ledGraphicUnit.updatePixelBounds();
             }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount() == 2) {
+                    ledRequestAcceptor.onDeletePixelRequest(pixelIndex);
+                }
+            }
         });
     }
 
@@ -80,6 +86,9 @@ public class GraphicPixel extends JLabel {
 
     public int getPixelIndex() {
         return this.pixelIndex;
+    }
+    public void pushBackIndex() {
+        this.pixelIndex--;
     }
 
     public void setNewCoordinates(int newX, int newY) {

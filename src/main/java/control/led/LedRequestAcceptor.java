@@ -11,6 +11,7 @@ public interface LedRequestAcceptor {
     void setLedGraphicUnit(LedGraphicUnit ledGraphicUnit);
     void onAddLayerRequest();
     void addPixel(int x, int y) throws Exception;
+    void onDeletePixelRequest(int pixelIndex);
     void requestNewOrder(ArrayList<ThreeCoordinatePoint> newOrder);
 
     ArrayList<Integer> onCopyLedsRequest(ArrayList<Integer> indexes);

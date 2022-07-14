@@ -68,7 +68,19 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
         this.ledGraphicUnit.updatePixelBounds();
     }
 
-     @Override
+    @Override
+    public void onDeletePixelRequest(int pixelIndex) {
+        if(this.pixels.size() < pixelIndex) return;
+
+        Point oldPixel = this.pixels.get(pixelIndex);
+        this.pixels.remove(pixelIndex);
+        if(this.getPixelIndex(oldPixel.x, oldPixel.y) == -1) {
+            this.pixelMask.setIntensityAt(oldPixel.x, oldPixel.y, 0.d);
+        }
+        this.ledGraphicUnit.deletePixel(pixelIndex);
+    }
+
+    @Override
      public void requestNewOrder(ArrayList<ThreeCoordinatePoint> newOrder) {
         for(ThreeCoordinatePoint threeCoordinatePoint : newOrder) {
             Point oldPosition = this.pixels.get(threeCoordinatePoint.getX());
