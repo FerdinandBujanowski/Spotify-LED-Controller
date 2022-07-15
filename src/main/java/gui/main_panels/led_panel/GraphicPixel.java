@@ -45,7 +45,9 @@ public class GraphicPixel extends JLabel {
                     if(e.getY() < 0) newY--;
                     else if(e.getY() > getHeight()) newY++;
 
-                    ledRequestAcceptor.onUpdatePixelRequest(getPixelIndex(), newX, newY, false);
+                    if(ledGraphicUnit.canEditPixels()) {
+                        ledRequestAcceptor.onUpdatePixelRequest(getPixelIndex(), newX, newY, false);
+                    }
                 }
             }
 
@@ -71,7 +73,9 @@ public class GraphicPixel extends JLabel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(e.getClickCount() == 2) {
-                    ledRequestAcceptor.onDeletePixelRequest(pixelIndex);
+                    if(ledGraphicUnit.canEditPixels()) {
+                        ledRequestAcceptor.onDeletePixelRequest(pixelIndex);
+                    }
                 }
             }
         });

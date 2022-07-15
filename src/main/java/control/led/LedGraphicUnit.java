@@ -15,6 +15,7 @@ public interface LedGraphicUnit {
     void showIndexes(boolean showIndexes);
     boolean isShowIndexes();
     void setOrderMode(boolean orderMode, boolean submit);
+    boolean canEditPixels();
     void requestPixelOrdered(int oldIndex);
 
     void handleSelection(int pixelIndex);

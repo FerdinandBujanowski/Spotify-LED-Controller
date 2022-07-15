@@ -21,12 +21,13 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     private boolean orderMode;
     private boolean updatePortWhenRepaint;
 
-    ArrayList<ThreeCoordinatePoint> newOrder;
+    private ArrayList<ThreeCoordinatePoint> newOrder;
 
     private ArrayList<Integer> selectedPixelIndexes, copiedPixelIndexes;
     private boolean toggleShift, toggleCtrl, toggleG;
     private boolean initiateToggleG;
     private Point movingOffset;
+    private ArrayList<Point> checkedPixels;
 
     private ArrayList<GraphicPixel> graphicPixels;
     private LayersPanel layersPanel;
@@ -49,6 +50,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         this.selectedPixelIndexes = new ArrayList<>();
         this.copiedPixelIndexes = new ArrayList<>();
         this.movingOffset = new Point();
+        this.checkedPixels = new ArrayList<>();
 
         this.graphicPixels = new ArrayList<>();
         this.layersPanel = new LayersPanel(ledControl, this);
@@ -90,7 +92,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         this.pixelPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(e.getClickCount() == 2) {
+                if(e.getClickCount() == 2 && canEditPixels()) {
                     Point clickPosition = getClosestCoordinates(pixelPanel.getX() + e.getX(), pixelPanel.getY() + e.getY());
                     try {
                         ledControl.addPixel(clickPosition.x, clickPosition.y);
@@ -186,7 +188,7 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
             }
             case KeyEvent.VK_V -> {
                 if(this.toggleCtrl) {
-                    ArrayList<Integer> newIndexes = this.ledControl.onCopyLedsRequest(this.selectedPixelIndexes);
+                    ArrayList<Integer> newIndexes = this.ledControl.onCopyLedsRequest(this.copiedPixelIndexes);
                     this.removeWholeSelection();
                     for(int index : newIndexes) {
                         this.graphicPixels.get(index).setInSelection(true);
@@ -206,7 +208,23 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
                 }
                 repaint();
             }
+            case KeyEvent.VK_J -> {
+                this.checkedPixels.removeAll(this.checkedPixels);
+                Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+                Point componentLocation = this.getLocationOnScreen();
+                Point closestCoordinates = this.getClosestCoordinates(mouseLocation.x - componentLocation.x, mouseLocation.y - componentLocation.y);
+                this.handleJ(closestCoordinates.x, closestCoordinates.y);
+
+                for(Point checkedPixel : this.checkedPixels) {
+                    int index = ledControl.getPixelIndex(checkedPixel.x, checkedPixel.y);
+                    if(!this.selectedPixelIndexes.contains(index)) {
+                        this.selectedPixelIndexes.add(index);
+                        this.graphicPixels.get(index).setInSelection(true);
+                    }
+                }
+            }
         }
+        repaint();
     }
 
     public void onKeyReleased(KeyEvent e) {
@@ -237,6 +255,19 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         if(yInPanel < 0) pixelY--;
 
         return new Point(pixelX, pixelY);
+    }
+
+    private void handleJ(int x, int y) {
+        Point thisPoint = new Point(x, y);
+        if(ledControl.getPixelIndex(x, y) == -1 || this.checkedPixels.contains(thisPoint)) return;
+
+        this.checkedPixels.add(thisPoint);
+        for(int cX = x - 1; cX <= x + 1; cX++) {
+            for(int cY = y - 1; cY <= y + 1; cY++) {
+                handleJ(cX, cY);
+            }
+        }
+
     }
 
     @Override
@@ -295,10 +326,13 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     public void deletePixel(int index) {
         this.remove(this.graphicPixels.get(index));
         this.graphicPixels.remove(index);
+        if(this.selectedPixelIndexes.contains(index)) this.selectedPixelIndexes.remove((Integer) index);
+        if(this.copiedPixelIndexes.contains(index)) this.copiedPixelIndexes.remove((Integer) index);
         for(int i = index; i < this.graphicPixels.size(); i++) {
             this.graphicPixels.get(i).pushBackIndex();
             this.graphicPixels.get(i).showIndex(this.showIndexes);
         }
+        this.repaint();
     }
 
     @Override
@@ -337,12 +371,16 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
     }
 
     @Override
+    public boolean canEditPixels() {
+        return(!this.orderMode && !this.toggleG && !this.toggleShift);
+    }
+
+    @Override
     public void requestPixelOrdered(int oldIndex) {
         if(this.toggleShift) {
             ThreeCoordinatePoint lastOrderedPixel = this.newOrder.get(this.newOrder.size() - 1);
             GraphicPixel lastPixel = this.graphicPixels.get(oldIndex);
 
-            System.out.println(lastOrderedPixel.getY() + " -> " + lastPixel.getPixelX() + ", " + lastOrderedPixel.getZ() + " -> " + lastPixel.getPixelY());
             Point from = new Point(lastOrderedPixel.getY(), lastOrderedPixel.getZ());
             Point to = new Point(lastPixel.getPixelX(), lastPixel.getPixelY());
             for(int y = Math.min(from.y, to.y); y <= Math.max(from.y, to.y); y++) {
