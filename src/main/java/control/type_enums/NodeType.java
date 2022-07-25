@@ -77,6 +77,7 @@ public enum NodeType {
     SCALE_MASK_NODE("Scale Mask", "Mask", ScaleMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
     ROTATE_MASK_NODE("Rotate Mask", "Mask", RotateMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
     SHOW_MASK_NODE("Show Mask", "Mask", ShowMaskNode.class, true),
+    RANDOM_MASK_NODE("Random Mask", "Mask", RandomMaskNode.class, true),
     GET_DEGREE_NODE("Get Degree", "Mask", GetDegreeNode.class, false),
 
     //MATH FUNCTIONS

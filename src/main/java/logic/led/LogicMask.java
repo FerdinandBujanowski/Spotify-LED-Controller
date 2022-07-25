@@ -57,6 +57,11 @@ public class LogicMask implements Serializable {
         return degree;
     }
 
+    public boolean isEmpty() {
+        this.cleanUp();
+        return this.pixels.size() == 0;
+    }
+
     public Double[][] getValues() {
         this.cleanUp();
         int degree = this.getDegree();

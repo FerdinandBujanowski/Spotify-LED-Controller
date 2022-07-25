@@ -2,6 +2,7 @@ package gui.main_panels.node_panel;
 
 import control.node.NodeConnection;
 import control.node.NodeRequestAcceptor;
+import control.save.JsonWriter;
 import control.type_enums.JointType;
 
 import java.awt.*;

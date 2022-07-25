@@ -93,21 +93,23 @@ public class MainWindow extends JFrame {
         JMenuItem loadNodes = new JMenuItem("Load Nodes");
         JMenuItem exportLeds = new JMenuItem("Export LEDs");
         JMenuItem loadLeds = new JMenuItem("Load LEDs");
+        JMenu importMenu = new JMenu("Import");
+        importMenu.add(loadTracks);
+        importMenu.add(loadTimeMeasures);
+        importMenu.add(loadNodes);
+        importMenu.add(loadLeds);
+        JMenu exportMenu = new JMenu("Export");
+        exportMenu.add(exportTracks);
+        exportMenu.add(exportTimeMeasures);
+        exportMenu.add(exportNodes);
+        exportMenu.add(exportLeds);
         fileMenu.add(newProject);
         fileMenu.add(openProject);
         fileMenu.add(new JSeparator());
         fileMenu.add(saveProject);
         fileMenu.add(new JSeparator());
-        fileMenu.add(exportTracks);
-        fileMenu.add(loadTracks);
-        fileMenu.add(exportTimeMeasures);
-        fileMenu.add(loadTimeMeasures);
-        fileMenu.add(new JSeparator());
-        fileMenu.add(exportNodes);
-        fileMenu.add(loadNodes);
-        fileMenu.add(new JSeparator());
-        fileMenu.add(exportLeds);
-        fileMenu.add(loadLeds);
+        fileMenu.add(importMenu);
+        fileMenu.add(exportMenu);
         this.jMenuBar.add(fileMenu);
         this.setJMenuBar(jMenuBar);
         this.songMenu = new JMenu("Song");
@@ -516,7 +518,7 @@ public class MainWindow extends JFrame {
                         functionEditGraphicNodePositions
                 );
 
-                JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
+                JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
                 fileSaveChooser.setFileFilter(serializedFilter);
                 fileSaveChooser.setSelectedFile(new File("new_song.ledcontrol"));
@@ -532,7 +534,7 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 EventSaveUnit eventSaveUnit = eventControl.createEventSaveUnit();
 
-                JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
+                JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
                 fileSaveChooser.setSelectedFile(new File("tracks.json"));
@@ -563,7 +565,7 @@ public class MainWindow extends JFrame {
                 Point[] graphicNodePositions = bakeGraphicNodePositions();
                 Point[][] functionGraphicNodePositions = bakeFunctionGraphicNodePositions();
 
-                JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
+                JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
                 fileSaveChooser.setSelectedFile(new File("nodes.json"));
@@ -593,7 +595,7 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 LedSaveUnit ledSaveUnit = ledControl.getLedSaveUnit();
 
-                JFileChooser fileSaveChooser = getDefaultFileSaveChooser();
+                JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
                 fileSaveChooser.setSelectedFile(new File("leds.json"));
@@ -750,31 +752,6 @@ public class MainWindow extends JFrame {
         int posX = (screenSize.width - this.getWidth()) / 2;
         int posY = (screenSize.height - this.getHeight()) / 2;
         this.setLocation(posX, posY);
-    }
-
-    private static JFileChooser getDefaultFileSaveChooser() {
-
-        return new JFileChooser() {
-            public void approveSelection() {
-                File f = getSelectedFile();
-                if (f.exists() && getDialogType() == SAVE_DIALOG) {
-                    int result = JOptionPane.showConfirmDialog(this,
-                            "File already exists, overwrite?", "Existing File",
-                            JOptionPane.YES_NO_CANCEL_OPTION);
-                    switch (result) {
-                        case JOptionPane.YES_OPTION:
-                            super.approveSelection();
-                            return;
-                        case JOptionPane.CANCEL_OPTION:
-                            cancelSelection();
-                            return;
-                        default:
-                            return;
-                    }
-                }
-                super.approveSelection();
-            }
-        };
     }
 
     public void repaintWindows(EventControl eventControl, NodeControl nodeControl) {

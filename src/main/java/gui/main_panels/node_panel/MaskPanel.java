@@ -1,7 +1,14 @@
 package gui.main_panels.node_panel;
 
+import control.save.JsonWriter;
+import gui.Dialogues;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.function.Function;
 
 public class MaskPanel extends JPanel {
@@ -15,6 +22,29 @@ public class MaskPanel extends JPanel {
 
         this.setOpaque(true);
         this.setBackground(Color.BLACK);
+
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getButton() == MouseEvent.BUTTON3) {
+                    JPopupMenu rightClickPopupMenu = new JPopupMenu();
+                    JMenuItem exportMaskItem = new JMenuItem("Export Mask");
+                    rightClickPopupMenu.add(exportMaskItem);
+                    rightClickPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    exportMaskItem.addActionListener(event -> {
+                        JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+                        FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+                        fileSaveChooser.setFileFilter(serializedFilter);
+                        fileSaveChooser.setSelectedFile(new File("mask.json"));
+                        int returnValue = fileSaveChooser.showSaveDialog(getParent());
+                        if(returnValue == JFileChooser.APPROVE_OPTION) {
+                            Double[][] values = getValuesFunction.apply(0);
+                            JsonWriter.writeMaskToFile(values, fileSaveChooser.getSelectedFile().getPath());
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override

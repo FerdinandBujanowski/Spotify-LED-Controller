@@ -63,6 +63,9 @@ public abstract class JsonWriter {
     private final static String X = "x";
     private final static String Y = "y";
 
+    private final static String MASK = "mask";
+    private final static String INTENSITY = "intensity";
+
     public static void writeTracksToFile(EventSaveUnit eventSaveUnit, String path) {
         JsonObject finalObject = new JsonObject();
 
@@ -364,5 +367,34 @@ public abstract class JsonWriter {
                 );
             } catch (Exception e) {}
         }
+    }
+
+    public static void writeMaskToFile(Double[][] values, String path) {
+
+        JsonObject maskObject = new JsonObject();
+
+        JsonArray pixelArray = new JsonArray();
+        int degree = (values.length - 1) / 2;
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                JsonObject currentPixel = new JsonObject();
+                double intensity = values[x + degree][y + degree];
+                if(intensity > 0) {
+                    currentPixel.addProperty(X, x);
+                    currentPixel.addProperty(Y, y);
+                    currentPixel.addProperty(INTENSITY, intensity);
+                    pixelArray.add(currentPixel);
+                }
+            }
+        }
+        maskObject.add(MASK, pixelArray);
+        try {
+            FileWriter file = new FileWriter(path);
+            file.write(maskObject.toString());
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("JSON file successfully created");
     }
 }

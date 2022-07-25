@@ -1,6 +1,7 @@
 package gui;
 
 import javax.swing.*;
+import java.io.File;
 import java.text.NumberFormat;
 
 public abstract class Dialogues {
@@ -40,5 +41,30 @@ public abstract class Dialogues {
         } else {
             return (Integer) numberTextField.getValue();
         }
+    }
+
+    public static JFileChooser getDefaultFileSaveChooser() {
+
+        return new JFileChooser() {
+            public void approveSelection() {
+                File f = getSelectedFile();
+                if (f.exists() && getDialogType() == SAVE_DIALOG) {
+                    int result = JOptionPane.showConfirmDialog(this,
+                            "File already exists, overwrite?", "Existing File",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+                    switch (result) {
+                        case JOptionPane.YES_OPTION:
+                            super.approveSelection();
+                            return;
+                        case JOptionPane.CANCEL_OPTION:
+                            cancelSelection();
+                            return;
+                        default:
+                            return;
+                    }
+                }
+                super.approveSelection();
+            }
+        };
     }
 }
