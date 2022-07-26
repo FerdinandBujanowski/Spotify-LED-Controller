@@ -1,6 +1,7 @@
 package control.type_enums;
 
 import control.math_functions.MathFunctions;
+import gui.Dialogues;
 
 import java.awt.*;
 import java.util.function.Function;
@@ -15,7 +16,8 @@ public enum CurveType {
     CENTER_PEAK(MathFunctions::getCenterPeak, new Color(190, 149, 196)),
     CENTER_PEAK_INVERSE(MathFunctions::getCenterPeakInverse, new Color(190, 149, 196)),
     COSINE(MathFunctions::getCosine, new Color(224, 177, 203)),
-    COSINE_INVERSE(MathFunctions::getCosineInverse, new Color(224, 177, 203));
+    COSINE_INVERSE(MathFunctions::getCosineInverse, new Color(224, 177, 203)),
+    USER_INPUT(MathFunctions::getLinear, Color.GRAY);
 
     private final Function<Double, Double> getCurveFunction;
     private final Color color;

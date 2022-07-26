@@ -14,9 +14,10 @@ import java.awt.event.MouseMotionAdapter;
 public class GraphicEvent extends JLabel {
 
     private EventGraphicUnit eventGraphicUnit;
-    private EventRequestAcceptor songControl;
+    private EventRequestAcceptor eventControl;
 
     private CurveType curveType;
+    private double userInput;
     private final int trackIndex, eventIndex;
     private Point eventTime;
 
@@ -26,14 +27,14 @@ public class GraphicEvent extends JLabel {
 
     private boolean inSelection;
 
-    public GraphicEvent(int trackIndex, int eventIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, EventRequestAcceptor songControl) {
+    public GraphicEvent(int trackIndex, int eventIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, EventRequestAcceptor eventControl) {
         this.trackIndex = trackIndex;
         this.eventIndex = eventIndex;
 
         this.curveType = curveType;
         this.eventTime = new Point();
         this.eventGraphicUnit = eventGraphicUnit;
-        this.songControl = songControl;
+        this.eventControl = eventControl;
 
         this.leftHovered = false;
         this.rightHovered = false;
@@ -75,25 +76,30 @@ public class GraphicEvent extends JLabel {
 
                         int selectedOption = Dialogues.getSelectedOptionFromArray(CurveType.values(), "Edit Curve Type", CurveType.indexOf(getCurveType()));
                         CurveType newCurveType = CurveType.values()[selectedOption];
+                        userInput = Dialogues.getNumberValue("Please enter Unit Number");
+                        if(userInput < 0) userInput = 0;
+                        else if(userInput > 1) userInput = 1;
 
-                        songControl.onUpdateEventRequest(
+                        eventControl.onUpdateEventRequest(
                                 trackIndex,
                                 eventIndex,
                                 eventTime.x,
                                 false,
                                 newCurveType,
+                                userInput,
                                 eventTime.x,
                                 eventTime.y
                         );
                     } else if(e.getButton() == MouseEvent.BUTTON1) {
 
                         if(e.getClickCount() == 2) {
-                            songControl.onUpdateEventRequest(
+                            eventControl.onUpdateEventRequest(
                                     trackIndex,
                                     eventIndex,
                                     eventTime.x,
                                     true,
                                     getCurveType(),
+                                    userInput,
                                     0,
                                     0
                             );
@@ -101,12 +107,13 @@ public class GraphicEvent extends JLabel {
                     }
                 } else {
                     if(e.getButton() == MouseEvent.BUTTON1) {
-                        songControl.onUpdateEventRequest(
+                        eventControl.onUpdateEventRequest(
                                 trackIndex,
                                 eventIndex,
                                 eventTime.x,
                                 false,
                                 eventGraphicUnit.getDefaultCurveType(),
+                                userInput,
                                 eventTime.x,
                                 eventTime.y
                         );
@@ -140,32 +147,35 @@ public class GraphicEvent extends JLabel {
                 Point newTime = eventGraphicUnit.getClosestEventTime(x);
 
                 if(lastMovement == -1 && newTime.x < (eventTime.x + eventTime.y) && eventTime.x != newTime.x) {
-                    songControl.onUpdateEventRequest(
+                    eventControl.onUpdateEventRequest(
                             trackIndex,
                             eventIndex,
                             eventTime.x,
                             false,
                             getCurveType(),
+                            userInput,
                             newTime.x,
                             (eventTime.x - newTime.x) + eventTime.y
                     );
                 } else if(lastMovement == 1 && (newTime.x + newTime.y) > eventTime.x && newTime.x != (eventTime.x + eventTime.y - newTime.y)) {
-                    songControl.onUpdateEventRequest(
+                    eventControl.onUpdateEventRequest(
                             trackIndex,
                             eventIndex,
                             eventTime.x,
                             false,
                             getCurveType(),
+                            userInput,
                             eventTime.x,
                             (newTime.x + newTime.y) - eventTime.x
                     );
                 } else if(lastMovement == 0 && newTime.x != (eventTime.x + differenceOnClicked)) {
-                    songControl.onUpdateEventRequest(
+                    eventControl.onUpdateEventRequest(
                             trackIndex,
                             eventIndex,
                             eventTime.x,
                             false,
                             getCurveType(),
+                            userInput,
                             newTime.x - differenceOnClicked,
                             eventTime.y
                     );
@@ -231,6 +241,16 @@ public class GraphicEvent extends JLabel {
         this.setBackground(curveType.getColor());
     }
 
+    public double getUserInput() {
+        return this.userInput;
+    }
+
+    public void setUserInput(double userInput) {
+        if(userInput > 1) this.userInput = 1;
+        else if(userInput < 0) this.userInput = 0;
+        else this.userInput = userInput;
+    }
+
     public boolean isRightHovered() {
         return this.rightHovered;
     }
@@ -267,9 +287,10 @@ public class GraphicEvent extends JLabel {
         }
         for(int i = 0; i < this.getWidth(); i++) {
             double x = (double)i / (double)this.getWidth();
+            double value = this.curveType == CurveType.USER_INPUT ? this.userInput : this.curveType.getCurve(x);
             g.fillRect(
                     i,
-                    this.getHeight() - (int)Math.round(this.curveType.getCurve(x) * (double)this.getHeight()),
+                    this.getHeight() - (int)Math.round(value * (double)this.getHeight()),
                     1,
                     1
             );

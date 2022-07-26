@@ -117,7 +117,8 @@ public abstract class JsonWriter {
                         newTrackIndex,
                         eventElement.getAsJsonObject().get(START).getAsInt(),
                         eventElement.getAsJsonObject().get(DURATION).getAsInt(),
-                        CurveType.getCurveTypeByString(eventElement.getAsJsonObject().get(CURVE_TYPE).getAsString())
+                        CurveType.getCurveTypeByString(eventElement.getAsJsonObject().get(CURVE_TYPE).getAsString()),
+                        0 //TODO : USER INPUT KEY IN JSON EVENT OBJECT
                 );
             }
         }

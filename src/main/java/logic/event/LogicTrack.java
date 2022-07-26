@@ -15,20 +15,9 @@ public class LogicTrack implements Serializable {
         this.eventArrayList = new ArrayList<>();
     }
 
-    public void addEventToTrack(int msStart, int msDuration, CurveType curveType, int eventIndex) {
+    public void addEventToTrack(int msStart, int msDuration, CurveType curveType, int eventIndex, double userInput) {
         try {
-            LogicEvent event = new LogicEvent(msStart, msDuration);
-            LogicEvent overlappingEvent = this.getOverlappingEvent(event);
-            /*
-            while(overlappingEvent != null) {
-                if(event.getMsStart() >= overlappingEvent.getMsStart()) {
-                    event.updateEventTime(overlappingEvent.getMsStart(), overlappingEvent.getMsDuration());
-                } else {
-                    event.updateEventTime(event.getMsStart(), overlappingEvent.getMsStart());
-                }
-                overlappingEvent = this.getOverlappingEvent(event);
-            }
-             */
+            LogicEvent event = new LogicEvent(msStart, msDuration, userInput);
             event.setCurveType(curveType);
             if(eventIndex == -1) {
                 this.eventArrayList.add(event);
@@ -40,25 +29,8 @@ public class LogicTrack implements Serializable {
         }
     }
 
-    private LogicEvent getOverlappingEvent(LogicEvent newEvent) {
-        for(LogicEvent event : this.eventArrayList) {
-            if(this.eventOverlap(newEvent, event) || this.eventOverlap(event, newEvent)) {
-                return event;
-            }
-        }
-        return null;
-    }
-
-    public boolean eventOverlap(LogicEvent eventA, LogicEvent eventE) {
-        return eventA.getMsStart() < eventE.getMsStart() && (eventA.getMsStart() + eventA.getMsDuration()) > eventE.getMsStart();
-    }
-
     public int getCurrentEventCount() {
         return this.eventArrayList.size();
-    }
-
-    public CurveType getCurveTypeAt(int eventIndex) {
-        return this.eventArrayList.get(eventIndex).getCurveType();
     }
 
     public int getEventIndex(int ms) {
@@ -82,7 +54,11 @@ public class LogicTrack implements Serializable {
         } else {
             int msInto = ms - logicEvent.getMsStart();
             double x = (double)msInto / (double)logicEvent.getMsDuration();
-            return logicEvent.getCurveType().getCurve(x);
+            if(logicEvent.getCurveType() == CurveType.USER_INPUT) {
+                return logicEvent.getUserInput();
+            } else {
+                return logicEvent.getCurveType().getCurve(x);
+            }
         }
     }
 
@@ -110,4 +86,13 @@ public class LogicTrack implements Serializable {
         LogicEvent logicEvent = this.eventArrayList.get(eventIndex);
         return new Point(logicEvent.getMsStart(), logicEvent.getMsDuration());
     }
+
+    public CurveType getCurveTypeAt(int eventIndex) {
+        return this.eventArrayList.get(eventIndex).getCurveType();
+    }
+
+    public double getUserInputAt(int eventIndex) {
+        return this.eventArrayList.get(eventIndex).getUserInput();
+    }
+
 }

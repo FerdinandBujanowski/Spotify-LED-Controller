@@ -228,8 +228,12 @@ public class LogicMask implements Serializable {
         if(scaleY == 0) scaleY = 1.d;
 
         LogicMask newMask = new LogicMask();
-        int degreeX = (int)Math.round(mask.getDegree() * scaleX);
-        int degreeY = (int)Math.round(mask.getDegree() * scaleY);
+        int oldLength = (mask.getDegree() * 2) + 1;
+
+        int lengthX = (int)Math.round(oldLength * scaleX);
+        int degreeX = (lengthX - 1) / 2;
+        int lengthY = (int)Math.round(oldLength * scaleY);
+        int degreeY = (lengthY - 1) / 2;
         for(int i = -degreeX; i <= degreeX; i++) {
             for(int j = -degreeY; j <= degreeY; j++) {
                 int oldX = (int)Math.round(i / scaleX);

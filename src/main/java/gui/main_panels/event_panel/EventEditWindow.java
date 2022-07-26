@@ -97,17 +97,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             @Override
             public void keyReleased(KeyEvent e) {
                 onKeyReleased(e);
-            }
-        });
-
-        this.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                onKeyPressed(e);
-            }
-            @Override
-            public void keyReleased(KeyEvent e) {
-                onKeyReleased(e);
+                repaint();
             }
         });
 
@@ -243,6 +233,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                         graphicEvent.getEventTime().x,
                         false,
                         graphicEvent.getCurveType(),
+                        graphicEvent.getUserInput(),
                         graphicEvent.getEventTime().x + relativeMovement,
                         graphicEvent.getEventTime().y
                 );
@@ -306,7 +297,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             this.addTrack();
             for(int j = 0; j < trackTimes[i].getPoints().length; j++) {
                 Point point = trackTimes[i].getPoints()[j];
-                this.addEventToTrack(i, point.x, point.y, trackTimes[i].getCurveTypes()[j]);
+                //TODO user input
+                this.addEventToTrack(i, point.x, point.y, trackTimes[i].getCurveTypes()[j], 0);
             }
         }
 
@@ -379,7 +371,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                                currentIndex,
                                eventTime.x,
                                eventTime.y,
-                               getDefaultCurveType()
+                               getDefaultCurveType(),
+                               0
                        );
                    }
                }
@@ -417,9 +410,10 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
-    public void addEventToTrack(int trackNumber, int msStart, int msDuration, CurveType curveType) {
+    public void addEventToTrack(int trackNumber, int msStart, int msDuration, CurveType curveType, double userInput) {
         int newEventIndex = this.graphicEvents.get(trackNumber).size();
         GraphicEvent graphicEvent = new GraphicEvent(trackNumber, newEventIndex, curveType, msStart, msDuration, this, this.eventControl);
+        graphicEvent.setUserInput(userInput);
 
         this.graphicEvents.get(trackNumber).add(graphicEvent);
         this.add(graphicEvent);
@@ -435,10 +429,11 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
-    public void editEvent(int trackIndex, int eventIndex, int msStartNew, int msDurationNew, CurveType curveTypeNew) {
+    public void editEvent(int trackIndex, int eventIndex, int msStartNew, int msDurationNew, CurveType curveTypeNew, double userInput) {
         GraphicEvent graphicEvent = this.findGraphicEvent(trackIndex, eventIndex);
         graphicEvent.updateEventTime(msStartNew, msDurationNew);
         graphicEvent.setCurveType(curveTypeNew);
+        graphicEvent.setUserInput(userInput);
         graphicEvent.updateBounds();
     }
 

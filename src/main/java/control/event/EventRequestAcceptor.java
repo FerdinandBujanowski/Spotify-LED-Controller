@@ -28,8 +28,8 @@ public interface EventRequestAcceptor {
     void onAddTrackRequest();
     void onUpdateTrackRequest(int trackIndex, boolean deleted);
 
-    void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType);
+    void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType, double userInput);
     ArrayList<Point> onCopyEventsRequest(ArrayList<Point> indexes);
-    void onUpdateEventRequest(int trackIndex, int eventIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew);
+    void onUpdateEventRequest(int trackIndex, int eventIndex, int msStartOld, boolean deleted, CurveType curveType, double userInput, int msStartNew, int msDurationNew);
     Point getUpdatedEventTime(int trackIndex, int eventIndex);
 }

@@ -6,6 +6,7 @@ public enum TimeSignature {
     ONE_SIXTEEN("1 / 16", 1.0 / 16.0),
     ONE_EIGHT("1 / 8", 1.0 / 8.0),
     ONE_FOUR("1 / 4", 1.0 / 4.0),
+    ONE_FIVE("1 / 5", 1.0 / 5.0),
     TWO_FOUR("2 / 4", 2.0 / 4.0),
     ONE_BAR("1B", 1.0),
     TWO_BAR("2B", 2.0),
@@ -14,8 +15,8 @@ public enum TimeSignature {
     TWO_FOUR_TRIPLE("(2 / 4)T", 2.0 / 12.0),
     ONE_BAR_TRIPLE("(1B)T", 1.0 / 3.0);
 
-    private String displayText;
-    private double ratio;
+    private final String displayText;
+    private final double ratio;
 
     TimeSignature(String displayText, double ratio) {
         this.displayText = displayText;

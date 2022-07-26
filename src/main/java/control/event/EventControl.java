@@ -158,20 +158,19 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     }
 
     @Override
-    public void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType) {
+    public void onAddEventToTrackRequest(int trackIndex, int msStart, int msDuration, CurveType curveType, double userInput) {
         if(trackIndex == 0) {
             return;
             //TODO: adding a time measure
         }
         if(this.logicTracks.get(trackIndex) != null) {
             int oldLength = this.logicTracks.get(trackIndex).getEventsCopyArray().length;
-            this.logicTracks.get(trackIndex).addEventToTrack(msStart, msDuration, curveType, -1);
+            this.logicTracks.get(trackIndex).addEventToTrack(msStart, msDuration, curveType, -1, userInput);
 
-            //TODO: Prüfen nach Overlaps klappt anscheinend noch nicht
             LogicEvent[] events = this.logicTracks.get(trackIndex).getEventsCopyArray();
             if(events.length > oldLength) {
                 LogicEvent newEvent = events[oldLength];
-                this.eventWindow.addEventToTrack(trackIndex, newEvent.getMsStart(), newEvent.getMsDuration(), newEvent.getCurveType());
+                this.eventWindow.addEventToTrack(trackIndex, newEvent.getMsStart(), newEvent.getMsDuration(), newEvent.getCurveType(), userInput);
             }
         }
     }
@@ -182,9 +181,10 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
         for(Point index : indexes) {
             Point eventTime = this.logicTracks.get(index.x).getEventTime(index.y);
             CurveType curveType = this.logicTracks.get(index.x).getCurveTypeAt(index.y);
+            double userInput = this.logicTracks.get(index.x).getUserInputAt(index.y);
 
             Point newIndex = new Point(index.x, this.logicTracks.get(index.x).getCurrentEventCount());
-            this.onAddEventToTrackRequest(newIndex.x, eventTime.x, eventTime.y, curveType);
+            this.onAddEventToTrackRequest(newIndex.x, eventTime.x, eventTime.y, curveType, userInput);
 
             newIndexes.add(newIndex);
         }
@@ -192,7 +192,7 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     }
 
     @Override
-    public void onUpdateEventRequest(int trackIndex, int eventIndex, int msStartOld, boolean deleted, CurveType curveType, int msStartNew, int msDurationNew) {
+    public void onUpdateEventRequest(int trackIndex, int eventIndex, int msStartOld, boolean deleted, CurveType curveType, double userInput, int msStartNew, int msDurationNew) {
         if(trackIndex == 0) {
 
         }
@@ -201,9 +201,9 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
             this.eventWindow.deleteEvent(trackIndex, eventIndex);
         }
         else {
-            this.logicTracks.get(trackIndex).addEventToTrack(msStartNew, msDurationNew, curveType, eventIndex);
+            this.logicTracks.get(trackIndex).addEventToTrack(msStartNew, msDurationNew, curveType, eventIndex, userInput);
             Point updatedEventTime = this.getUpdatedEventTime(trackIndex, eventIndex);
-            this.eventWindow.editEvent(trackIndex, eventIndex, updatedEventTime.x, updatedEventTime.y, curveType);
+            this.eventWindow.editEvent(trackIndex, eventIndex, updatedEventTime.x, updatedEventTime.y, curveType, userInput);
         }
     }
 

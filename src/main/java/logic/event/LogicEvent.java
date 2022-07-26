@@ -10,11 +10,13 @@ public class LogicEvent implements Serializable {
     private int msStart, msDuration;
 
     private CurveType curveType;
+    private double userInput;
 
-    public LogicEvent(int msStart, int msDuration) throws EventTimeNegativeException {
+    public LogicEvent(int msStart, int msDuration, double userInput) throws EventTimeNegativeException {
         this.updateEventTime(msStart, msDuration);
 
         this.curveType = CurveType.CONSTANT;
+        this.userInput = userInput;
     }
 
     public void updateEventTime(int newStart, int newDuration) throws EventTimeNegativeException {
@@ -42,5 +44,7 @@ public class LogicEvent implements Serializable {
         this.curveType = curveType;
     }
 
-
+    public double getUserInput() {
+        return this.userInput;
+    }
 }
