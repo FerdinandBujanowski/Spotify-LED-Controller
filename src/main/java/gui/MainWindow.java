@@ -269,9 +269,9 @@ public class MainWindow extends JFrame {
                         }
                     }
                     if(tabbedPane.getSelectedComponent() == nodeEditWindow) {
-                        nodeControl.addNode(-1, nodeType, extraParameters);
+                        nodeControl.addNode(-1, nodeType, extraParameters, new Point(0, 0));
                     } else if(tabbedPane.getSelectedComponent() == functionTabbedPane) {
-                        nodeControl.addNode(functionTabbedPane.getSelectedIndex(), nodeType, extraParameters);
+                        nodeControl.addNode(functionTabbedPane.getSelectedIndex(), nodeType, extraParameters, new Point(0, 0));
                     }
                 }
             });
@@ -359,7 +359,8 @@ public class MainWindow extends JFrame {
                 if(currentLayerCount < ledControl.getLayerCount()) {
                     nodeControl.addLayerNode(
                             ledControl.updateTextureFunction(currentLayerCount),
-                            "Layer " + (currentLayerCount + 1)
+                            "Layer " + (currentLayerCount + 1),
+                            new Point(0, 0)
                     );
                 }
             }
@@ -578,7 +579,7 @@ public class MainWindow extends JFrame {
                 fileSaveChooser.setSelectedFile(new File("nodes.json"));
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
-                    JsonWriter.writeNodesToFile(nodeSaveUnit, fileSaveChooser.getSelectedFile().getPath());
+                    JsonWriter.writeNodesToFile(nodeSaveUnit, fileSaveChooser.getSelectedFile().getPath(), graphicNodePositions, functionGraphicNodePositions);
                 }
             }
         });
@@ -658,10 +659,10 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int currentFunctionIndex = functionItemList.indexOf(addNewFunctionItem);
                 if(tabbedPane.getSelectedIndex() == 2) {
-                    nodeControl.addFunctionNode(currentFunctionIndex, -1);
+                    nodeControl.addFunctionNode(currentFunctionIndex, -1, new Point(0, 0));
                 } else if(tabbedPane.getSelectedIndex() == 3) {
                     int selectedFunctionIndex = functionTabbedPane.getSelectedIndex();
-                    nodeControl.addFunctionNode(currentFunctionIndex, selectedFunctionIndex);
+                    nodeControl.addFunctionNode(currentFunctionIndex, selectedFunctionIndex, new Point(0, 0));
                 }
             }
         });
@@ -706,7 +707,7 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //TODO : Track Node wird "gebacken"
                 if(tabbedPane.getSelectedComponent() == nodeEditWindow) {
-                    nodeControl.addTrackNode(trackIndex);
+                    nodeControl.addTrackNode(trackIndex, new Point(0, 0));
                 } else if(tabbedPane.getSelectedComponent() == functionTabbedPane) {
                     JOptionPane.showMessageDialog(
                             null,

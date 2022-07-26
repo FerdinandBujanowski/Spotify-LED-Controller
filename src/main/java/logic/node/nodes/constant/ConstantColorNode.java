@@ -1,4 +1,4 @@
-package logic.node.nodes.color;
+package logic.node.nodes.constant;
 
 import control.type_enums.JointType;
 import control.type_enums.NodeType;

@@ -131,7 +131,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
                 } else {
                     nodeName = nodeType.getName();
                 }
-                this.addGraphicNode(this.functionIndex, nodeIndex, nodeType, nodeName);
+                this.addGraphicNode(this.functionIndex, nodeIndex, nodeType, nodeName, position);
             }
         }
     }
@@ -452,7 +452,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
     }
 
     @Override
-    public void addGraphicNode(int functionIndex, int nodeIndex, NodeType nodeType, String nodeName) {
+    public void addGraphicNode(int functionIndex, int nodeIndex, NodeType nodeType, String nodeName, Point position) {
 
         String[] inputJointNames = this.getNodeControl().getInputJointNames(functionIndex, nodeIndex);
         String[] outputJointNames = this.getNodeControl().getOutputJointNames(functionIndex, nodeIndex);
@@ -474,7 +474,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         );
         this.add(newGraphicNode);
         newGraphicNode.setTotalSize(this.zoomFactor);
-        newGraphicNode.setTotalLocation(10, 10, this.zoomFactor);
+        newGraphicNode.setTotalLocation(position.x, position.y, this.zoomFactor);
 
         this.graphicNodes.add(newGraphicNode);
         this.repaint();

@@ -1,4 +1,4 @@
-package logic.node.nodes.constant;
+package logic.node.nodes.math_functions;
 
 import control.type_enums.NodeType;
 import logic.node.LogicNode;

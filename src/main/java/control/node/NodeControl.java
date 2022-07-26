@@ -108,7 +108,7 @@ public class NodeControl implements NodeRequestAcceptor {
         return this.logicFunctions.get(this.logicFunctions.size() -1).getFunctionIndex() + 1;
     }
 
-    public void addNode(int functionIndex, NodeType nodeType, Object[] extraParameters) {
+    public void addNode(int functionIndex, NodeType nodeType, Object[] extraParameters, Point position) {
         LogicNode newNode = null;
         int newNodeIndex = this.getNextFreeNodeIndex(functionIndex);
 
@@ -132,10 +132,10 @@ public class NodeControl implements NodeRequestAcceptor {
             }
             if(functionIndex == -1) {
                 this.logicNodes.add(newNode);
-                this.nodeGraphicUnit.addGraphicNode(functionIndex, newNodeIndex, nodeType, specificNodeName);
+                this.nodeGraphicUnit.addGraphicNode(functionIndex, newNodeIndex, nodeType, specificNodeName, position);
             } else {
                 this.findFunction(functionIndex).getLogicNodes().add(newNode);
-                this.functionGraphicUnits.get(functionIndex).addGraphicNode(functionIndex, newNodeIndex, nodeType, specificNodeName);
+                this.functionGraphicUnits.get(functionIndex).addGraphicNode(functionIndex, newNodeIndex, nodeType, specificNodeName, position);
             }
         } else {
             switch(nodeType) {
@@ -143,7 +143,7 @@ public class NodeControl implements NodeRequestAcceptor {
                     int funcIndex = (int)extraParameters[0];
                     LogicFunction function = this.findFunction(funcIndex);
                     if(function != null) {
-                        this.addFunctionNode(funcIndex, (int)extraParameters[1]);
+                        this.addFunctionNode(funcIndex, (int)extraParameters[1], position);
                     }
                 }
                 case _INPUT_PARAMETER_NODE -> {
@@ -157,9 +157,9 @@ public class NodeControl implements NodeRequestAcceptor {
 
                     String nodeName = this.findNode(funcIndex, newNodeIndex).getSpecificName();
                     if(funcIndex == -1) {
-                        this.nodeGraphicUnit.addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName);
+                        this.nodeGraphicUnit.addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName, position);
                     } else {
-                        this.functionGraphicUnits.get(funcIndex).addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName);
+                        this.functionGraphicUnits.get(funcIndex).addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName, position);
                     }
                 }
                 case _OUTPUT_PARAMETER_NODE -> {
@@ -173,20 +173,20 @@ public class NodeControl implements NodeRequestAcceptor {
 
                     String nodeName = this.findNode(funcIndex, newNodeIndex).getSpecificName();
                     if(funcIndex == -1) {
-                        this.nodeGraphicUnit.addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName);
+                        this.nodeGraphicUnit.addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName, position);
                     } else {
-                        this.functionGraphicUnits.get(funcIndex).addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName);
+                        this.functionGraphicUnits.get(funcIndex).addGraphicNode(funcIndex, newNodeIndex, nodeType, nodeName, position);
                     }
                 }
                 case _TRACK_NODE -> {
                     int trackIndex = (int)extraParameters[0];
-                    this.addTrackNode(trackIndex);
+                    this.addTrackNode(trackIndex, position);
                 }
                 case _LAYER_NODE -> {
-                    this.addLayerNode(null, "[Prototype Layer]");
+                    this.addLayerNode(null, "[Prototype Layer]", position);
                 }
                 case _LED_POSITION_NODE -> {
-                    this.addLedPositionNode(functionIndex, "Led Position", this.ledNodeCommunication.pixelPositionFunction());
+                    this.addLedPositionNode(functionIndex, "Led Position", this.ledNodeCommunication.pixelPositionFunction(), position);
                 }
             }
         }
@@ -221,25 +221,25 @@ public class NodeControl implements NodeRequestAcceptor {
         for(int index : nodeIndexes) {
             NodeType nodeType = this.getNodeType(newFunctionIndex, index);
             String nodeName = nodeType == null ? this.getSpecificNodeName(newFunctionIndex, index) : nodeType.getName();
-            this.functionGraphicUnits.get(newFunctionIndex).addGraphicNode(newFunctionIndex, index, nodeType, nodeName);
+            this.functionGraphicUnits.get(newFunctionIndex).addGraphicNode(newFunctionIndex, index, nodeType, nodeName, new Point(0, 0));
         }
     }
 
-    public void addFunctionNode(int functionIndexOrigin, int functionIndexGoal) {
+    public void addFunctionNode(int functionIndexOrigin, int functionIndexGoal, Point position) {
         int newNodeIndex = this.getNextFreeNodeIndex(functionIndexGoal);
         LogicFunction logicFunction = this.findFunction(functionIndexOrigin);
         LogicNode logicNodeToAdd = logicFunction.bakeNode(newNodeIndex, functionIndexGoal);
         if(functionIndexGoal == -1) {
             this.logicNodes.add(logicNodeToAdd);
-            this.nodeGraphicUnit.addGraphicNode(functionIndexGoal, newNodeIndex, NodeType._FUNCTION_NODE, logicFunction.getFunctionName());
+            this.nodeGraphicUnit.addGraphicNode(functionIndexGoal, newNodeIndex, NodeType._FUNCTION_NODE, logicFunction.getFunctionName(), position);
         } else {
             this.findFunction(functionIndexGoal).getLogicNodes().add(logicNodeToAdd);
-            this.functionGraphicUnits.get(functionIndexGoal).addGraphicNode(functionIndexGoal, newNodeIndex, NodeType._FUNCTION_NODE, logicFunction.getFunctionName());
+            this.functionGraphicUnits.get(functionIndexGoal).addGraphicNode(functionIndexGoal, newNodeIndex, NodeType._FUNCTION_NODE, logicFunction.getFunctionName(), position);
         }
 
     }
 
-    public void addTrackNode(int trackIndex) {
+    public void addTrackNode(int trackIndex, Point position) {
 
         String nodeName = "Track " + (trackIndex + 1);
         int newNodeIndex = this.getNextFreeNodeIndex(-1);
@@ -264,10 +264,10 @@ public class NodeControl implements NodeRequestAcceptor {
             }
         };
         this.logicNodes.add(trackNode);
-        this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._TRACK_NODE, nodeName);
+        this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._TRACK_NODE, nodeName, position);
     }
 
-    public void addLayerNode(SerializableFunction<Object, Integer> setTextureFunction, String layerName) {
+    public void addLayerNode(SerializableFunction<Object, Integer> setTextureFunction, String layerName, Point position) {
         int newNodeIndex = this.getNextFreeNodeIndex(-1);
         LogicNode layerNode = new LogicNode(
                 newNodeIndex,
@@ -287,10 +287,10 @@ public class NodeControl implements NodeRequestAcceptor {
         };
 
         this.logicNodes.add(layerNode);
-        this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._LAYER_NODE, layerName);
+        this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._LAYER_NODE, layerName, position);
     }
 
-    public void addLedPositionNode(int functionIndex, String nodeName, SerializableFunction<Integer, Point> getPositionFunction) {
+    public void addLedPositionNode(int functionIndex, String nodeName, SerializableFunction<Integer, Point> getPositionFunction, Point position) {
         int newNodeIndex = this.getNextFreeNodeIndex(functionIndex);
         LogicNode ledPositionNode = new LogicNode(
                 newNodeIndex,
@@ -317,10 +317,10 @@ public class NodeControl implements NodeRequestAcceptor {
 
         if(functionIndex == -1) {
             this.logicNodes.add(ledPositionNode);
-            this.nodeGraphicUnit.addGraphicNode(functionIndex, newNodeIndex, NodeType._LED_POSITION_NODE, nodeName);
+            this.nodeGraphicUnit.addGraphicNode(functionIndex, newNodeIndex, NodeType._LED_POSITION_NODE, nodeName, position);
         } else {
             this.findFunction(functionIndex).getLogicNodes().add(ledPositionNode);
-            this.functionGraphicUnits.get(functionIndex).addGraphicNode(functionIndex, newNodeIndex, NodeType._LED_POSITION_NODE, nodeName);
+            this.functionGraphicUnits.get(functionIndex).addGraphicNode(functionIndex, newNodeIndex, NodeType._LED_POSITION_NODE, nodeName, position);
         }
     }
 
@@ -719,7 +719,7 @@ public class NodeControl implements NodeRequestAcceptor {
         for(LogicNode logicNode : templateNodes) {
             int newNodeIndex = this.getNextFreeNodeIndex(functionIndex);
             newIndexCorrespondence.addValue(logicNode.getNodeIndex(), newNodeIndex);
-            this.addNode(functionIndex, logicNode.getNodeType(), logicNode.getExtraParameters());
+            this.addNode(functionIndex, logicNode.getNodeType(), logicNode.getExtraParameters(), new Point(0, 0));
             newNodeIndexes.add(newNodeIndex);
 
             GraphicNode oldGraphicNode;

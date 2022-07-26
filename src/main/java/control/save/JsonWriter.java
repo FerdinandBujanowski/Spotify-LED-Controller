@@ -125,12 +125,13 @@ public abstract class JsonWriter {
         }
     }
 
-    public static void writeNodesToFile(NodeSaveUnit nodeSaveUnit, String path) {
+    public static void writeNodesToFile(NodeSaveUnit nodeSaveUnit, String path, Point[] graphicNodePositions, Point[][] functionGraphicNodePositions) {
         JsonObject finalObject = new JsonObject();
 
         JsonArray nodeArray = new JsonArray();
-        for(LogicNode logicNode : nodeSaveUnit.getLogicNodes()) {
-            nodeArray.add(JsonWriter.getNodeJsonObject(logicNode));
+        for(int i = 0; i < nodeSaveUnit.getLogicNodes().size(); i++) {
+            LogicNode logicNode = nodeSaveUnit.getLogicNodes().get(i);
+            nodeArray.add(JsonWriter.getNodeJsonObject(logicNode, graphicNodePositions[i]));
         }
         finalObject.add(NODES, nodeArray);
 
@@ -141,14 +142,16 @@ public abstract class JsonWriter {
         finalObject.add(NODE_CONNECTIONS, connectionsArray);
 
         JsonArray functionArray = new JsonArray();
-        for(LogicFunction logicFunction : nodeSaveUnit.getLogicFunctions()) {
+        for(int i = 0; i < nodeSaveUnit.getLogicFunctions().size(); i++) {
+            LogicFunction logicFunction = nodeSaveUnit.getLogicFunctions().get(i);
             JsonObject functionObject = new JsonObject();
             functionObject.addProperty(FUNCTION_INDEX, logicFunction.getFunctionIndex());
             functionObject.addProperty(FUNCTION_NAME, logicFunction.getFunctionName());
 
             JsonArray functionNodesArray = new JsonArray();
-            for(LogicNode logicNode : logicFunction.getLogicNodes()) {
-                functionNodesArray.add(JsonWriter.getNodeJsonObject(logicNode));
+            for(int j = 0; j < logicFunction.getLogicNodes().size(); j++) {
+                LogicNode logicNode = logicFunction.getLogicNodes().get(j);
+                functionNodesArray.add(JsonWriter.getNodeJsonObject(logicNode, functionGraphicNodePositions[i][j]));
             }
             functionObject.add(NODES, functionNodesArray);
 
@@ -172,7 +175,7 @@ public abstract class JsonWriter {
         System.out.println("JSON file successfully created");
     }
 
-    private static JsonObject getNodeJsonObject(LogicNode logicNode) {
+    private static JsonObject getNodeJsonObject(LogicNode logicNode, Point position) {
         JsonObject nodeObject = new JsonObject();
         NodeType nodeType = logicNode.getNodeType();
         nodeObject.addProperty(NODE_INDEX, logicNode.getNodeIndex());
@@ -180,6 +183,8 @@ public abstract class JsonWriter {
         if(!logicNode.getSpecificName().equals("")) {
             nodeObject.addProperty(SPECIFIC_NAME, logicNode.getSpecificName());
         }
+        nodeObject.addProperty(X, position.x);
+        nodeObject.addProperty(Y, position.y);
         Object[] extraParameters = logicNode.getExtraParameters();
         if(extraParameters.length > 0) {
             JsonArray extraParamArray = new JsonArray();
@@ -258,7 +263,9 @@ public abstract class JsonWriter {
                 if(nodeType == NodeType._INPUT_PARAMETER_NODE || nodeType == NodeType._OUTPUT_PARAMETER_NODE) {
                     extraParamArray[0] = functionCorrespondence.getCorrespondingValue((Integer) extraParamArray[0]);
                 }
-                nodeControl.addNode(newFunctionIndex, nodeType, extraParamArray);
+                int x = currentNodeObject.has(X) ? currentNodeObject.get(X).getAsInt() : 0;
+                int y = currentNodeObject.has(Y) ? currentNodeObject.get(Y).getAsInt() : 0;
+                nodeControl.addNode(newFunctionIndex, nodeType, extraParamArray, new Point(x, y));
             }
 
             //NODE CONNECTIONS
@@ -298,7 +305,9 @@ public abstract class JsonWriter {
             if(nodeType == NodeType._FUNCTION_NODE) {
                 extraParamArray[0] = functionCorrespondence.getCorrespondingValue((Integer) extraParamArray[0]);
             }
-            nodeControl.addNode(-1, nodeType, extraParamArray);
+            int x = currentNodeObject.has(X) ? currentNodeObject.get(X).getAsInt() : 0;
+            int y = currentNodeObject.has(Y) ? currentNodeObject.get(Y).getAsInt() : 0;
+            nodeControl.addNode(-1, nodeType, extraParamArray, new Point(x, y));
         }
 
         //NODE CONNECTIONS

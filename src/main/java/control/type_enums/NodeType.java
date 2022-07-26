@@ -4,7 +4,7 @@ import logic.node.nodes.basic_operations.*;
 import logic.node.nodes.branch.ConditionalBranchNode;
 import logic.node.nodes.branch.ProbabilityBranchNode;
 import logic.node.nodes.branch.RandomBranchNode;
-import logic.node.nodes.color.ConstantColorNode;
+import logic.node.nodes.constant.ConstantColorNode;
 import logic.node.nodes.color.CreateColorNode;
 import logic.node.nodes.color.SplitColorNode;
 import logic.node.nodes.compare.*;
@@ -36,7 +36,6 @@ public enum NodeType {
     PROBABILITY_BRANCH_NODE("Probability Branch", "Branch", ProbabilityBranchNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT }),
 
     //COLOR
-    CONSTANT_COLOR_NODE("Constant Color", "Color", ConstantColorNode.class, new InputDialogType[] { InputDialogType.COLOR_TYPE_INPUT }, true),
     CREATE_COLOR_NODE("Create Color", "Color", CreateColorNode.class, true),
     SPLIT_COLOR_NODE("Split Color", "Color", SplitColorNode.class),
 
@@ -49,7 +48,7 @@ public enum NodeType {
     CONSTANT_INTEGER_NODE("CONST Integer", "Constant", ConstantIntegerNode.class, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
     CONSTANT_NUMBER_NODE("CONST Number", "Constant", ConstantNumberNode.class, new InputDialogType[] { InputDialogType.NUMBER_TYPE_INPUT }),
     CONSTANT_UNIT_NUMBER_NODE("CONST Unit Number", "Constant", ConstantUnitNumberNode.class, new InputDialogType[] {InputDialogType.UNIT_NUMBER_TYPE_INPUT }),
-    PI_NODE("PI", "Constant", PiNode.class),
+    CONSTANT_COLOR_NODE("CONST Color", "Constant", ConstantColorNode.class, new InputDialogType[] { InputDialogType.COLOR_TYPE_INPUT }, true),
     CONSTANT_MASK_NODE("CONST Mask", "Constant", ConstantMaskNode.class, new InputDialogType[] { InputDialogType.JSON_INPUT }, true),
 
     //DEBUG
@@ -89,6 +88,7 @@ public enum NodeType {
     POWER_NODE("Power", "Math Functions", PowerNode.class),
     SQRT_NODE("Square Root", "Math Functions", SquareRootNode.class),
     MODULO_NODE("Modulo", "Math Functions", ModuloNode.class),
+    PI_NODE("PI", "Math Functions", PiNode.class),
 
     //TEXTURE
     SIMPLE_TEXTURE_NODE("Simple Texture", "Texture", SimpleTextureNode.class, true),

@@ -1,9 +1,9 @@
 package logic.node.nodes.color;
 
 import control.type_enums.NodeType;
-import logic.node.LogicNode;
 import logic.node.joint.*;
 import logic.node.joint.joint_types.*;
+import logic.node.nodes.constant.ConstantColorNode;
 
 import java.awt.*;
 
