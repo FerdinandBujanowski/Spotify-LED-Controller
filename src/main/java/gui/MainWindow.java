@@ -259,6 +259,13 @@ public class MainWindow extends JFrame {
                                 int selectedOption = Dialogues.getSelectedOptionFromArray(BlendType.values(), message, 0);
                                 extraParameters[i] = BlendType.values()[selectedOption];
                             }
+                            case JSON_INPUT -> {
+                                JFileChooser fileOpenChooser = new JFileChooser();
+                                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+                                fileOpenChooser.setFileFilter(serializedFilter);
+                                int returnValue = fileOpenChooser.showOpenDialog(getParent());
+                                extraParameters[i] = returnValue == JFileChooser.APPROVE_OPTION ? fileOpenChooser.getSelectedFile().getPath() : "";
+                            }
                         }
                     }
                     if(tabbedPane.getSelectedComponent() == nodeEditWindow) {

@@ -50,6 +50,7 @@ public enum NodeType {
     CONSTANT_NUMBER_NODE("CONST Number", "Constant", ConstantNumberNode.class, new InputDialogType[] { InputDialogType.NUMBER_TYPE_INPUT }),
     CONSTANT_UNIT_NUMBER_NODE("CONST Unit Number", "Constant", ConstantUnitNumberNode.class, new InputDialogType[] {InputDialogType.UNIT_NUMBER_TYPE_INPUT }),
     PI_NODE("PI", "Constant", PiNode.class),
+    CONSTANT_MASK_NODE("CONST Mask", "Constant", ConstantMaskNode.class, new InputDialogType[] { InputDialogType.JSON_INPUT }, true),
 
     //DEBUG
     DEBUG_NODE("Debug Node", "Debug", DebugNode.class, new InputDialogType[] { InputDialogType.JOINT_TYPE_INPUT, InputDialogType.STRING_TYPE_INPUT }),

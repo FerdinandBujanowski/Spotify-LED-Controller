@@ -17,6 +17,7 @@ import control.type_enums.JointType;
 import control.type_enums.NodeType;
 import gui.MainWindow;
 import logic.function.LogicFunction;
+import logic.led.LogicMask;
 import logic.node.LogicNode;
 import logic.event.LogicEvent;
 import logic.event.LogicTrack;
@@ -397,5 +398,29 @@ public abstract class JsonWriter {
             e.printStackTrace();
         }
         System.out.println("JSON file successfully created");
+    }
+
+    public static LogicMask getMaskFromFile(String path) {
+        //TODO hier was richtiges einfügen lel
+        LogicMask logicMask = new LogicMask();
+
+        JsonObject ledObject = new JsonObject();
+        JsonParser jsonParser = new JsonParser();
+        try {
+            FileReader fileReader = new FileReader(path);
+            ledObject = jsonParser.parse(fileReader).getAsJsonObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        JsonArray pixelArray = ledObject.getAsJsonArray(MASK);
+        for(JsonElement jsonElement : pixelArray) {
+            JsonObject pixelObject = jsonElement.getAsJsonObject();
+            int x = pixelObject.get(X).getAsInt();
+            int y = pixelObject.get(Y).getAsInt();
+            double intensity = pixelObject.get(INTENSITY).getAsDouble();
+            logicMask.setIntensityAt(x, y, intensity);
+        }
+        return logicMask;
     }
 }
