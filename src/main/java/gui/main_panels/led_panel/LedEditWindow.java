@@ -223,6 +223,11 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
                     }
                 }
             }
+            case KeyEvent.VK_DELETE -> {
+                while(!this.selectedPixelIndexes.isEmpty()) {
+                    this.ledControl.onDeletePixelRequest(this.selectedPixelIndexes.get(this.selectedPixelIndexes.size() - 1));
+                }
+            }
         }
         repaint();
     }
@@ -331,6 +336,11 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
         for(int i = index; i < this.graphicPixels.size(); i++) {
             this.graphicPixels.get(i).pushBackIndex();
             this.graphicPixels.get(i).showIndex(this.showIndexes);
+        }
+        for(int i = 0; i < this.selectedPixelIndexes.size(); i++) {
+            if(this.selectedPixelIndexes.get(i) > index) {
+                this.selectedPixelIndexes.set(i, this.selectedPixelIndexes.get(i) - 1);
+            }
         }
         this.repaint();
     }

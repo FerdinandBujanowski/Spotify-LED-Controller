@@ -92,6 +92,7 @@ public class MainWindow extends JFrame {
         JMenuItem exportNodes = new JMenuItem("Export Nodes");
         JMenuItem loadNodes = new JMenuItem("Load Nodes");
         JMenuItem exportLeds = new JMenuItem("Export LEDs");
+        JMenuItem exportLedsAsMask = new JMenuItem("Export LEDs as Mask");
         JMenuItem loadLeds = new JMenuItem("Load LEDs");
         JMenu importMenu = new JMenu("Import");
         importMenu.add(loadTracks);
@@ -103,6 +104,7 @@ public class MainWindow extends JFrame {
         exportMenu.add(exportTimeMeasures);
         exportMenu.add(exportNodes);
         exportMenu.add(exportLeds);
+        exportMenu.add(exportLedsAsMask);
         fileMenu.add(newProject);
         fileMenu.add(openProject);
         fileMenu.add(new JSeparator());
@@ -611,6 +613,17 @@ public class MainWindow extends JFrame {
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
                     JsonWriter.writeLedsToFile(ledSaveUnit, fileSaveChooser.getSelectedFile().getPath());
                 }
+            }
+        });
+
+        exportLedsAsMask.addActionListener(e -> {
+            JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+            FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+            fileSaveChooser.setFileFilter(serializedFilter);
+            fileSaveChooser.setSelectedFile(new File("leds_mask.json"));
+            int returnValue = fileSaveChooser.showSaveDialog(getParent());
+            if(returnValue == JFileChooser.APPROVE_OPTION) {
+                ledControl.exportLedsAsMask(fileSaveChooser.getSelectedFile().getPath());
             }
         });
 

@@ -76,9 +76,11 @@ public class GraphicEvent extends JLabel {
 
                         int selectedOption = Dialogues.getSelectedOptionFromArray(CurveType.values(), "Edit Curve Type", CurveType.indexOf(getCurveType()));
                         CurveType newCurveType = CurveType.values()[selectedOption];
-                        userInput = Dialogues.getNumberValue("Please enter Unit Number");
-                        if(userInput < 0) userInput = 0;
-                        else if(userInput > 1) userInput = 1;
+                        if(newCurveType == CurveType.USER_INPUT) {
+                            userInput = Dialogues.getNumberValue("Please enter Unit Number");
+                            if (userInput < 0) userInput = 0;
+                            else if (userInput > 1) userInput = 1;
+                        }
 
                         eventControl.onUpdateEventRequest(
                                 trackIndex,

@@ -3,6 +3,7 @@ package control.led;
 import control.SerializableFunction;
 import control.node.ThreeCoordinatePoint;
 import control.node.TwoIntegerCorrespondence;
+import control.save.JsonWriter;
 import control.save.LedSaveUnit;
 import logic.led.LogicLayer;
 import logic.led.LogicMask;
@@ -42,6 +43,10 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
 
     public int getLayerCount() {
         return this.logicLayers.size();
+    }
+
+    public void exportLedsAsMask(String path) {
+        JsonWriter.writeMaskToFile(this.pixelMask.getValues(), path);
     }
 
     @Override

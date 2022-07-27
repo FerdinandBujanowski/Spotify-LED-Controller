@@ -346,10 +346,8 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             }
             case KeyEvent.VK_V -> {
                 if(this.toggleCtrl) {
-                    ArrayList<Integer> newNodeIndexes = this.nodeControl.copyNodes(this.copiedNodeIndexes, this.getFunctionIndex());
                     this.selectedNodeIndexes.removeAll(this.selectedNodeIndexes);
-                    this.selectedNodeIndexes.addAll(newNodeIndexes);
-                    this.toggleG = true;
+                    this.nodeControl.copyNodes(this.copiedNodeIndexes, this.getFunctionIndex());
                 }
             }
             case KeyEvent.VK_A -> {
@@ -453,6 +451,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
 
     @Override
     public void addGraphicNode(int functionIndex, int nodeIndex, NodeType nodeType, String nodeName, Point position) {
+        this.requestFocus();
 
         String[] inputJointNames = this.getNodeControl().getInputJointNames(functionIndex, nodeIndex);
         String[] outputJointNames = this.getNodeControl().getOutputJointNames(functionIndex, nodeIndex);
@@ -477,6 +476,8 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         newGraphicNode.setTotalLocation(position.x, position.y, this.zoomFactor);
 
         this.graphicNodes.add(newGraphicNode);
+        this.selectedNodeIndexes.add(nodeIndex);
+        this.toggleG = true;
         this.repaint();
     }
 
