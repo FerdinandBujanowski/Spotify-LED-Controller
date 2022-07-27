@@ -35,6 +35,7 @@ public abstract class JsonWriter {
     private final static String START = "start";
     private final static String DURATION = "duration";
     private final static String CURVE_TYPE = "curve_type";
+    private final static String USER_INPUT = "user_input";
     //TODO : seperate export/import events and time measures
     private final static String TIME_MEASURES = "time_measures";
     private final static String BEATS_BAR = "beats_per_bar";
@@ -72,9 +73,12 @@ public abstract class JsonWriter {
 
         JsonArray trackArray = new JsonArray();
         for(LogicTrack logicTrack : eventSaveUnit.getLogicTracks()) {
-            JsonObject eventsObject = new JsonObject();
-            eventsObject.add(EVENTS, getEventsArray(logicTrack));
-            trackArray.add(eventsObject);
+            JsonArray eventsArray = getEventsArray(logicTrack);
+            if(eventsArray.size() > 0) {
+                JsonObject eventsObject = new JsonObject();
+                eventsObject.add(EVENTS, getEventsArray(logicTrack));
+                trackArray.add(eventsObject);
+            }
         }
         finalObject.add(TRACKS, trackArray);
 
@@ -95,6 +99,9 @@ public abstract class JsonWriter {
             eventObject.addProperty(START, logicEvent.getMsStart());
             eventObject.addProperty(DURATION, logicEvent.getMsDuration());
             eventObject.addProperty(CURVE_TYPE, logicEvent.getCurveType().toString());
+            if(logicEvent.getCurveType() == CurveType.USER_INPUT) {
+                eventObject.addProperty(USER_INPUT, logicEvent.getUserInput());
+            }
             eventsArray.add(eventObject);
         }
         return eventsArray;
@@ -111,15 +118,16 @@ public abstract class JsonWriter {
         }
 
         for(JsonElement trackElement : tracksObject.getAsJsonArray(TRACKS)) {
-            int newTrackIndex = eventControl.getTrackCount();
+            int newTrackIndex = eventControl.getTrackCount() + 1;
             eventControl.onAddTrackRequest();
             for(JsonElement eventElement : trackElement.getAsJsonObject().getAsJsonArray(EVENTS)) {
+                JsonObject eventObject = eventElement.getAsJsonObject();
                 eventControl.onAddEventToTrackRequest(
                         newTrackIndex,
-                        eventElement.getAsJsonObject().get(START).getAsInt(),
-                        eventElement.getAsJsonObject().get(DURATION).getAsInt(),
-                        CurveType.getCurveTypeByString(eventElement.getAsJsonObject().get(CURVE_TYPE).getAsString()),
-                        0 //TODO : USER INPUT KEY IN JSON EVENT OBJECT
+                        eventObject.get(START).getAsInt(),
+                        eventObject.get(DURATION).getAsInt(),
+                        CurveType.getCurveTypeByString(eventObject.get(CURVE_TYPE).getAsString()),
+                        eventObject.has(USER_INPUT) ? eventObject.get(USER_INPUT).getAsDouble() : 0
                 );
             }
         }
@@ -410,7 +418,6 @@ public abstract class JsonWriter {
     }
 
     public static LogicMask getMaskFromFile(String path) {
-        //TODO hier was richtiges einfügen lel
         LogicMask logicMask = new LogicMask();
 
         JsonObject ledObject = new JsonObject();
