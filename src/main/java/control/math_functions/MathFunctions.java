@@ -38,4 +38,10 @@ public abstract class MathFunctions implements Serializable {
     public static double getCenterPeakInverse(double value) {
         return 4 * Math.pow((value - 0.5d), 2);
     }
+    public static double getExponential(double value) {
+        return Math.pow(value, 5);
+    }
+    public static double getExponentialInverse(double value) {
+        return -Math.pow(value, 5) + 1;
+    }
 }

@@ -17,6 +17,8 @@ public enum CurveType {
     CENTER_PEAK_INVERSE(MathFunctions::getCenterPeakInverse, new Color(190, 149, 196)),
     COSINE(MathFunctions::getCosine, new Color(224, 177, 203)),
     COSINE_INVERSE(MathFunctions::getCosineInverse, new Color(224, 177, 203)),
+    EXPONENTIAL(MathFunctions::getExponential, new Color(245, 210, 218)),
+    EXPONENTIAL_INVERSE(MathFunctions::getExponentialInverse, new Color(245, 210, 218)),
     USER_INPUT(MathFunctions::getLinear, Color.GRAY);
 
     private final Function<Double, Double> getCurveFunction;
