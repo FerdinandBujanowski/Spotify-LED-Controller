@@ -181,8 +181,15 @@ public class MainWindow extends JFrame {
                 }
             }
         });
-
         this.songMenu.add(createTrackNodeMenu);
+
+        JCheckBoxMenuItem animationModeItem = new JCheckBoxMenuItem("Animation Mode");
+        animationModeItem.addActionListener(e -> {
+            songControl.setAnimationMode(animationModeItem.isSelected());
+        });
+        this.songMenu.add(new JSeparator());
+        this.songMenu.add(animationModeItem);
+
         this.songMenu.setEnabled(false);
         this.jMenuBar.add(this.songMenu);
 
@@ -786,9 +793,9 @@ public class MainWindow extends JFrame {
             while(this.createTrackNodeMenu.getItemCount() != 0) {
                 this.createTrackNodeMenu.remove(0);
             }
-            for(int i = 0; i < eventControl.getTrackCount(); i++) {
+            for(int i = 1; i < eventControl.getTrackCount() + 1; i++) {
                 String trackName = "Track " + i;
-                JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, i, nodeControl);
+                JMenuItem newTrackNodeItem = createTrackToNodeItem(trackName, i - 1, nodeControl);
                 this.createTrackNodeMenu.add(newTrackNodeItem);
             }
         }

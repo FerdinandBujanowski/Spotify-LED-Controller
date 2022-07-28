@@ -44,10 +44,15 @@ public class Main {
                 if(songControl.isSongSelected()) {
                     songControl.updatePlayingState();
                     if(songControl.isSongPlaying() && songControl.isSongPaused()) {
-                        int updatedMS = songControl.getUpdatedSongMs();
-                        songControl.setCurrentSongMs(updatedMS);
-                        songControl.onSkipTo(updatedMS);
-
+                        int updatedMS;
+                        if(songControl.isAnimationMode()) {
+                            updatedMS = songControl.getAnimationTime();
+                            songControl.setCurrentSongMs(updatedMS);
+                        } else {
+                            updatedMS = songControl.getUpdatedSongMs();
+                            songControl.setCurrentSongMs(updatedMS);
+                            songControl.onSkipTo(updatedMS);
+                        }
                         eventControl.tick(updatedMS);
                         nodeControl.tick(updatedMS, eventControl.getTrackIntensitiesAt(updatedMS));
                     }
@@ -70,14 +75,19 @@ public class Main {
                     e.printStackTrace();
                 }
                 if(songControl.isSongPlaying()) {
+                    int correctMS;
                     if(!songControl.isSongPaused()) {
                         msSince.set((int)(System.currentTimeMillis() - currentMs.get()));
 
-                        int correctMS = msSince.get() + songControl.getCurrentSongMs();
+                         correctMS = msSince.get() + songControl.getCurrentSongMs();
 
                         eventControl.tick(correctMS);
                         nodeControl.tick(correctMS, eventControl.getTrackIntensitiesAt(correctMS));
                         mainWindow.repaintWindows(eventControl, nodeControl);
+
+                        if(songControl.isAnimationMode()) {
+                            songControl.setAnimationTime(correctMS);
+                        }
 
                     } else {
                         currentMs.set((int)System.currentTimeMillis());

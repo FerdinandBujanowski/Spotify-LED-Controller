@@ -365,7 +365,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
            @Override
            public void mouseClicked(MouseEvent e) {
                if(!curveBrush) {
-                   if(e.getClickCount() == 2 && e.getButton()  == MouseEvent.BUTTON1) {
+                   if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
                        Point eventTime = getClosestEventTime(e.getX());
                        eventControl.onAddEventToTrackRequest(
                                currentIndex,
@@ -410,12 +410,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
-    public void addEventToTrack(int trackNumber, int msStart, int msDuration, CurveType curveType, double userInput) {
-        int newEventIndex = this.graphicEvents.get(trackNumber).size();
-        GraphicEvent graphicEvent = new GraphicEvent(trackNumber, newEventIndex, curveType, msStart, msDuration, this, this.eventControl);
+    public void addEventToTrack(int trackIndex, int msStart, int msDuration, CurveType curveType, double userInput) {
+        int newEventIndex = this.graphicEvents.get(trackIndex).size();
+        GraphicEvent graphicEvent = new GraphicEvent(trackIndex, newEventIndex, curveType, msStart, msDuration, this, this.eventControl);
         graphicEvent.setUserInput(userInput);
 
-        this.graphicEvents.get(trackNumber).add(graphicEvent);
+        this.graphicEvents.get(trackIndex).add(graphicEvent);
         this.add(graphicEvent);
         graphicEvent.getParent().setComponentZOrder(graphicEvent, 0);
         this.repaint();

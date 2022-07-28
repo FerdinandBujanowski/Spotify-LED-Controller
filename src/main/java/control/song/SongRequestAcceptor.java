@@ -21,6 +21,9 @@ public interface SongRequestAcceptor {
     boolean isSongPlaying();
     boolean isSongPaused();
     boolean isSongSynced();
+    boolean isAnimationMode();
+    int getAnimationTime();
+    void setAnimationTime(int animationTime);
 
     ImageIcon getAlbumImage();
 

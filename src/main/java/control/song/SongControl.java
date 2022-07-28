@@ -40,6 +40,10 @@ public class SongControl implements SongRequestAcceptor {
     private String songId;
     private ImageIcon albumImage;
     private boolean songSelected, songPlaying, songPaused;
+
+    private boolean animationMode;
+    private int animationTime;
+
     private int currentSongMs;
     private Track[] lastSearchedSongList;
 
@@ -99,6 +103,11 @@ public class SongControl implements SongRequestAcceptor {
             }
         }
     }
+
+    public void setAnimationMode(boolean animationMode) {
+        this.animationMode = animationMode;
+    }
+
     public void updatePlayingState() {
         if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
             GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
@@ -122,6 +131,9 @@ public class SongControl implements SongRequestAcceptor {
         }
     }
     public int getUpdatedSongMs() {
+        if(this.animationMode) {
+            return this.currentSongMs;
+        }
         if(this.spotifyWebHandler.getSpotifyApi().getAccessToken() != null) {
             GetInformationAboutUsersCurrentPlaybackRequest currentPlaybackRequest =
                     this.spotifyWebHandler.getSpotifyApi().getInformationAboutUsersCurrentPlayback().build();
@@ -200,7 +212,9 @@ public class SongControl implements SongRequestAcceptor {
     }
 
     @Override
-    public void onStartPlayback() throws NotFoundException {
+    public void onStartPlayback() {
+        if(this.animationMode) return;
+
         StartResumeUsersPlaybackRequest startUsersPlayback = this.spotifyWebHandler.getSpotifyApi().startResumeUsersPlayback()
                 .uris(JsonParser.parseString("[\"spotify:track:" + this.songId + "\"]").getAsJsonArray())
                 .position_ms(0).build();
@@ -212,6 +226,10 @@ public class SongControl implements SongRequestAcceptor {
         }
     }
     private void onPausePlayback() {
+        if(this.animationMode) {
+            this.songPaused = true;
+            return;
+        }
         PauseUsersPlaybackRequest pauseUsersPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().pauseUsersPlayback().build();
         try {
             pauseUsersPlaybackRequest.execute();
@@ -221,11 +239,13 @@ public class SongControl implements SongRequestAcceptor {
         }
     }
     private void onResumePlayback() {
+        if(this.animationMode) {
+            this.songPaused = false;
+            return;
+        }
         StartResumeUsersPlaybackRequest resumeUsersPlaybackRequest = this.spotifyWebHandler.getSpotifyApi().startResumeUsersPlayback().build();
         try {
-            long msBefore = System.currentTimeMillis();
             resumeUsersPlaybackRequest.execute();
-            long msAfter = System.currentTimeMillis();
             this.songPaused = false;
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             e.printStackTrace();
@@ -233,7 +253,7 @@ public class SongControl implements SongRequestAcceptor {
     }
     @Override
     public void onTogglePlayback() {
-        if(this.songSelected && this.songPlaying) {
+        if(this.isSongSelected() && this.isSongPlaying()) {
             if(this.songPaused) {
                 this.onResumePlayback();
             } else {
@@ -248,11 +268,11 @@ public class SongControl implements SongRequestAcceptor {
     }
     @Override
     public boolean isSongSelected() {
-        return this.songSelected;
+        return this.songSelected || this.animationMode;
     }
     @Override
     public boolean isSongPlaying() {
-        return this.songPlaying;
+        return this.songPlaying || this.animationMode;
     }
     @Override
     public boolean isSongPaused() {
@@ -261,6 +281,21 @@ public class SongControl implements SongRequestAcceptor {
     @Override
     public boolean isSongSynced() {
         return false;
+    }
+
+    @Override
+    public boolean isAnimationMode() {
+        return this.animationMode;
+    }
+
+    @Override
+    public int getAnimationTime() {
+        return this.animationTime;
+    }
+
+    @Override
+    public void setAnimationTime(int animationTime) {
+        this.animationTime = animationTime;
     }
 
     @Override
@@ -273,6 +308,8 @@ public class SongControl implements SongRequestAcceptor {
     }
     @Override
     public void onSkipTo(int ms) {
+        if(this.animationMode) return;
+
         SeekToPositionInCurrentlyPlayingTrackRequest request =
                 this.spotifyWebHandler.getSpotifyApi().seekToPositionInCurrentlyPlayingTrack(ms).build();
         try {

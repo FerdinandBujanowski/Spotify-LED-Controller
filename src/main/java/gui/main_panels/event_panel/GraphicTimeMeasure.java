@@ -7,9 +7,7 @@ import control.type_enums.CurveType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 
 public class GraphicTimeMeasure extends GraphicEvent {
 
@@ -18,6 +16,9 @@ public class GraphicTimeMeasure extends GraphicEvent {
     private EventGraphicUnit eventGraphicUnit;
 
     private int hoveredBar;
+
+    private boolean startLock, midLock, endLock;
+    private JCheckBoxMenuItem startLockItem, midLockItem, endLockItem;
 
     public GraphicTimeMeasure(TimeMeasure timeMeasure, EventRequestAcceptor eventRequestAcceptor, EventGraphicUnit eventGraphicUnit) {
         super(
@@ -33,17 +34,36 @@ public class GraphicTimeMeasure extends GraphicEvent {
         this.eventRequestAcceptor = eventRequestAcceptor;
         this.eventGraphicUnit = eventGraphicUnit;
 
+        this.startLockItem = new JCheckBoxMenuItem("Start Lock");
+        this.midLockItem = new JCheckBoxMenuItem("Mid Lock");
+        this.endLockItem = new JCheckBoxMenuItem("End Lock");
+
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(e.getButton() == MouseEvent.BUTTON3) {
                     JPopupMenu editMenu = new JPopupMenu();
+
                     JMenuItem splitMenuItem = new JMenuItem("Split");
-                    editMenu.add(splitMenuItem);
-                    editMenu.show(e.getComponent(), e.getX(), e.getY());
                     splitMenuItem.addActionListener(actionEvent -> {
                         eventRequestAcceptor.onSplitTimeMeasureRequest(timeMeasure.getMsStart(), hoveredBar);
                     });
+
+
+                    ActionListener actionListener = actionEvent -> {
+                        handleLock(startLockItem.isSelected(), midLockItem.isSelected(), endLockItem.isSelected());
+                    };
+                    startLockItem.addActionListener(actionListener);
+                    midLockItem.addActionListener(actionListener);
+                    endLockItem.addActionListener(actionListener);
+
+                    editMenu.add(splitMenuItem);
+                    editMenu.add(new JSeparator());
+                    editMenu.add(startLockItem);
+                    editMenu.add(midLockItem);
+                    editMenu.add(endLockItem);
+
+                    editMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
@@ -57,8 +77,18 @@ public class GraphicTimeMeasure extends GraphicEvent {
     }
 
     public void calculateHoveredBarX(int pixelX) {
-        int ms = (int)Math.round(pixelX * eventGraphicUnit.getEventWidthDivision());
-        hoveredBar = (int)Math.round((double)ms / timeMeasure.getLengthOneBar());
+        int ms = (int)Math.round(pixelX * this.eventGraphicUnit.getEventWidthDivision());
+        this.hoveredBar = (int)Math.round((double)ms / this.timeMeasure.getLengthOneBar());
+    }
+
+    public void handleLock(boolean startLockRequest, boolean midLockRequest, boolean endLockRequest) {
+        //TODO : manche kombinationen ergeben keinen sinn
+        this.startLock = startLockRequest;
+        this.startLockItem.setSelected(this.startLock);
+        this.midLock = midLockRequest;
+        this.midLockItem.setSelected(this.midLock);
+        this.endLock = endLockRequest;
+        this.endLockItem.setSelected(this.endLock);
     }
 
     @Override
@@ -75,7 +105,6 @@ public class GraphicTimeMeasure extends GraphicEvent {
             int x = (int)Math.floor(i * msSingleBeat / this.eventGraphicUnit.getEventWidthDivision());
             g.fillRect(x, 0, 1, this.getHeight());
         }
-
 
         if(this.isRightHovered() || this.getLastMovement() == 1) {
             g.setColor(Color.BLUE);

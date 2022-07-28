@@ -37,6 +37,7 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     }
 
     public double[] getTrackIntensitiesAt(int ms) {
+        //TODO : sobald animation mode funktioniert hier gucken ob was geändert werden muss
         double[] values = new double[this.logicTracks.size()];
         for(int i = 0; i < values.length; i++) {
             values[i] = this.getTrackIntensityAt(new Point(i, ms));
@@ -194,7 +195,7 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     @Override
     public void onUpdateEventRequest(int trackIndex, int eventIndex, int msStartOld, boolean deleted, CurveType curveType, double userInput, int msStartNew, int msDurationNew) {
         if(trackIndex == 0) {
-
+            return;
         }
         this.logicTracks.get(trackIndex).removeEventAtIndex(eventIndex);
         if(deleted) {
