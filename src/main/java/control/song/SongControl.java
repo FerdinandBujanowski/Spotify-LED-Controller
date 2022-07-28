@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 
-public class SongControl implements SongRequestAcceptor {
+public class SongControl implements SongRequestAcceptor, SongEventCommunication {
 
     SpotifyWebHandler spotifyWebHandler;
     private boolean spotifyConnected;
@@ -306,9 +306,13 @@ public class SongControl implements SongRequestAcceptor {
     public void setCurrentSongMs(int newMs) {
         this.currentSongMs = newMs;
     }
+
     @Override
     public void onSkipTo(int ms) {
-        if(this.animationMode) return;
+        if(this.animationMode) {
+            this.animationTime = ms;
+            return;
+        }
 
         SeekToPositionInCurrentlyPlayingTrackRequest request =
                 this.spotifyWebHandler.getSpotifyApi().seekToPositionInCurrentlyPlayingTrack(ms).build();

@@ -34,6 +34,7 @@ public class Main {
                 ledControl
         );
         nodeControl.setLedNodeCommunication(ledControl);
+        eventControl.setSongEventCommunication(songControl);
         mainWindow.setVisible(true);
 
         AtomicInteger currentMs = new AtomicInteger((int) System.currentTimeMillis());

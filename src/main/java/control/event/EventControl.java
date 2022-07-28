@@ -1,6 +1,7 @@
 package control.event;
 
 import control.save.EventSaveUnit;
+import control.song.SongEventCommunication;
 import control.type_enums.CurveType;
 import logic.event.LogicEvent;
 import logic.event.LogicTrack;
@@ -16,6 +17,8 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     private ArrayList<TimeMeasure> timeMeasures;
 
     private int currentSongMs;
+
+    private SongEventCommunication songEventCommunication;
 
     public EventControl() {
 
@@ -45,9 +48,13 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
         return values;
     }
 
+    public void setSongEventCommunication(SongEventCommunication songEventCommunication) {
+        this.songEventCommunication = songEventCommunication;
+    }
+
     @Override
     public void onSkipTo(int ms) {
-
+        this.songEventCommunication.onSkipTo(ms);
     }
 
     @Override
