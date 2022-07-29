@@ -293,8 +293,14 @@ public class LogicMask implements Serializable {
     public static LogicMask getRotatedMask_Closest(LogicMask mask, double radians) {
         int degree = mask.getDegree();
         double[] rotatedDegreeCoordinates = LogicMask.rotateCoordinates(degree, degree, radians);
-        int rotatedDegree = (int)Math.round(Math.max(rotatedDegreeCoordinates[0], rotatedDegreeCoordinates[1]));
+        int rotatedDegree = (int)Math.round(
+                Math.max(
+                        Math.abs(rotatedDegreeCoordinates[0]), 
+                        Math.abs(rotatedDegreeCoordinates[1])
+                )
+        );
 
+        System.out.println(rotatedDegree);
         LogicMask newMask = new LogicMask();
         for(int i = -rotatedDegree; i <= rotatedDegree; i++) {
             for(int j = -rotatedDegree; j <= rotatedDegree; j++) {

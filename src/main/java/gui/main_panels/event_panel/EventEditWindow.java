@@ -404,8 +404,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
-    public void removeTrack(int trackNumber) {
-        this.trackLabels.remove(trackNumber);
+    public void removeTrack(int trackIndex) {
+        this.trackLabels.remove(trackIndex);
         //TODO : trackIndexes aller GraphicEvents müssen aktualisiert werden
     }
 
