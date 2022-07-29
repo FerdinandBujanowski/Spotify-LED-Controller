@@ -311,9 +311,9 @@ public class SongControl implements SongRequestAcceptor, SongEventCommunication 
     public void onSkipTo(int ms) {
         if(this.animationMode) {
             this.animationTime = ms;
+            this.setCurrentSongMs(this.animationTime);
             return;
         }
-
         SeekToPositionInCurrentlyPlayingTrackRequest request =
                 this.spotifyWebHandler.getSpotifyApi().seekToPositionInCurrentlyPlayingTrack(ms).build();
         try {

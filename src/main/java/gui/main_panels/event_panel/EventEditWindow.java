@@ -71,8 +71,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
                 if(e.getClickCount() == 2) {
                     Point closestEventTime = getClosestEventTime(e.getX());
                     eventControl.onSkipTo(closestEventTime.x);
+                    repaint();
                 }
-                repaint();
             }
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -422,9 +422,12 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     }
 
     @Override
-    public void deleteEvent(int trackNumber, int eventIndex) {
-        this.remove(this.graphicEvents.get(trackNumber).get(eventIndex));
-        this.graphicEvents.get(trackNumber).remove(eventIndex);
+    public void deleteEvent(int trackIndex, int eventIndex) {
+        this.remove(this.graphicEvents.get(trackIndex).get(eventIndex));
+        this.graphicEvents.get(trackIndex).remove(eventIndex);
+        for(int i = eventIndex; i < this.graphicEvents.get(trackIndex).size(); i++) {
+            this.graphicEvents.get(trackIndex).get(i).pushBackIndex();
+        }
         this.repaint();
     }
 

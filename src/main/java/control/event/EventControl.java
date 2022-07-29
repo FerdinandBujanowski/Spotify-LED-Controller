@@ -40,10 +40,9 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     }
 
     public double[] getTrackIntensitiesAt(int ms) {
-        //TODO : sobald animation mode funktioniert hier gucken ob was geändert werden muss
-        double[] values = new double[this.logicTracks.size()];
+        double[] values = new double[this.logicTracks.size() - 1];
         for(int i = 0; i < values.length; i++) {
-            values[i] = this.getTrackIntensityAt(new Point(i, ms));
+            values[i] = this.getTrackIntensityAt(new Point(i + 1, ms));
         }
         return values;
     }
@@ -55,6 +54,7 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     @Override
     public void onSkipTo(int ms) {
         this.songEventCommunication.onSkipTo(ms);
+        this.tick(ms);
     }
 
     @Override

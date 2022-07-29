@@ -18,7 +18,8 @@ public class GraphicEvent extends JLabel {
 
     private CurveType curveType;
     private double userInput;
-    private final int trackIndex, eventIndex;
+    private final int trackIndex;
+    private int eventIndex;
     private Point eventTime;
 
     private boolean leftHovered, rightHovered;
@@ -27,9 +28,9 @@ public class GraphicEvent extends JLabel {
 
     private boolean inSelection;
 
-    public GraphicEvent(int trackIndex, int eventIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, EventRequestAcceptor eventControl) {
-        this.trackIndex = trackIndex;
-        this.eventIndex = eventIndex;
+    public GraphicEvent(int pTrackIndex, int pEventIndex, CurveType curveType, int msStart, int msDuration, EventGraphicUnit eventGraphicUnit, EventRequestAcceptor eventControl) {
+        this.trackIndex = pTrackIndex;
+        this.eventIndex = pEventIndex;
 
         this.curveType = curveType;
         this.eventTime = new Point();
@@ -216,6 +217,10 @@ public class GraphicEvent extends JLabel {
 
         this.updateEventTime(msStart, msDuration);
         this.updateBounds();
+    }
+
+    public void pushBackIndex() {
+        this.eventIndex--;
     }
 
     public Point getEventTime() {
