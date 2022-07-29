@@ -15,7 +15,7 @@ public enum InputDialogType {
     ROUND_INPUT("Please select rounding algorithm"),
     COLOR_MIXING_INPUT("Please select color mixing type"),
     UPDATE_INPUT("Please select updating frequency"),
-    BLEND_INPUT("Please select blend direction"),
+    AXIS_INPUT("Please select axis"),
     JSON_INPUT("Please select .JSON file");
 
     private final String message;
@@ -58,7 +58,7 @@ public enum InputDialogType {
             case ROUND_INPUT -> RoundAlgorithmType.getTypeByString(objectString);
             case COLOR_MIXING_INPUT -> MixingAlgorithmType.getTypeByString(objectString);
             case UPDATE_INPUT -> UpdateType.getTypeByString(objectString);
-            case BLEND_INPUT -> BlendType.getTypeByString(objectString);
+            case AXIS_INPUT -> AxisType.getTypeByString(objectString);
         };
     }
 }

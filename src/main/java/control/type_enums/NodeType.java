@@ -65,7 +65,7 @@ public enum NodeType {
     //MASK
     SQUARE_MASK_NODE("Square Mask", "Mask", SquareMaskNode.class, true),
     CIRCLE_MASK_NODE("Circle Mask", "Mask", CircleMaskNode.class, true),
-    BLEND_MASK_NODE("Blend Mask", "Mask", BlendMaskNode.class, new InputDialogType[] { InputDialogType.BLEND_INPUT }, true),
+    BLEND_MASK_NODE("Blend Mask", "Mask", BlendMaskNode.class, new InputDialogType[] { InputDialogType.AXIS_INPUT }, true),
     MASK_ADDITION_NODE("Mask Addition", "Mask", MaskAdditionNode.class, true),
     MASK_SUBTRACTION_NODE("Mask Subtraction", "Mask", MaskSubtractionNode.class, true),
     MASK_DIFFERENCE_NODE("Mask Difference", "Mask", MaskDifferenceNode.class, true),
@@ -76,6 +76,7 @@ public enum NodeType {
     MOVE_MASK_NODE("Move Mask", "Mask", MoveMaskNode.class, true),
     SCALE_MASK_NODE("Scale Mask", "Mask", ScaleMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
     ROTATE_MASK_NODE("Rotate Mask", "Mask", RotateMaskNode.class, new InputDialogType[] { InputDialogType.ROUND_PIXEL_INPUT }, true),
+    MIRROR_MASK_NODE("Mirror Mask", "Mask", MirrorMaskNode.class, new InputDialogType[] { InputDialogType.AXIS_INPUT }, true),
     SHOW_MASK_NODE("Show Mask", "Mask", ShowMaskNode.class, true),
     RANDOM_MASK_NODE("Random Mask", "Mask", RandomMaskNode.class, true),
     GET_DEGREE_NODE("Get Degree", "Mask", GetDegreeNode.class, false),

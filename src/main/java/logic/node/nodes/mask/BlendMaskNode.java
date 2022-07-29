@@ -1,6 +1,6 @@
 package logic.node.nodes.mask;
 
-import control.type_enums.BlendType;
+import control.type_enums.AxisType;
 import control.type_enums.NodeType;
 import logic.led.LogicMask;
 import logic.node.joint.InputJoint;
@@ -11,9 +11,9 @@ import logic.node.joint.joint_types.UnitNumberJointDataType;
 
 public class BlendMaskNode extends SquareMaskNode {
 
-    private final BlendType blendType;
+    private final AxisType axisType;
 
-    public BlendMaskNode(int nodeIndex, BlendType blendType) {
+    public BlendMaskNode(int nodeIndex, AxisType axisType) {
         super(
                 nodeIndex,
                 new InputJoint[] {
@@ -24,13 +24,13 @@ public class BlendMaskNode extends SquareMaskNode {
                 new OutputJoint[] {
                         new OutputJoint(
                                 new MaskJointDataType(),
-                                "Output [" + blendType.name().toUpperCase().substring(0, 3) + "]"
+                                "Output [" + axisType.name().toUpperCase().substring(0, 3) + "]"
                         )
                 },
                 NodeType.BLEND_MASK_NODE,
-                new Object[] { blendType }
+                new Object[] {axisType}
         );
-        this.blendType = blendType;
+        this.axisType = axisType;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class BlendMaskNode extends SquareMaskNode {
         int iteration = (int) inputJoints[1].getJointDataType().getData();
         double alteration = (double) inputJoints[2].getJointDataType().getData();
 
-        LogicMask logicMask = LogicMask.getBlendMask(degree, iteration, alteration, this.blendType);
+        LogicMask logicMask = LogicMask.getBlendMask(degree, iteration, alteration, this.axisType);
         return new MaskJointDataType[] { new MaskJointDataType(logicMask) };
     }
 }

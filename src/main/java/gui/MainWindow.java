@@ -1,6 +1,5 @@
 package gui;
 
-import control.event.TimeMeasure;
 import control.led.LedControl;
 import control.node.NodeControl;
 import control.save.*;
@@ -264,9 +263,9 @@ public class MainWindow extends JFrame {
                                 int selectedOption = Dialogues.getSelectedOptionFromArray(UpdateType.values(), message, 0);
                                 extraParameters[i] = UpdateType.values()[selectedOption];
                             }
-                            case BLEND_INPUT -> {
-                                int selectedOption = Dialogues.getSelectedOptionFromArray(BlendType.values(), message, 0);
-                                extraParameters[i] = BlendType.values()[selectedOption];
+                            case AXIS_INPUT -> {
+                                int selectedOption = Dialogues.getSelectedOptionFromArray(AxisType.values(), message, 0);
+                                extraParameters[i] = AxisType.values()[selectedOption];
                             }
                             case JSON_INPUT -> {
                                 JFileChooser fileOpenChooser = new JFileChooser();

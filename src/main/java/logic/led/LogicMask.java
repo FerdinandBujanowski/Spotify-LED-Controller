@@ -1,12 +1,11 @@
 package logic.led;
 
 import control.SerializableFunction;
-import control.type_enums.BlendType;
+import control.type_enums.AxisType;
 
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.function.Function;
 
 public class LogicMask implements Serializable {
 
@@ -295,12 +294,10 @@ public class LogicMask implements Serializable {
         double[] rotatedDegreeCoordinates = LogicMask.rotateCoordinates(degree, degree, radians);
         int rotatedDegree = (int)Math.round(
                 Math.max(
-                        Math.abs(rotatedDegreeCoordinates[0]), 
+                        Math.abs(rotatedDegreeCoordinates[0]),
                         Math.abs(rotatedDegreeCoordinates[1])
                 )
         );
-
-        System.out.println(rotatedDegree);
         LogicMask newMask = new LogicMask();
         for(int i = -rotatedDegree; i <= rotatedDegree; i++) {
             for(int j = -rotatedDegree; j <= rotatedDegree; j++) {
@@ -316,8 +313,8 @@ public class LogicMask implements Serializable {
         return newMask;
     }
 
-    public static LogicMask getBlendMask(int degree, int iteration, double alterationPercentage, BlendType blendType) {
-        switch(blendType) {
+    public static LogicMask getBlendMask(int degree, int iteration, double alterationPercentage, AxisType axisType) {
+        switch(axisType) {
             case HORIZONTAL -> {
                 return LogicMask.getBlendMask_Horizontal(degree, iteration, alterationPercentage);
             }
@@ -375,4 +372,47 @@ public class LogicMask implements Serializable {
         };
     }
 
+    public static LogicMask getMirroredMask(LogicMask mask, AxisType axisType) {
+        switch(axisType) {
+            case HORIZONTAL -> {
+                return getMirroredMask_Horizontal(mask);
+            }
+            case VERTICAL -> {
+                return getMirroredMask_Vertical(mask);
+            }
+            case CIRCULAR -> {
+                return getMirroredMask_Horizontal(getMirroredMask_Vertical(mask));
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
+    private static LogicMask getMirroredMask_Horizontal(LogicMask mask) {
+        LogicMask newMask = new LogicMask();
+
+        int degree = mask.getDegree();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                newMask.setIntensityAt(x, y, mask.getIntensityAt(x, -1 * y));
+            }
+        }
+        newMask.cleanUp();
+
+        return newMask;
+    }
+
+    private static LogicMask getMirroredMask_Vertical(LogicMask mask) {
+        LogicMask newMask = new LogicMask();
+
+        int degree = mask.getDegree();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                newMask.setIntensityAt(x, y, mask.getIntensityAt(-1 * x, y));
+            }
+        }
+
+        return newMask;
+    }
 }
