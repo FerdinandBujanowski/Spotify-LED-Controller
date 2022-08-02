@@ -278,7 +278,6 @@ public class NodeControl implements NodeRequestAcceptor {
                 layerName,
                 NodeType._LAYER_NODE
         ) {
-
             @Override
             public void onInputChangeEvent() {
                 if(setTextureFunction != null && this.getInputJoints()[0].getConnectedOutputJoint() != null) {
