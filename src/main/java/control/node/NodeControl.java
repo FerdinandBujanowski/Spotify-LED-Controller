@@ -281,8 +281,9 @@ public class NodeControl implements NodeRequestAcceptor {
 
             @Override
             public void onInputChangeEvent() {
-                updateAll();
-                if(setTextureFunction != null) setTextureFunction.apply(this.getInputJoints()[0].getJointDataType().getData());
+                if(setTextureFunction != null && this.getInputJoints()[0].getConnectedOutputJoint() != null) {
+                    setTextureFunction.apply(this.getInputJoints()[0].getConnectedOutputJoint().getJointDataType().getData());
+                }
             }
         };
 
