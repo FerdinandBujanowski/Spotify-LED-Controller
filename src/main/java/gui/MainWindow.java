@@ -294,7 +294,6 @@ public class MainWindow extends JFrame {
         this.functionMenu = new JMenu("Function");
         JMenuItem createFunctionMenuItem = new JMenuItem("Create Function");
         this.addFunctionMenu = new JMenu("Add Function");
-        JMenuItem cleanUpCanvas = new JMenuItem("Clean up Canvas");
         JCheckBoxMenuItem gridMenuItem = new JCheckBoxMenuItem("Grid Active");
         this.functionItemList = new ArrayList<>();
 
@@ -336,17 +335,6 @@ public class MainWindow extends JFrame {
                 }
             }
         });
-        cleanUpCanvas.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(tabbedPane.getSelectedIndex() == 2) {
-                    nodeEditWindow.cleanUpCanvas();
-                } else if(tabbedPane.getSelectedIndex() == 3) {
-                    functionTabbedPane.getFunctionEditWindows().get(functionTabbedPane.getSelectedIndex()).cleanUpCanvas();
-                }
-            }
-        });
-
         gridMenuItem.addActionListener(e -> {
             nodeEditWindow.setGridActive(gridMenuItem.isSelected());
             nodeEditWindow.repaint();
@@ -355,7 +343,6 @@ public class MainWindow extends JFrame {
         this.functionMenu.add(createFunctionMenuItem);
         this.functionMenu.add(addFunctionMenu);
         this.functionMenu.add(new JSeparator());
-        this.functionMenu.add(cleanUpCanvas);
         this.functionMenu.add(gridMenuItem);
         jMenuBar.add(this.functionMenu);
         this.functionMenu.setEnabled(false);

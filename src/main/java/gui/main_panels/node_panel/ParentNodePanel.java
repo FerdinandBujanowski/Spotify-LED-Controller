@@ -517,34 +517,6 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         }
     }
 
-    @Override
-    public void cleanUpCanvas() {
-        ArrayList<ArrayList<Integer>> nodeSets = this.nodeControl.getNodeSets(this.getFunctionIndex());
-
-        for(ArrayList<Integer> nodeSet : nodeSets) {
-            TwoIntegerCorrespondence rankCorresponence = new TwoIntegerCorrespondence();
-            Point[] oldBounds = this.getNodeSetBounds(nodeSet);
-            Point centerPoint = new Point(
-                    oldBounds[0].x + ((oldBounds[1].x - oldBounds[0].x) / 2),
-                    oldBounds[0].y + ((oldBounds[1].y - oldBounds[0].y) / 2)
-            );
-            for(int nodeIndex : nodeSet) {
-                GraphicNode graphicNode = this.findGraphicNode(nodeIndex);
-                if(graphicNode != null) {
-                    Point newLocation = new Point(centerPoint.x - (int)(0.5 * graphicNode.getWidth()), centerPoint.y - (int)(0.5 * graphicNode.getHeight()));
-                    this.moveGraphicNode(graphicNode, new Point(newLocation.x - graphicNode.getX(), newLocation.y - graphicNode.getY()));
-
-                    int rank = this.nodeControl.getNodeRank(this.getFunctionIndex(), nodeIndex);
-                    rankCorresponence.addValue(nodeIndex, rank);
-                    newLocation.x = graphicNode.getX() + rank * graphicNode.getWidth();
-                    newLocation.y = graphicNode.getY();
-                    this.moveGraphicNode(graphicNode, new Point(newLocation.x - graphicNode.getX(), newLocation.y - graphicNode.getY()));
-                }
-            }
-        }
-        this.repaint();
-    }
-
     private Point[] getNodeSetBounds(ArrayList<Integer> nodeSet) {
         Point[] bounds = new Point[2];
         Point upperLeft = new Point();

@@ -10,5 +10,4 @@ public interface NodeGraphicUnit {
     void addGraphicNode(int functionIndex, int nodeIndex, NodeType nodeType, String nodeName, Point position);
     GraphicNode findGraphicNode(int nodeIndex);
     void moveGraphicNode(GraphicNode graphicNode, Point relativeMovement);
-    void cleanUpCanvas();
 }
