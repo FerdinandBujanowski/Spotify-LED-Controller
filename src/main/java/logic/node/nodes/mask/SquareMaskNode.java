@@ -11,6 +11,8 @@ import logic.node.joint.joint_types.UnitNumberJointDataType;
 
 public class SquareMaskNode extends LogicNode {
 
+    public LogicMask logicMask;
+
     public SquareMaskNode(int nodeIndex) {
         super(
                 nodeIndex,
@@ -23,14 +25,17 @@ public class SquareMaskNode extends LogicNode {
                 },
                 NodeType.SQUARE_MASK_NODE
         );
+        this.logicMask = new LogicMask();
     }
 
     public SquareMaskNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, NodeType nodeType, Object[] extraParameters) {
         super(nodeIndex, inputJoints, outputJoints, nodeType, extraParameters);
+        this.logicMask = new LogicMask();
     }
 
     public SquareMaskNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, NodeType nodeType) {
         super(nodeIndex, inputJoints, outputJoints, nodeType);
+        this.logicMask = new LogicMask();
     }
 
     @Override
@@ -38,8 +43,13 @@ public class SquareMaskNode extends LogicNode {
         int degree = (Integer) inputJoints[0].getJointDataType().getData();
         double intensity = (Double) inputJoints[1].getJointDataType().getData();
 
-        LogicMask logicMask = LogicMask.getSquareMask(degree, intensity);
-        return new MaskJointDataType[] { new MaskJointDataType(logicMask) };
+        this.logicMask.sweep();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                this.logicMask.setIntensityAt(x, y, intensity);
+            }
+        }
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 
     @Override

@@ -39,7 +39,7 @@ public class MainWindow extends JFrame {
 
     JSplitPane splitPane;
 
-    private final JMenu songMenu, nodeMenu, functionMenu, ledMenu, microControllerMenu, addFunctionMenu;
+    private final JMenu fileMenu, songMenu, nodeMenu, functionMenu, ledMenu, microControllerMenu, addFunctionMenu, exportFunctionMenu;
     private final ArrayList<JMenuItem> functionItemList;
     private final JMenu createTrackNodeMenu;
 
@@ -80,28 +80,32 @@ public class MainWindow extends JFrame {
         this.splitPane.setDividerLocation(40);
         this.add(this.splitPane);
         this.jMenuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
+        this.fileMenu = new JMenu("File");
         JMenuItem newProject = new JMenuItem("New Project");
         JMenuItem openProject = new JMenuItem("Open Project");
         JMenuItem saveProject = new JMenuItem("Save Project");
         JMenuItem exportTracks = new JMenuItem("Export Tracks");
-        JMenuItem loadTracks = new JMenuItem("Add Tracks");
+        JMenuItem loadTracks = new JMenuItem("Import Tracks");
         JMenuItem exportTimeMeasures = new JMenuItem("Export Time Measures");
         JMenuItem loadTimeMeasures = new JMenuItem("Set Time Measures");
         JMenuItem exportNodes = new JMenuItem("Export Nodes");
-        JMenuItem loadNodes = new JMenuItem("Load Nodes");
+        this.exportFunctionMenu = new JMenu("Export Function");
+        JMenuItem importFunction = new JMenuItem("Import Function");
+        JMenuItem loadNodes = new JMenuItem("Import Nodes");
         JMenuItem exportLeds = new JMenuItem("Export LEDs");
         JMenuItem exportLedsAsMask = new JMenuItem("Export LEDs as Mask");
-        JMenuItem loadLeds = new JMenuItem("Load LEDs");
+        JMenuItem loadLeds = new JMenuItem("Import LEDs");
         JMenu importMenu = new JMenu("Import");
         importMenu.add(loadTracks);
         importMenu.add(loadTimeMeasures);
         importMenu.add(loadNodes);
+        importMenu.add(importFunction);
         importMenu.add(loadLeds);
         JMenu exportMenu = new JMenu("Export");
         exportMenu.add(exportTracks);
         exportMenu.add(exportTimeMeasures);
         exportMenu.add(exportNodes);
+        exportMenu.add(exportFunctionMenu);
         exportMenu.add(exportLeds);
         exportMenu.add(exportLedsAsMask);
         fileMenu.add(newProject);
@@ -606,6 +610,16 @@ public class MainWindow extends JFrame {
             }
         });
 
+        importFunction.addActionListener(e -> {
+            JFileChooser fileOpenChooser = new JFileChooser();
+            FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+            fileOpenChooser.setFileFilter(serializedFilter);
+            int returnValue = fileOpenChooser.showOpenDialog(getParent());
+            if(returnValue == JFileChooser.APPROVE_OPTION) {
+                JsonWriter.importFunction(fileOpenChooser.getSelectedFile().getPath(), nodeControl, this);
+            }
+        });
+
         exportLeds.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -671,7 +685,9 @@ public class MainWindow extends JFrame {
         this.tabbedPane.setSelectedComponent(this.functionTabbedPane);
         this.functionTabbedPane.setSelectedIndex(this.functionTabbedPane.getTabCount() - 1);
         JMenuItem addNewFunctionItem = new JMenuItem(functionName);
+        JMenuItem exportNewFunctionItem = new JMenuItem(functionName);
         this.addFunctionMenu.add(addNewFunctionItem);
+        this.exportFunctionMenu.add(exportNewFunctionItem);
         this.functionItemList.add(addNewFunctionItem);
         addNewFunctionItem.addActionListener(new ActionListener() {
             @Override
@@ -683,6 +699,19 @@ public class MainWindow extends JFrame {
                     int selectedFunctionIndex = functionTabbedPane.getSelectedIndex();
                     nodeControl.addFunctionNode(currentFunctionIndex, selectedFunctionIndex, new Point(0, 0));
                 }
+            }
+        });
+        exportNewFunctionItem.addActionListener(e -> {
+            int currentFunctionIndex = functionItemList.indexOf(addNewFunctionItem);
+            JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+            FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+            fileSaveChooser.setFileFilter(serializedFilter);
+            fileSaveChooser.setSelectedFile(new File("function.json"));
+            int returnValue = fileSaveChooser.showSaveDialog(getParent());
+            if(returnValue == JFileChooser.APPROVE_OPTION) {
+                NodeSaveUnit nodeSaveUnit = nodeControl.createNodeSaveUnit();
+                Point[] functionGraphicNodePositions = bakeFunctionGraphicNodePositions()[currentFunctionIndex];
+                JsonWriter.writeFunctionToFile(nodeSaveUnit, fileSaveChooser.getSelectedFile().getPath(), currentFunctionIndex, functionGraphicNodePositions);
             }
         });
     }

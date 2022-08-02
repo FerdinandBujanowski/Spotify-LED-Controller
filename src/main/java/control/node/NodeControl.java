@@ -419,10 +419,24 @@ public class NodeControl implements NodeRequestAcceptor {
 
         //Kopie wird erstellt
         for(LogicNode logicNode : logicNodes) {
-            LogicNode newLogicNode;
-            try {
-                newLogicNode = logicNode.getClass().getDeclaredConstructor(int.class).newInstance(currentIndex);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            NodeType nodeType = logicNode.getNodeType();
+            LogicNode newLogicNode = null;
+            Object[] extraParameters = logicNode.getExtraParameters();
+            Class[] parameterClasses = new Class[extraParameters.length + 1];
+            Object[] newParameters = new Object[parameterClasses.length];
+            parameterClasses[0] = int.class;
+            newParameters[0] = currentIndex;
+            for(int i = 0; i < extraParameters.length; i++) {
+                parameterClasses[i + 1] = extraParameters[i].getClass();
+                newParameters[i + 1] = extraParameters[i];
+            }
+            if(logicNode.getNodeType().getNodeClass() != null) {
+                try {
+                    newLogicNode = (LogicNode) nodeType.getNodeClass().getDeclaredConstructor(parameterClasses).newInstance(newParameters);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
+            } else {
                 newLogicNode = new LogicNode(
                         currentIndex,
                         NodeControl.getCopyOfInputJointArray(logicNode.getInputJoints()),

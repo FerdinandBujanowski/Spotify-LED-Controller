@@ -10,8 +10,6 @@ import logic.node.nodes.mask.SquareMaskNode;
 
 public class ConstantMaskNode extends SquareMaskNode {
 
-    private final LogicMask logicMask;
-
     public ConstantMaskNode(int nodeIndex, String jsonPath) {
         super(
                 nodeIndex,

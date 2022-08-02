@@ -28,11 +28,18 @@ public class MoveMaskNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
-        LogicMask mask = (LogicMask) inputJoints[0].getJointDataType().getData();
+        this.logicMask.sweep();
+
+        LogicMask inputMask = (LogicMask) inputJoints[0].getJointDataType().getData();
         Point movement = new Point(
                 (Integer) inputJoints[1].getJointDataType().getData(),
                 (Integer) inputJoints[2].getJointDataType().getData()
         );
-        return new MaskJointDataType[] { new MaskJointDataType(LogicMask.getMovedMask(mask, movement)) };
+        for(Point pixel : inputMask.getCoordinates()) {
+            this.logicMask.setIntensityAt(pixel.x + movement.x, pixel.y + movement.y, inputMask.getIntensityAt(pixel.x, pixel.y));
+        }
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }

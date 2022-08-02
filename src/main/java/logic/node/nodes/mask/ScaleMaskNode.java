@@ -34,19 +34,37 @@ public class ScaleMaskNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
-        LogicMask logicMask = (LogicMask) inputJoints[0].getJointDataType().getData();
+        this.logicMask.sweep();
+
+        LogicMask inputMask = (LogicMask) inputJoints[0].getJointDataType().getData();
         double scaleX = (Double) inputJoints[1].getJointDataType().getData();
         double scaleY = (Double) inputJoints[2].getJointDataType().getData();
+        if(scaleX == 0) scaleX = 1.d;
+        if(scaleY == 0) scaleY = 1.d;
 
-        if(this.pixelAlgorithmType == PixelAlgorithmType.CLOSEST_NEIGHBOR) {
+        switch(this.pixelAlgorithmType) {
+            case CLOSEST_NEIGHBOR -> {
+                int oldLength = (inputMask.getDegree() * 2) + 1;
 
-            return new MaskJointDataType[] {
-                    new MaskJointDataType(LogicMask.getScaledMask_Closest(logicMask, scaleX, scaleY))
-            };
-        } else if(this.pixelAlgorithmType == PixelAlgorithmType.LINEAR_INTERPOLATION) {
-            return new MaskJointDataType[] {
-                    new MaskJointDataType(LogicMask.getScaledMask_Linear(logicMask, scaleX, scaleY))
-            };
-        } else return new MaskJointDataType[0];
+                int lengthX = (int)Math.round(oldLength * scaleX);
+                int degreeX = (lengthX - 1) / 2;
+                int lengthY = (int)Math.round(oldLength * scaleY);
+                int degreeY = (lengthY - 1) / 2;
+                for(int x = -degreeX; x <= degreeX; x++) {
+                    for(int y = -degreeY; y <= degreeY; y++) {
+                        int oldX = (int)Math.round(x / scaleX);
+                        int oldY = (int)Math.round(y / scaleY);
+                        this.logicMask.setIntensityAt(x, y, inputMask.getIntensityAt(oldX, oldY));
+                    }
+                }
+            }
+            case LINEAR_INTERPOLATION -> {
+
+            }
+        }
+
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }

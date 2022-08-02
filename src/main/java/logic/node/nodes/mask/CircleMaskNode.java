@@ -27,10 +27,23 @@ public class CircleMaskNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
+        this.logicMask.sweep();
+
         int radius = (Integer) inputJoints[0].getJointDataType().getData();
         double intensity = (Double) inputJoints[1].getJointDataType().getData();
-        LogicMask logicMask = LogicMask.getCircleMask(radius, intensity);
 
-        return new MaskJointDataType[] { new MaskJointDataType(logicMask) };
+        for(int i = -radius; i <= radius; i++) {
+            for(int j = -radius; j <= radius; j++) {
+                double hypothenuse = Math.sqrt(Math.pow(i, 2) + Math.pow(j, 2));
+                if(hypothenuse <= radius) {
+                    this.logicMask.setIntensityAt(i, j, intensity);
+                } else {
+                    this.logicMask.setIntensityAt(i, j, 0.0);
+                }
+            }
+        }
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }

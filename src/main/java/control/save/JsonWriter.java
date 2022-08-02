@@ -139,36 +139,20 @@ public abstract class JsonWriter {
         JsonArray nodeArray = new JsonArray();
         for(int i = 0; i < nodeSaveUnit.getLogicNodes().size(); i++) {
             LogicNode logicNode = nodeSaveUnit.getLogicNodes().get(i);
-            nodeArray.add(JsonWriter.getNodeJsonObject(logicNode, graphicNodePositions[i]));
+            nodeArray.add(JsonWriter.getNodeJsonObject(logicNode, -1, graphicNodePositions[i]));
         }
         finalObject.add(NODES, nodeArray);
 
         JsonArray connectionsArray = new JsonArray();
         for(NodeConnection nodeConnection : nodeSaveUnit.getNodeConnections()) {
-            connectionsArray.add(JsonWriter.getNodeConenctionJsonObject(nodeConnection));
+            connectionsArray.add(JsonWriter.getNodeConnectionJsonObject(nodeConnection, -1));
         }
         finalObject.add(NODE_CONNECTIONS, connectionsArray);
 
         JsonArray functionArray = new JsonArray();
         for(int i = 0; i < nodeSaveUnit.getLogicFunctions().size(); i++) {
             LogicFunction logicFunction = nodeSaveUnit.getLogicFunctions().get(i);
-            JsonObject functionObject = new JsonObject();
-            functionObject.addProperty(FUNCTION_INDEX, logicFunction.getFunctionIndex());
-            functionObject.addProperty(FUNCTION_NAME, logicFunction.getFunctionName());
-
-            JsonArray functionNodesArray = new JsonArray();
-            for(int j = 0; j < logicFunction.getLogicNodes().size(); j++) {
-                LogicNode logicNode = logicFunction.getLogicNodes().get(j);
-                functionNodesArray.add(JsonWriter.getNodeJsonObject(logicNode, functionGraphicNodePositions[i][j]));
-            }
-            functionObject.add(NODES, functionNodesArray);
-
-            JsonArray functionConnectionsArray = new JsonArray();
-            for(NodeConnection nodeConnection : logicFunction.getNodeConnections()) {
-                functionConnectionsArray.add(JsonWriter.getNodeConenctionJsonObject(nodeConnection));
-            }
-            functionObject.add(NODE_CONNECTIONS, functionConnectionsArray);
-
+            JsonObject functionObject = JsonWriter.getFunctionJsonObject(logicFunction, logicFunction.getFunctionIndex(), functionGraphicNodePositions[i]);
             functionArray.add(functionObject);
         }
         finalObject.add(FUNCTIONS, functionArray);
@@ -183,7 +167,42 @@ public abstract class JsonWriter {
         System.out.println("JSON file successfully created");
     }
 
-    private static JsonObject getNodeJsonObject(LogicNode logicNode, Point position) {
+    public static void writeFunctionToFile(NodeSaveUnit nodeSaveUnit, String path, int functionIndex, Point[] functionGraphicNodePositions) {
+        LogicFunction logicFunction = nodeSaveUnit.getLogicFunctions().get(functionIndex);
+        JsonObject functionObject = JsonWriter.getFunctionJsonObject(logicFunction, 0, functionGraphicNodePositions);
+
+        try {
+            FileWriter file = new FileWriter(path);
+            file.write(functionObject.toString());
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("JSON file successfully created");
+    }
+
+    private static JsonObject getFunctionJsonObject(LogicFunction logicFunction, int functionIndex, Point[] functionGraphicNodePositions) {
+        JsonObject functionObject = new JsonObject();
+        functionObject.addProperty(FUNCTION_INDEX, functionIndex);
+        functionObject.addProperty(FUNCTION_NAME, logicFunction.getFunctionName());
+
+        JsonArray functionNodesArray = new JsonArray();
+        for(int j = 0; j < logicFunction.getLogicNodes().size(); j++) {
+            LogicNode logicNode = logicFunction.getLogicNodes().get(j);
+            functionNodesArray.add(JsonWriter.getNodeJsonObject(logicNode, functionIndex, functionGraphicNodePositions[j]));
+        }
+        functionObject.add(NODES, functionNodesArray);
+
+        JsonArray functionConnectionsArray = new JsonArray();
+        for(NodeConnection nodeConnection : logicFunction.getNodeConnections()) {
+            functionConnectionsArray.add(JsonWriter.getNodeConnectionJsonObject(nodeConnection, functionIndex));
+        }
+        functionObject.add(NODE_CONNECTIONS, functionConnectionsArray);
+
+        return functionObject;
+    }
+
+    private static JsonObject getNodeJsonObject(LogicNode logicNode, int functionIndex, Point position) {
         JsonObject nodeObject = new JsonObject();
         NodeType nodeType = logicNode.getNodeType();
         nodeObject.addProperty(NODE_INDEX, logicNode.getNodeIndex());
@@ -200,22 +219,28 @@ public abstract class JsonWriter {
             for(int i = 0; i < extraParameters.length; i++) {
                 JsonObject inputObject = new JsonObject();
                 inputObject.addProperty(TYPE, inputDialogTypes[i].toString());
-                inputObject.addProperty(VALUE, InputDialogType.valueToString(inputDialogTypes[i], extraParameters[i]));
+                String value;
+                if((nodeType == NodeType._INPUT_PARAMETER_NODE || nodeType == NodeType._OUTPUT_PARAMETER_NODE) && i == 0) {
+                    value = String.valueOf(functionIndex);
+                } else {
+                    value = InputDialogType.valueToString(inputDialogTypes[i], extraParameters[i]);
+                }
+                inputObject.addProperty(VALUE, value);
                 extraParamArray.add(inputObject);
             }
             nodeObject.add(EXTRA_PARAMETERS, extraParamArray);
         }
         return nodeObject;
     }
-    private static JsonObject getNodeConenctionJsonObject(NodeConnection nodeConnection) {
+    private static JsonObject getNodeConnectionJsonObject(NodeConnection nodeConnection, int functionIndex) {
         JsonObject connectionObject = new JsonObject();
-        connectionObject.add(INPUT, JsonWriter.getThreeCoordinateJsonObject(nodeConnection.getInputCoordinates()));
-        connectionObject.add(OUTPUT, JsonWriter.getThreeCoordinateJsonObject(nodeConnection.getOutputCoordinates()));
+        connectionObject.add(INPUT, JsonWriter.getThreeCoordinateJsonObject(nodeConnection.getInputCoordinates(), functionIndex));
+        connectionObject.add(OUTPUT, JsonWriter.getThreeCoordinateJsonObject(nodeConnection.getOutputCoordinates(), functionIndex));
         return connectionObject;
     }
-    private static JsonObject getThreeCoordinateJsonObject(ThreeCoordinatePoint coordinatePoint) {
+    private static JsonObject getThreeCoordinateJsonObject(ThreeCoordinatePoint coordinatePoint, int functionIndex) {
         JsonObject coordinateObject = new JsonObject();
-        coordinateObject.addProperty(C_1, coordinatePoint.getX());
+        coordinateObject.addProperty(C_1, functionIndex);
         coordinateObject.addProperty(C_2, coordinatePoint.getY());
         coordinateObject.addProperty(C_3, coordinatePoint.getZ());
         return coordinateObject;
@@ -238,56 +263,9 @@ public abstract class JsonWriter {
         for(int i = 0; i < functionArray.size(); i++) {
 
             JsonObject functionObject = functionArray.get(i).getAsJsonObject();
-            int oldFunctionIndex = functionObject.get(FUNCTION_INDEX).getAsInt();
-            int newFunctionIndex = functionIndexOffset + oldFunctionIndex;
-            functionCorrespondence.addValue(oldFunctionIndex, newFunctionIndex);
-            JsonArray functionNodesArray = functionObject.getAsJsonArray(NODES);
-            JsonArray nodeConnectionsArray = functionObject.getAsJsonArray(NODE_CONNECTIONS);
-            String functionName = functionObject.get(FUNCTION_NAME).getAsString();
 
-            mainWindow.createFunction(functionName, new String[0], new JointType[0], new String[0], new JointType[0], nodeControl);
-            nodeControl.addFunction(newFunctionIndex, functionName, new String[0], new JointType[0], new String[0], new JointType[0]);
-
-            TwoIntegerCorrespondence nodeIndexCorrespondence = new TwoIntegerCorrespondence();
-
-            //FUNCTION NODES
-            for(int functionNodesIndex = 0; functionNodesIndex < functionNodesArray.size(); functionNodesIndex++) {
-                JsonObject currentNodeObject = functionNodesArray.get(functionNodesIndex).getAsJsonObject();
-
-                int oldIndex = currentNodeObject.get(NODE_INDEX).getAsInt();
-                int newIndex = nodeControl.getNextFreeNodeIndex(newFunctionIndex);
-                nodeIndexCorrespondence.addValue(oldIndex, newIndex);
-                NodeType nodeType = NodeType.getNodeTypeByString(currentNodeObject.get(NODE_TYPE).getAsString());
-
-                JsonArray extraParamJsonArray = currentNodeObject.getAsJsonArray(EXTRA_PARAMETERS);
-                Object[] extraParamArray = new Object[extraParamJsonArray != null ? extraParamJsonArray.size() : 0];
-                for(int extraParamIndex = 0; extraParamIndex < extraParamArray.length; extraParamIndex++) {
-                    JsonObject currentParamObject = extraParamJsonArray.get(extraParamIndex).getAsJsonObject();
-                    String typeString = currentParamObject.get(TYPE).getAsString();
-                    String valueString = currentParamObject.get(VALUE).getAsString();
-                    extraParamArray[extraParamIndex] = InputDialogType.getValueByString(typeString, valueString);
-                }
-
-                if(nodeType == NodeType._INPUT_PARAMETER_NODE || nodeType == NodeType._OUTPUT_PARAMETER_NODE) {
-                    extraParamArray[0] = functionCorrespondence.getCorrespondingValue((Integer) extraParamArray[0]);
-                }
-                int x = currentNodeObject.has(X) ? currentNodeObject.get(X).getAsInt() : 0;
-                int y = currentNodeObject.has(Y) ? currentNodeObject.get(Y).getAsInt() : 0;
-                nodeControl.addNode(newFunctionIndex, nodeType, extraParamArray, new Point(x, y));
-            }
-
-            //NODE CONNECTIONS
-            for(int nodeConnectionIndex = 0; nodeConnectionIndex < nodeConnectionsArray.size(); nodeConnectionIndex++) {
-                JsonObject currentConnectionObject = nodeConnectionsArray.get(nodeConnectionIndex).getAsJsonObject();
-
-                NodeConnection nodeConnection = getNodeConnection(currentConnectionObject, functionCorrespondence, nodeIndexCorrespondence);
-                try {
-                    nodeControl.makeNodeConnection(nodeConnection);
-                } catch (JointConnectionFailedException e) {
-                    System.out.println(e.getNodeConnection());
-                    e.printStackTrace();
-                }
-            }
+            //TODO Funktion einbeziehen
+            JsonWriter.addFunction(functionObject, nodeControl, mainWindow, functionIndexOffset, functionCorrespondence);
         }
 
         //NODES
@@ -323,6 +301,70 @@ public abstract class JsonWriter {
         for(int connectionIndex = 0; connectionIndex < nodeConnectionsArray.size(); connectionIndex++) {
             JsonObject currentConnectionObject = nodeConnectionsArray.get(connectionIndex).getAsJsonObject();
             NodeConnection nodeConnection = getNodeConnection(currentConnectionObject, new TwoIntegerCorrespondence(), nodeIndexCorrespondence);
+            try {
+                nodeControl.makeNodeConnection(nodeConnection);
+            } catch (JointConnectionFailedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void importFunction(String path, NodeControl nodeControl, MainWindow mainWindow) {
+        JsonObject functionObject = new JsonObject();
+        JsonParser jsonParser = new JsonParser();
+        try {
+            FileReader fileReader = new FileReader(path);
+            functionObject = jsonParser.parse(fileReader).getAsJsonObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        JsonWriter.addFunction(functionObject, nodeControl, mainWindow, nodeControl.getNextFreeFunctionIndex(), new TwoIntegerCorrespondence());
+    }
+
+    private static void addFunction(JsonObject functionObject, NodeControl nodeControl, MainWindow mainWindow, int functionIndexOffset, TwoIntegerCorrespondence functionCorrespondence) {
+        int oldFunctionIndex = functionObject.get(FUNCTION_INDEX).getAsInt();
+        int newFunctionIndex = functionIndexOffset + oldFunctionIndex;
+        functionCorrespondence.addValue(oldFunctionIndex, newFunctionIndex);
+        JsonArray functionNodesArray = functionObject.getAsJsonArray(NODES);
+        JsonArray nodeConnectionsArray = functionObject.getAsJsonArray(NODE_CONNECTIONS);
+        String functionName = functionObject.get(FUNCTION_NAME).getAsString();
+
+        mainWindow.createFunction(functionName, new String[0], new JointType[0], new String[0], new JointType[0], nodeControl);
+
+        TwoIntegerCorrespondence nodeIndexCorrespondence = new TwoIntegerCorrespondence();
+
+        //FUNCTION NODES
+        for(int functionNodesIndex = 0; functionNodesIndex < functionNodesArray.size(); functionNodesIndex++) {
+            JsonObject currentNodeObject = functionNodesArray.get(functionNodesIndex).getAsJsonObject();
+
+            int oldIndex = currentNodeObject.get(NODE_INDEX).getAsInt();
+            int newIndex = nodeControl.getNextFreeNodeIndex(newFunctionIndex);
+            nodeIndexCorrespondence.addValue(oldIndex, newIndex);
+            NodeType nodeType = NodeType.getNodeTypeByString(currentNodeObject.get(NODE_TYPE).getAsString());
+
+            JsonArray extraParamJsonArray = currentNodeObject.getAsJsonArray(EXTRA_PARAMETERS);
+            Object[] extraParamArray = new Object[extraParamJsonArray != null ? extraParamJsonArray.size() : 0];
+            for(int extraParamIndex = 0; extraParamIndex < extraParamArray.length; extraParamIndex++) {
+                JsonObject currentParamObject = extraParamJsonArray.get(extraParamIndex).getAsJsonObject();
+                String typeString = currentParamObject.get(TYPE).getAsString();
+                String valueString = currentParamObject.get(VALUE).getAsString();
+                extraParamArray[extraParamIndex] = InputDialogType.getValueByString(typeString, valueString);
+            }
+
+            if(nodeType == NodeType._INPUT_PARAMETER_NODE || nodeType == NodeType._OUTPUT_PARAMETER_NODE) {
+                extraParamArray[0] = functionCorrespondence.getCorrespondingValue((Integer) extraParamArray[0]);
+            }
+            int x = currentNodeObject.has(X) ? currentNodeObject.get(X).getAsInt() : 0;
+            int y = currentNodeObject.has(Y) ? currentNodeObject.get(Y).getAsInt() : 0;
+            nodeControl.addNode(newFunctionIndex, nodeType, extraParamArray, new Point(x, y));
+        }
+
+        //NODE CONNECTIONS
+        for(int nodeConnectionIndex = 0; nodeConnectionIndex < nodeConnectionsArray.size(); nodeConnectionIndex++) {
+            JsonObject currentConnectionObject = nodeConnectionsArray.get(nodeConnectionIndex).getAsJsonObject();
+
+            NodeConnection nodeConnection = getNodeConnection(currentConnectionObject, functionCorrespondence, nodeIndexCorrespondence);
             try {
                 nodeControl.makeNodeConnection(nodeConnection);
             } catch (JointConnectionFailedException e) {

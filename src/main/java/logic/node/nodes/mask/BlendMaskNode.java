@@ -35,11 +35,15 @@ public class BlendMaskNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
+        this.logicMask.sweep();
+
         int degree = (int) inputJoints[0].getJointDataType().getData();
         int iteration = (int) inputJoints[1].getJointDataType().getData();
         double alteration = (double) inputJoints[2].getJointDataType().getData();
 
-        LogicMask logicMask = LogicMask.getBlendMask(degree, iteration, alteration, this.axisType);
-        return new MaskJointDataType[] { new MaskJointDataType(logicMask) };
+        LogicMask.blendMask(this.logicMask, degree, iteration, alteration, this.axisType);
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }

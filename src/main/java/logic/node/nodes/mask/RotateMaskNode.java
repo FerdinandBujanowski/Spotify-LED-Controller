@@ -8,6 +8,8 @@ import logic.node.joint.OutputJoint;
 import logic.node.joint.joint_types.MaskJointDataType;
 import logic.node.joint.joint_types.NumberJointDataType;
 
+import java.awt.*;
+
 public class RotateMaskNode extends SquareMaskNode {
 
     private final PixelAlgorithmType pixelAlgorithmType;
@@ -33,11 +35,31 @@ public class RotateMaskNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
+        this.logicMask.sweep();
         //TODO : zwei verschiedene Algorithmen
-        LogicMask logicMask = (LogicMask) inputJoints[0].getJointDataType().getData();
+        LogicMask inputMask = (LogicMask) inputJoints[0].getJointDataType().getData();
         double radians = (Double) inputJoints[1].getJointDataType().getData();
-        return new MaskJointDataType[] {
-                new MaskJointDataType(LogicMask.getRotatedMask_Closest(logicMask, radians))
-        };
+        int degree = inputMask.getDegree();
+        
+        double[] rotatedDegreeCoordinates = LogicMask.rotateCoordinates(degree, degree, radians);
+        int rotatedDegree = (int)Math.round(
+                Math.max(
+                        Math.abs(rotatedDegreeCoordinates[0]),
+                        Math.abs(rotatedDegreeCoordinates[1])
+                )
+        );
+        for(int x = -rotatedDegree; x <= rotatedDegree; x++) {
+            for(int y = -rotatedDegree; y <= rotatedDegree; y++) {
+                double[] rotatedCoordinates = LogicMask.rotateCoordinates(x, y, -radians);
+                Point closestOldCoordinates = new Point(
+                        (int)Math.round(rotatedCoordinates[0]),
+                        (int)Math.round(rotatedCoordinates[1])
+                );
+                this.logicMask.setIntensityAt(x, y, inputMask.getIntensityAt(closestOldCoordinates.x, closestOldCoordinates.y));
+            }
+        }
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }

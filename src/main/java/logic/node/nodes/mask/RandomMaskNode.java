@@ -31,16 +31,19 @@ public class RandomMaskNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
-        LogicMask logicMask = new LogicMask();
+        this.logicMask.sweep();
+
         int degree = (Integer) inputJoints[0].getJointDataType().getData();
         LogicMask inputMask = (LogicMask) inputJoints[1].getJointDataType().getData();
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
                 if(inputMask.isEmpty() || inputMask.getIntensityAt(x, y) > 0) {
-                    logicMask.setIntensityAt(x, y, this.random.nextDouble());
+                    this.logicMask.setIntensityAt(x, y, this.random.nextDouble());
                 }
             }
         }
-        return new MaskJointDataType[] { new MaskJointDataType(logicMask) };
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }

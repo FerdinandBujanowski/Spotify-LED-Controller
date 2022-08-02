@@ -25,10 +25,18 @@ public class MultiplyMaskWithUnitNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
-        LogicMask logicMask = (LogicMask) inputJoints[0].getJointDataType().getData();
+        this.logicMask.sweep();
+        LogicMask inputMask = (LogicMask) inputJoints[0].getJointDataType().getData();
         double scalar = (Double) inputJoints[1].getJointDataType().getData();
-        return new MaskJointDataType[] {
-                new MaskJointDataType(LogicMask.getMultipliedMask(logicMask, scalar))
-        };
+        int degree = inputMask.getDegree();
+
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                this.logicMask.setIntensityAt(x, y, inputMask.getIntensityAt(x, y) * scalar);
+            }
+        }
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }

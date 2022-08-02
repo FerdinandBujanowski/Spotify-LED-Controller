@@ -29,7 +29,30 @@ public class MirrorMaskNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
+        this.logicMask.sweep();
+
         LogicMask inputMask = (LogicMask) inputJoints[0].getJointDataType().getData();
-        return new MaskJointDataType[] { new MaskJointDataType(LogicMask.getMirroredMask(inputMask, this.axisType)) };
+        int newX = 1, newY = 1;
+        switch(this.axisType) {
+            case HORIZONTAL -> {
+                newY = -1;
+            }
+            case VERTICAL -> {
+                newX = -1;
+            }
+            case CIRCULAR -> {
+                newX = -1;
+                newY = -1;
+            }
+        }
+        int degree = inputMask.getDegree();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                this.logicMask.setIntensityAt(x, y, inputMask.getIntensityAt(newX * x, newY * y));
+            }
+        }
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }

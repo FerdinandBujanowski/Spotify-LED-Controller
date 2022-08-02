@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class LogicMask implements Serializable {
 
-    public ArrayList<LogicPixel> pixels;
+    private final ArrayList<LogicPixel> pixels;
 
     public LogicMask() {
         this.pixels = new ArrayList<>();
@@ -36,6 +36,10 @@ public class LogicMask implements Serializable {
 
     public void cleanUp() {
         this.pixels.removeIf(logicPixel -> logicPixel.getIntensity() == 0);
+    }
+
+    public void sweep() {
+        this.pixels.removeAll(this.pixels);
     }
 
     public Point[] getCoordinates() {
@@ -86,19 +90,9 @@ public class LogicMask implements Serializable {
         return output;
     }
 
-    public static LogicMask getSquareMask(int degree, double intensity) {
-        LogicMask logicMask = new LogicMask();
-        for(int i = -degree; i <= degree; i++) {
-            for(int j = -degree; j <= degree; j++) {
-                logicMask.setIntensityAt(i, j, intensity);
-            }
-        }
-
-        logicMask.cleanUp();
-        return logicMask;
-    }
     public static LogicMask getCircleMask(int radius, double intensity) {
         LogicMask logicMask = new LogicMask();
+        System.out.println("New Mask");
         for(int i = -radius; i <= radius; i++) {
             for(int j = -radius; j <= radius; j++) {
                 double hypothenuse = Math.sqrt(Math.pow(i, 2) + Math.pow(j, 2));
@@ -119,6 +113,7 @@ public class LogicMask implements Serializable {
         int degree = (Math.max(degA, degB));
 
         LogicMask joinedMask = new LogicMask();
+        System.out.println("New Mask");
         for(int i = -degree; i <= degree; i++) {
             for(int j = -degree; j <= degree; j++) {
                 double newIntensity = operation.apply(
@@ -144,44 +139,6 @@ public class LogicMask implements Serializable {
         );
     }
 
-    public static LogicMask getJoinedMask_Subtract(LogicMask maskA, LogicMask maskB) {
-        return LogicMask.getJoinedMask(
-                maskA,
-                maskB,
-                doubles -> doubles[0] - doubles[1]
-        );
-    }
-
-    public static LogicMask getJoinedMask_Intersection(LogicMask maskA, LogicMask maskB) {
-        return LogicMask.getJoinedMask(
-                maskA,
-                maskB,
-                doubles -> {
-                    if(doubles[0] > 0 && doubles[1] > 0) {
-                        return doubles[0] + doubles[1];
-                    } else {
-                        return 0.0;
-                    }
-                }
-        );
-    }
-
-    public static LogicMask getJoinedMask_Difference(LogicMask maskA, LogicMask maskB) {
-        return LogicMask.getJoinedMask(
-                maskA,
-                maskB,
-                doubles -> {
-                    if(doubles[0] > 0 && doubles[1] <= 0) {
-                        return doubles[0];
-                    } else if(doubles[0] <= 0 && doubles[1] > 0) {
-                        return doubles[1];
-                    } else {
-                        return 0.0;
-                    }
-                }
-        );
-    }
-
     public static LogicMask getJoinedMask_Multiply(LogicMask maskA, LogicMask maskB) {
         return LogicMask.getJoinedMask(
                 maskA,
@@ -192,6 +149,7 @@ public class LogicMask implements Serializable {
 
     public static LogicMask getInvertedMask(LogicMask mask, int degree) {
         LogicMask newMask = new LogicMask();
+        System.out.println("New Mask");
         int newDegree = (Math.max(degree, mask.getDegree()));
 
         for(int i = -newDegree; i <= newDegree; i++) {
@@ -204,40 +162,11 @@ public class LogicMask implements Serializable {
 
     public static LogicMask getMultipliedMask(LogicMask mask, double scalar) {
         LogicMask newMask = new LogicMask();
+        System.out.println("New Mask");
         int degree = mask.getDegree();
         for(int i = -degree; i <= degree; i++) {
             for(int j = -degree; j <= degree; j++) {
                 newMask.setIntensityAt(i, j, scalar * mask.getIntensityAt(i, j));
-            }
-        }
-        return newMask;
-    }
-
-    public static LogicMask getMovedMask(LogicMask mask, Point movement) {
-        LogicMask newMask = new LogicMask();
-        for(Point pixel : mask.getCoordinates()) {
-            newMask.setIntensityAt(pixel.x + movement.x, pixel.y + movement.y, mask.getIntensityAt(pixel.x, pixel.y));
-        }
-        newMask.cleanUp();
-        return newMask;
-    }
-
-    public static LogicMask getScaledMask_Closest(LogicMask mask, double scaleX, double scaleY) {
-        if(scaleX == 0) scaleX = 1.d;
-        if(scaleY == 0) scaleY = 1.d;
-
-        LogicMask newMask = new LogicMask();
-        int oldLength = (mask.getDegree() * 2) + 1;
-
-        int lengthX = (int)Math.round(oldLength * scaleX);
-        int degreeX = (lengthX - 1) / 2;
-        int lengthY = (int)Math.round(oldLength * scaleY);
-        int degreeY = (lengthY - 1) / 2;
-        for(int i = -degreeX; i <= degreeX; i++) {
-            for(int j = -degreeY; j <= degreeY; j++) {
-                int oldX = (int)Math.round(i / scaleX);
-                int oldY = (int)Math.round(j / scaleY);
-                newMask.setIntensityAt(i, j, mask.getIntensityAt(oldX, oldY));
             }
         }
         return newMask;
@@ -248,6 +177,7 @@ public class LogicMask implements Serializable {
         if(scaleY == 0) scaleY = 1.d;
 
         LogicMask newMask = new LogicMask();
+        System.out.println("New Mask");
         int degreeX = (int)Math.round(mask.getDegree() * scaleX);
         int degreeY = (int)Math.round(mask.getDegree() * scaleY);
         for(int i = -degreeX; i <= degreeX; i++) {
@@ -289,76 +219,43 @@ public class LogicMask implements Serializable {
         return (valueA * interpolation) + (valueB * (1.d - interpolation));
     }
 
-    public static LogicMask getRotatedMask_Closest(LogicMask mask, double radians) {
-        int degree = mask.getDegree();
-        double[] rotatedDegreeCoordinates = LogicMask.rotateCoordinates(degree, degree, radians);
-        int rotatedDegree = (int)Math.round(
-                Math.max(
-                        Math.abs(rotatedDegreeCoordinates[0]),
-                        Math.abs(rotatedDegreeCoordinates[1])
-                )
-        );
-        LogicMask newMask = new LogicMask();
-        for(int i = -rotatedDegree; i <= rotatedDegree; i++) {
-            for(int j = -rotatedDegree; j <= rotatedDegree; j++) {
-                double[] rotatedCoordinates = LogicMask.rotateCoordinates(i, j, -radians);
-                Point closestOldCoordinates = new Point(
-                        (int)Math.round(rotatedCoordinates[0]),
-                        (int)Math.round(rotatedCoordinates[1])
-                );
-                newMask.setIntensityAt(i, j, mask.getIntensityAt(closestOldCoordinates.x, closestOldCoordinates.y));
-            }
-        }
-        newMask.cleanUp();
-        return newMask;
-    }
-
-    public static LogicMask getBlendMask(int degree, int iteration, double alterationPercentage, AxisType axisType) {
+    public static void blendMask(LogicMask originalMask, int degree, int iteration, double alterationPercentage, AxisType axisType) {
         switch(axisType) {
             case HORIZONTAL -> {
-                return LogicMask.getBlendMask_Horizontal(degree, iteration, alterationPercentage);
+                LogicMask. blendMask_Horizontal(originalMask, degree, iteration, alterationPercentage);
             }
             case VERTICAL -> {
-                return LogicMask.getBlendMask_Vertical(degree, iteration, alterationPercentage);
+                LogicMask.blendMask_Vertical(originalMask, degree, iteration, alterationPercentage);
             }
             case CIRCULAR -> {
-                return LogicMask.getBlendMask_Circular(degree, iteration, alterationPercentage);
-            }
-            default -> {
-                return null;
+                LogicMask.blendMask_Circular(originalMask, degree, iteration, alterationPercentage);
             }
         }
     }
 
-    private static LogicMask getBlendMask_Horizontal(int degree, int iteration, double alterationPercentage) {
-        LogicMask newMask = new LogicMask();
+    private static void blendMask_Horizontal(LogicMask originalMask, int degree, int iteration, double alterationPercentage) {
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
-                newMask.setIntensityAt(x, y, LogicMask.getBlendCurve(y, iteration, alterationPercentage));
+                originalMask.setIntensityAt(x, y, LogicMask.getBlendCurve(y, iteration, alterationPercentage));
             }
         }
-        return newMask;
     }
 
-    private static LogicMask getBlendMask_Vertical(int degree, int iteration, double alterationPercentage) {
-        LogicMask newMask = new LogicMask();
+    private static void blendMask_Vertical(LogicMask originalMask, int degree, int iteration, double alterationPercentage) {
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
-                newMask.setIntensityAt(x, y, LogicMask.getBlendCurve(x, iteration, alterationPercentage));
+                originalMask.setIntensityAt(x, y, LogicMask.getBlendCurve(x, iteration, alterationPercentage));
             }
         }
-        return newMask;
     }
 
-    private static LogicMask getBlendMask_Circular(int degree, int iteration, double alterationPercentage) {
-        LogicMask circularMask = new LogicMask();
+    private static void blendMask_Circular(LogicMask originalMask, int degree, int iteration, double alterationPercentage) {
         for(int x = -degree; x <= degree; x++) {
             for(int y = -degree; y <= degree; y++) {
                 double xValue = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-                circularMask.setIntensityAt(x, y, LogicMask.getBlendCurve(xValue, iteration, alterationPercentage));
+                originalMask.setIntensityAt(x, y, LogicMask.getBlendCurve(xValue, iteration, alterationPercentage));
             }
         }
-        return circularMask;
     }
 
     private static double getBlendCurve(double x, int iteration, double alterationPercentage) {
@@ -370,49 +267,5 @@ public class LogicMask implements Serializable {
                 Math.cos(radians) * x - Math.sin(radians) * y,
                 Math.sin(radians) * x + Math.cos(radians) * y
         };
-    }
-
-    public static LogicMask getMirroredMask(LogicMask mask, AxisType axisType) {
-        switch(axisType) {
-            case HORIZONTAL -> {
-                return getMirroredMask_Horizontal(mask);
-            }
-            case VERTICAL -> {
-                return getMirroredMask_Vertical(mask);
-            }
-            case CIRCULAR -> {
-                return getMirroredMask_Horizontal(getMirroredMask_Vertical(mask));
-            }
-            default -> {
-                return null;
-            }
-        }
-    }
-
-    private static LogicMask getMirroredMask_Horizontal(LogicMask mask) {
-        LogicMask newMask = new LogicMask();
-
-        int degree = mask.getDegree();
-        for(int x = -degree; x <= degree; x++) {
-            for(int y = -degree; y <= degree; y++) {
-                newMask.setIntensityAt(x, y, mask.getIntensityAt(x, -1 * y));
-            }
-        }
-        newMask.cleanUp();
-
-        return newMask;
-    }
-
-    private static LogicMask getMirroredMask_Vertical(LogicMask mask) {
-        LogicMask newMask = new LogicMask();
-
-        int degree = mask.getDegree();
-        for(int x = -degree; x <= degree; x++) {
-            for(int y = -degree; y <= degree; y++) {
-                newMask.setIntensityAt(x, y, mask.getIntensityAt(-1 * x, y));
-            }
-        }
-
-        return newMask;
     }
 }

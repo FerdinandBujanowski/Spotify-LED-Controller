@@ -25,8 +25,20 @@ public class InvertedMaskNode extends SquareMaskNode {
 
     @Override
     public MaskJointDataType[] function(InputJoint[] inputJoints) {
-        LogicMask maskA = (LogicMask) inputJoints[0].getJointDataType().getData();
+        this.logicMask.sweep();
+
+        LogicMask inputMask = (LogicMask) inputJoints[0].getJointDataType().getData();
         int degree = (Integer) inputJoints[1].getJointDataType().getData();
-        return new MaskJointDataType[] { new MaskJointDataType(LogicMask.getInvertedMask(maskA, degree)) };
+
+        int newDegree = (Math.max(degree, inputMask.getDegree()));
+
+        for(int i = -newDegree; i <= newDegree; i++) {
+            for(int j = -newDegree; j <= newDegree; j++) {
+                this.logicMask.setIntensityAt(i, j, 1.0 - inputMask.getIntensityAt(i, j));
+            }
+        }
+        this.logicMask.cleanUp();
+
+        return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };
     }
 }
