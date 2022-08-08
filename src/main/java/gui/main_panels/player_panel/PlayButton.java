@@ -2,6 +2,7 @@ package gui.main_panels.player_panel;
 
 import control.event.EventControl;
 import control.song.SongControl;
+import control.song.SongRequestAcceptor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -13,11 +14,11 @@ import java.io.IOException;
 
 public class PlayButton extends JButton {
 
-    private SongControl songControl;
+    private SongRequestAcceptor songControl;
     final ImageIcon playIcon;
     final ImageIcon pauseIcon;
 
-    public PlayButton(SongControl songControl) {
+    public PlayButton(SongRequestAcceptor songControl) {
         this.songControl = songControl;
 
         BufferedImage playImage = null;
