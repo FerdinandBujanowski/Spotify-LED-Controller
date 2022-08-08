@@ -42,14 +42,16 @@ public class ScaleMaskNode extends SquareMaskNode {
         if(scaleX == 0) scaleX = 1.d;
         if(scaleY == 0) scaleY = 1.d;
 
+        double oldLength = inputMask.getDegree() + 0.5;
+
+        double lengthX = oldLength * scaleX;
+        double lengthY = oldLength * scaleY;
+
         switch(this.pixelAlgorithmType) {
             case CLOSEST_NEIGHBOR -> {
-                int oldLength = (inputMask.getDegree() * 2) + 1;
+                int degreeX = (int)Math.round(lengthX - 0.5);
+                int degreeY = (int)Math.round(lengthY - 0.5);
 
-                int lengthX = (int)Math.round(oldLength * scaleX);
-                int degreeX = (lengthX - 1) / 2;
-                int lengthY = (int)Math.round(oldLength * scaleY);
-                int degreeY = (lengthY - 1) / 2;
                 for(int x = -degreeX; x <= degreeX; x++) {
                     for(int y = -degreeY; y <= degreeY; y++) {
                         int oldX = (int)Math.round(x / scaleX);
@@ -59,7 +61,37 @@ public class ScaleMaskNode extends SquareMaskNode {
                 }
             }
             case LINEAR_INTERPOLATION -> {
+                int degreeX = (int)Math.ceil(lengthX - 0.5);
+                int degreeY = (int)Math.ceil(lengthX - 0.5);
 
+                for(int x = -degreeX; x <= degreeX; x++) {
+                    for(int y = -degreeY; y <= degreeY; y++) {
+                        double oldX_d = x / scaleX;
+                        int oldX_high = (int)Math.ceil(oldX_d);
+                        int oldX_low = (int)Math.floor(oldX_d);
+                        double oldY_d = y / scaleY;
+                        int oldY_high = (int)Math.ceil(oldY_d);
+                        int oldY_low = (int)Math.floor(oldY_d);
+
+                        double intensityX_A = LogicMask.linearInterpolation(
+                                inputMask.getIntensityAt(oldX_high, oldY_high),
+                                inputMask.getIntensityAt(oldX_low, oldY_high),
+                                oldX_high - oldX_d
+                        );
+                        double intensityX_B = LogicMask.linearInterpolation(
+                                inputMask.getIntensityAt(oldX_high, oldY_low),
+                                inputMask.getIntensityAt(oldX_low, oldY_low),
+                                oldX_high - oldX_d
+                        );
+                        double finalIntensity = LogicMask.linearInterpolation(
+                                intensityX_A,
+                                intensityX_B,
+                                oldY_high - oldY_d
+                        );
+
+                        this.logicMask.setIntensityAt(x, y, finalIntensity);
+                    }
+                }
             }
         }
 

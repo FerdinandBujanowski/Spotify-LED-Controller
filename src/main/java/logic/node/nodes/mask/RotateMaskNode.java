@@ -48,16 +48,52 @@ public class RotateMaskNode extends SquareMaskNode {
                         Math.abs(rotatedDegreeCoordinates[1])
                 )
         );
-        for(int x = -rotatedDegree; x <= rotatedDegree; x++) {
-            for(int y = -rotatedDegree; y <= rotatedDegree; y++) {
-                double[] rotatedCoordinates = LogicMask.rotateCoordinates(x, y, -radians);
-                Point closestOldCoordinates = new Point(
-                        (int)Math.round(rotatedCoordinates[0]),
-                        (int)Math.round(rotatedCoordinates[1])
-                );
-                this.logicMask.setIntensityAt(x, y, inputMask.getIntensityAt(closestOldCoordinates.x, closestOldCoordinates.y));
+
+        switch(this.pixelAlgorithmType) {
+            case CLOSEST_NEIGHBOR -> {
+                for(int x = -rotatedDegree; x <= rotatedDegree; x++) {
+                    for(int y = -rotatedDegree; y <= rotatedDegree; y++) {
+                        double[] rotatedCoordinates = LogicMask.rotateCoordinates(x, y, -radians);
+                        Point closestOldCoordinates = new Point(
+                                (int)Math.round(rotatedCoordinates[0]),
+                                (int)Math.round(rotatedCoordinates[1])
+                        );
+                        this.logicMask.setIntensityAt(x, y, inputMask.getIntensityAt(closestOldCoordinates.x, closestOldCoordinates.y));
+                    }
+                }
+            }
+            case LINEAR_INTERPOLATION -> {
+                for(int x = -rotatedDegree; x <= rotatedDegree; x++) {
+                    for(int y = -rotatedDegree; y <= rotatedDegree; y++) {
+                        double[] rotatedCoordinates = LogicMask.rotateCoordinates(x, y, -radians);
+
+                        int oldX_high = (int)Math.ceil(rotatedCoordinates[0]);
+                        int oldX_low = (int)Math.floor(rotatedCoordinates[0]);
+                        int oldY_high = (int)Math.ceil(rotatedCoordinates[1]);
+                        int oldY_low = (int)Math.floor(rotatedCoordinates[1]);
+
+                        double intensityX_A = LogicMask.linearInterpolation(
+                                inputMask.getIntensityAt(oldX_high, oldY_high),
+                                inputMask.getIntensityAt(oldX_low, oldY_high),
+                                oldX_high - rotatedCoordinates[0]
+                        );
+                        double intensityX_B = LogicMask.linearInterpolation(
+                                inputMask.getIntensityAt(oldX_high, oldY_low),
+                                inputMask.getIntensityAt(oldX_low, oldY_low),
+                                oldX_high - rotatedCoordinates[0]
+                        );
+                        double finalIntensity = LogicMask.linearInterpolation(
+                                intensityX_A,
+                                intensityX_B,
+                                oldY_high - rotatedCoordinates[1]
+                        );
+
+                        this.logicMask.setIntensityAt(x, y, finalIntensity);
+                    }
+                }
             }
         }
+
         this.logicMask.cleanUp();
 
         return new MaskJointDataType[] { new MaskJointDataType(this.logicMask) };

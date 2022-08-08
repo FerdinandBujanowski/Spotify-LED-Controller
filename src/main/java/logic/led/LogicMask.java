@@ -212,7 +212,7 @@ public class LogicMask implements Serializable {
         return newMask;
     }
 
-    private static double linearInterpolation(double valueA, double valueB, double interpolation) {
+    public static double linearInterpolation(double valueA, double valueB, double interpolation) {
         if(interpolation > 1) interpolation = 1.d;
         if(interpolation < 0) interpolation = 0.d;
 
