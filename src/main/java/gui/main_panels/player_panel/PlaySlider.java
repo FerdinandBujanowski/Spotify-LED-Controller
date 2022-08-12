@@ -1,6 +1,5 @@
 package gui.main_panels.player_panel;
 
-import control.song.SongControl;
 import control.song.SongRequestAcceptor;
 
 import javax.swing.*;

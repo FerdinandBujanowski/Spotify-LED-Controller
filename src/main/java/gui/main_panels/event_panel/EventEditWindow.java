@@ -3,6 +3,7 @@ package gui.main_panels.event_panel;
 import control.event.*;
 import control.type_enums.CurveType;
 import control.type_enums.TimeSignature;
+import gui.main_panels.player_panel.PlaySlider;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +18,8 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
     private final ArrayList<JLabel> trackLabels;
     private final ArrayList<ArrayList<GraphicEvent>> graphicEvents;
     private final JLabel cursorLabel;
+
+    private PlaySlider playSlider;
 
     private double eventWidthDivision = 20;
     private TimeSignature barRoster;
@@ -103,6 +106,10 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
 
         eventControl.onAddTimeMeasureRequest(4, 60, 0, 16);
         eventControl.onAddTrackRequest();
+    }
+
+    public void setPlaySlider(PlaySlider playSlider) {
+        this.playSlider = playSlider;
     }
 
     public TimeSignature getBarRoster() {

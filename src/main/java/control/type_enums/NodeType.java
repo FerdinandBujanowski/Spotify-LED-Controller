@@ -114,7 +114,7 @@ public enum NodeType {
     _OUTPUT_PARAMETER_NODE("Output Parameter", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT, InputDialogType.JOINT_TYPE_INPUT, InputDialogType.STRING_TYPE_INPUT }),
     _TRACK_NODE("Track", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT }),
     _LED_POSITION_NODE("LED Position", "Commands", null),
-    _LAYER_NODE("Layer", "Commands", null);
+    _LAYER_NODE("Layer", "Commands", null, new InputDialogType[] { InputDialogType.INTEGER_TYPE_INPUT });
 
     private final String name;
     private final String categoryName;

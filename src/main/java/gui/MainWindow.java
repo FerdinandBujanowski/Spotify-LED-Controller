@@ -358,7 +358,8 @@ public class MainWindow extends JFrame {
                 if(currentLayerCount < ledControl.getLayerCount()) {
                     nodeControl.addLayerNode(
                             ledControl.updateTextureFunction(currentLayerCount),
-                            "Layer " + (currentLayerCount + 1),
+                            "Layer ",
+                            currentLayerCount + 1,
                             new Point(0, 0)
                     );
                 }

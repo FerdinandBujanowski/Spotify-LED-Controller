@@ -183,7 +183,7 @@ public class NodeControl implements NodeRequestAcceptor {
                     this.addTrackNode(trackIndex, position);
                 }
                 case _LAYER_NODE -> {
-                    this.addLayerNode(null, "[Prototype Layer]", position);
+                    this.addLayerNode(null, "[Prototype] Layer ", (int)extraParameters[0], position);
                 }
                 case _LED_POSITION_NODE -> {
                     this.addLedPositionNode(functionIndex, "Led Position", this.ledNodeCommunication.pixelPositionFunction(), position);
@@ -267,7 +267,8 @@ public class NodeControl implements NodeRequestAcceptor {
         this.nodeGraphicUnit.addGraphicNode(-1, newNodeIndex, NodeType._TRACK_NODE, nodeName, position);
     }
 
-    public void addLayerNode(SerializableFunction<Object, Integer> setTextureFunction, String layerName, Point position) {
+    public void addLayerNode(SerializableFunction<Object, Integer> setTextureFunction, String layerTitle, int layerIndex, Point position) {
+        String layerName = layerTitle + layerIndex;
         int newNodeIndex = this.getNextFreeNodeIndex(-1);
         LogicNode layerNode = new LogicNode(
                 newNodeIndex,
@@ -276,7 +277,10 @@ public class NodeControl implements NodeRequestAcceptor {
                 },
                 new OutputJoint[] {},
                 layerName,
-                NodeType._LAYER_NODE
+                NodeType._LAYER_NODE,
+                new Object[] {
+                        layerIndex
+                }
         ) {
             @Override
             public void onInputChangeEvent() {
