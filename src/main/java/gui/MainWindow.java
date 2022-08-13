@@ -20,6 +20,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -483,59 +484,105 @@ public class MainWindow extends JFrame {
         this.setCorrectLocation();
 
         newProject.addActionListener(e -> {
-            if(this.bProjectOpen) {
-                //TODO: Abfangen, dass im Zweifelsfall das geöffnete Programm nicht gespeichert wird
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int returnValue = fileChooser.showOpenDialog(getParent());
+            if(returnValue == JFileChooser.APPROVE_OPTION) {
+                String folderPath = fileChooser.getSelectedFile().getPath();
+
+                File projectFile = new File(folderPath + "\\project.json");
+                if(projectFile.exists()) {
+                    //TODO cannot create project
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Unable to create already existing project",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                } else {
+                    boolean creationSuccess = false;
+                    try {
+                        creationSuccess = projectFile.createNewFile();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    if(creationSuccess) {
+                        //TODO create project
+                        newProject(songControl, eventControl, nodeControl, ledControl, dimension);
+                        pack();
+                        setCorrectLocation();
+                        repaint();
+                        bProjectOpen = true;
+
+                        setTitle(projectFile.getParentFile().getName());
+                    }
+                }
             }
-            newProject(songControl, eventControl, nodeControl, ledControl, dimension);
-            pack();
-            setCorrectLocation();
-            repaint();
-            bProjectOpen = true;
         });
 
         openProject.addActionListener(e -> {
-            JFileChooser fileOpenChooser = new JFileChooser();
-            FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
-            fileOpenChooser.setFileFilter(serializedFilter);
+            JFileChooser fileOpenChooser = new JFileChooser("Please select project.json");
+            FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter("JSON", "json");
+            fileOpenChooser.setFileFilter(jsonFilter);
             int returnValue = fileOpenChooser.showOpenDialog(getParent());
             if(returnValue == JFileChooser.APPROVE_OPTION) {
-                DataStore data = DataStore.readFromFile(fileOpenChooser.getSelectedFile().getPath());
-                if(data != null) {
-
-                    newProject(songControl, eventControl, nodeControl, data.getLedControl(), dimension);
-                    eventControl.reinitialize(data.getEventSaveUnit());
-                    nodeControl.reinitialize(data.getNodeSaveUnit());
-                    nodeEditWindow.updateGraphicNodes(data.getNodeEditGraphicNodePositions());
-                    functionTabbedPane.updateFunctions(data.getFunctionEditGraphicNodePositions());
-
+                File projectFile = fileOpenChooser.getSelectedFile();
+                File directoryFile = projectFile.getParentFile();
+                if(projectFile.getName().equals("project.json")) {
+                    setTitle(directoryFile.getName());
+                    newProject(songControl, eventControl, nodeControl, ledControl, dimension);
+                    pack();
+                    setCorrectLocation();
+                    repaint();
+                    bProjectOpen = true;
                     enableTabs();
+
+                    File tracksFile = new File(directoryFile.getPath() + "\\data\\tracks.json");
+                    if(tracksFile.exists()) {
+                        JsonWriter.addTracksFromFile(tracksFile.getPath(), eventControl);
+                    }
+
+                    File nodesFile = new File(directoryFile.getPath() + "\\data\\nodes.json");
+                    if(nodesFile.exists()) {
+                        JsonWriter.addNodesFromFile(nodesFile.getPath(), nodeControl, this);
+                    }
+
+                    File ledsFile = new File(directoryFile.getPath() + "\\data\\leds.json");
+                    if(ledsFile.exists()) {
+                        JsonWriter.addLedsFromFile(ledsFile.getPath(), ledControl);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Unable to open: Please select project.json",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
 
-        saveProject.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Point[] nodeEditGraphicNodePositions = bakeGraphicNodePositions();
-                Point[][] functionEditGraphicNodePositions = bakeFunctionGraphicNodePositions();
-                DataStore dataStore = new DataStore(
-                        eventControl.createEventSaveUnit(),
-                        nodeControl.createNodeSaveUnit(),
-                        ledControl,
-                        nodeEditGraphicNodePositions,
-                        functionEditGraphicNodePositions
-                );
+        saveProject.addActionListener(e -> {
+            Point[] nodeEditGraphicNodePositions = bakeGraphicNodePositions();
+            Point[][] functionEditGraphicNodePositions = bakeFunctionGraphicNodePositions();
+            DataStore dataStore = new DataStore(
+                    eventControl.createEventSaveUnit(),
+                    nodeControl.createNodeSaveUnit(),
+                    ledControl,
+                    nodeEditGraphicNodePositions,
+                    functionEditGraphicNodePositions
+            );
 
-                JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
-                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
-                fileSaveChooser.setFileFilter(serializedFilter);
-                fileSaveChooser.setSelectedFile(new File("new_song.ledcontrol"));
-                int returnValue = fileSaveChooser.showSaveDialog(getParent());
-                if(returnValue == JFileChooser.APPROVE_OPTION) {
-                    DataStore.writeToFile(fileSaveChooser.getSelectedFile().getPath(), dataStore);
-                }
+            JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+            FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
+            fileSaveChooser.setFileFilter(serializedFilter);
+            fileSaveChooser.setSelectedFile(new File("new_song.ledcontrol"));
+            int returnValue = fileSaveChooser.showSaveDialog(getParent());
+            if(returnValue == JFileChooser.APPROVE_OPTION) {
+                DataStore.writeToFile(fileSaveChooser.getSelectedFile().getPath(), dataStore);
             }
-        });
+            });
 
         exportTracks.addActionListener(new ActionListener() {
             @Override
@@ -725,6 +772,10 @@ public class MainWindow extends JFrame {
 
     private void newProject(SongControl songControl, EventControl eventControl, NodeControl nodeControl, LedControl ledControl, Dimension dimension) {
 
+        songControl.reinitialize();
+        eventControl.reinitialize();
+        nodeControl.reinitialize();
+        ledControl.reinitialize();
         this.spotifyPlayerPanel = new SpotifyPlayerPanel(songControl, eventControl, dimension);
         this.eventEditWindow = new EventEditWindow(eventControl);
         this.nodeEditWindow = new NodeEditWindow(nodeControl);

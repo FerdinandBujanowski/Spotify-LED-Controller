@@ -34,8 +34,11 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
         this.colorSender = new ColorSender();
     }
 
-    public void reinitialize(LedSaveUnit ledSaveUnit) {
-
+    public void reinitialize() {
+        this.pixels.removeAll(this.pixels);
+        this.lastUpdatedColors.removeAll(this.lastUpdatedColors);
+        this.pixelMask.sweep();
+        this.logicLayers.removeAll(this.logicLayers);
     }
     public LedSaveUnit getLedSaveUnit() {
         return new LedSaveUnit(this.pixels, this.logicLayers.size());

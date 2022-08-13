@@ -29,10 +29,9 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
         this.currentSongMs = 0;
     }
 
-    public void reinitialize(EventSaveUnit eventSaveUnit) {
-        this.logicTracks = eventSaveUnit.getLogicTracks();
-        this.timeMeasures = eventSaveUnit.getTimeMeasures();
-        this.eventWindow.syncTracks(this.getTrackTimes());
+    public void reinitialize() {
+        this.logicTracks.removeAll(this.logicTracks);
+        this.timeMeasures.removeAll(this.timeMeasures);
     }
 
     public int getTrackCount() {

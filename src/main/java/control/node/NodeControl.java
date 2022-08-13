@@ -52,40 +52,13 @@ public class NodeControl implements NodeRequestAcceptor {
         this.jointHoveredJointIndex = -1;
     }
 
-    public void reinitialize(NodeSaveUnit nodeSaveUnit) {
-        this.logicNodes = nodeSaveUnit.getLogicNodes();
-        this.nodeConnections = nodeSaveUnit.getNodeConnections();
-        this.logicFunctions = nodeSaveUnit.getLogicFunctions();
-        this.trackNodeIndexes = nodeSaveUnit.getTrackNodeIndexes();
-
-        for(ThreeCoordinatePoint trackNodeIndex : this.trackNodeIndexes) {
-            int indexInArrayList = this.getNodeIndexInArrayList(trackNodeIndex.getX(), trackNodeIndex.getY());
-            LogicNode oldNode = this.findNode(trackNodeIndex.getX(), trackNodeIndex.getY());
-            LogicNode newNode = new LogicNode(
-                    oldNode.getNodeIndex(),
-                    oldNode.getInputJoints(),
-                    oldNode.getOutputJoints(),
-                    oldNode.getSpecificName(),
-                    oldNode.getNodeType(),
-                    oldNode.getExtraParameters()
-            ) {
-                @Override
-                public JointDataType[] function(InputJoint[] nullInputJoints) {
-                    double intensity = 0.d;
-                    if(trackIntensities.get(trackNodeIndex.getZ()) != null) {
-                        intensity = trackIntensities.get(trackNodeIndex.getZ());
-                    }
-                    return new UnitNumberJointDataType[] { new UnitNumberJointDataType(intensity) };
-                }
-            };
-            if(indexInArrayList != -1) {
-                if(trackNodeIndex.getX() == -1) {
-                    this.logicNodes.set(indexInArrayList, newNode);
-                } else {
-                    this.findFunction(trackNodeIndex.getY()).getLogicNodes().set(indexInArrayList, newNode);
-                }
-            }
-        }
+    public void reinitialize() {
+        this.logicNodes.removeAll(this.logicNodes);
+        this.nodeConnections.removeAll(this.nodeConnections);
+        this.logicFunctions.removeAll(this.logicFunctions);
+        this.trackNodeIndexes.removeAll(this.trackNodeIndexes);
+        this.ledNodeIndexes.removeAll(this.ledNodeIndexes);
+        this.functionGraphicUnits.removeAll(this.functionGraphicUnits);
     }
 
     public void setLedNodeCommunication(LedNodeCommunication ledNodeCommunication) {
