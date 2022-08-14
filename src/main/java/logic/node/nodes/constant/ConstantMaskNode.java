@@ -21,7 +21,7 @@ public class ConstantMaskNode extends SquareMaskNode {
                 new Object[] { jsonPath }
         );
 
-        this.logicMask = JsonWriter.getMaskFromFile(jsonPath);
+        this.logicMask = !jsonPath.equals("") ? JsonWriter.getMaskFromFile(jsonPath) : new LogicMask();
         this.getOutputJoints()[0].getJointDataType().setData(this.logicMask);
     }
 

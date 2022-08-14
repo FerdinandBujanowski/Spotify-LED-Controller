@@ -5,9 +5,11 @@ import control.exceptions.JointConnectionFailedException;
 import control.node.*;
 import control.exceptions.CannotDeleteNodeException;
 import control.save.JsonWriter;
+import control.type_enums.InputDialogType;
 import control.type_enums.JointType;
 import control.type_enums.NodeType;
 import control.math_functions.MathFunctions;
+import gui.Dialogues;
 import gui.main_panels.node_panel.GraphicJoint;
 import gui.main_panels.node_panel.GraphicNode;
 import gui.main_panels.node_panel.MaskPanel;
@@ -446,6 +448,56 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             return Color.WHITE;
         } else {
             return jointType.getColor();
+        }
+    }
+
+    public void handleInputJointClicked(Point coordinates) {
+        JointType jointType = this.getNodeControl().getJointType(true, this.functionIndex, coordinates.x, coordinates.y);
+        NodeType nodeType = null;
+        Object[] extraParameters = new Object[1];
+        switch(jointType) {
+            case INTEGER_TYPE -> {
+                nodeType = NodeType.CONSTANT_INTEGER_NODE;
+                extraParameters[0] = Dialogues.getIntegerValue("Please enter integer");
+            }
+            case NUMBER_TYPE -> {
+                nodeType = NodeType.CONSTANT_NUMBER_NODE;
+                extraParameters[0] = Dialogues.getNumberValue("Please enter number");
+            }
+            case UNIT_NUMBER_TYPE -> {
+                nodeType = NodeType.CONSTANT_UNIT_NUMBER_NODE;
+                extraParameters[0] = Dialogues.getNumberValue("Please enter unit number");
+                if((double)extraParameters[0] < 0) extraParameters[0] = 0;
+                if((double) extraParameters[0] > 1) extraParameters[0] = 1;
+            }
+            case MASK_TYPE -> {
+                nodeType = NodeType.CONSTANT_MASK_NODE;
+                extraParameters[0] = Dialogues.getJsonChooserFile(getParent(), InputDialogType.JSON_INPUT.getMessage());
+            }
+            case COLOR_TYPE -> {
+                nodeType = NodeType.CONSTANT_COLOR_NODE;
+                extraParameters[0] = JColorChooser.showDialog(null, InputDialogType.COLOR_TYPE_INPUT.getMessage(), null);
+            }
+        }
+        if(nodeType == null) return;
+        GraphicNode currentGraphicNode = this.findGraphicNode(coordinates.x);
+        this.nodeControl.addNode(this.functionIndex, nodeType, extraParameters, new Point(currentGraphicNode.getX() - 250, currentGraphicNode.getY()));
+        NodeConnection nodeConnection = new NodeConnection(
+                new ThreeCoordinatePoint(
+                        this.functionIndex,
+                        this.graphicNodes.get(this.graphicNodes.size() - 1).getIndexes().y,
+                        0
+                ),
+                new ThreeCoordinatePoint(
+                        this.functionIndex,
+                        coordinates.x,
+                        coordinates.y
+                )
+        );
+        try {
+            this.nodeControl.makeNodeConnection(nodeConnection);
+        } catch (JointConnectionFailedException e) {
+            e.printStackTrace();
         }
     }
 

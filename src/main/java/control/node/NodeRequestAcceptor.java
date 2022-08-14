@@ -15,6 +15,8 @@ public interface NodeRequestAcceptor {
     void setNodeGraphicUnit(NodeGraphicUnit nodeGraphicUnit);
     void addFunctionGraphicUnit(NodeGraphicUnit nodeGraphicUnit);
 
+    void addNode(int functionIndex, NodeType nodeType, Object[] extraParameters, Point position);
+
     ArrayList<NodeConnection> getNodeConnections(int functionIndex);
     String[] getInputJointNames(int functionIndex, int nodeIndex);
     String[] getOutputJointNames(int functionIndex, int nodeIndex);
@@ -24,6 +26,7 @@ public interface NodeRequestAcceptor {
     void updateOutputJointReleased(int functionIndex, int nodeIndex, int outputJointIndex) throws FunctionNodeInUseException, JointConnectionFailedException;
     void deleteJointConnectionRequest(int functionIndex, int nodeIndex, int inputJointIndex) throws FunctionNodeInUseException;
     void deleteNodeRequest(int functionIndex, int nodeIndex) throws CannotDeleteNodeException, FunctionNodeInUseException;
+    public void makeNodeConnection(NodeConnection nodeConnection) throws JointConnectionFailedException;
 
     NodeType getNodeType(int functionIndex, int nodeIndex);
     JointType getJointType(boolean input, int functionIndex, int nodeIndex, int jointIndex);

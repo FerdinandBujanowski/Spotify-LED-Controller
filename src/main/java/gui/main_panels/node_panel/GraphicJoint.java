@@ -32,6 +32,13 @@ public class GraphicJoint extends JPanel {
                 repaint();
                 getParent().repaint();
             }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(e.getButton() == MouseEvent.BUTTON3) {
+
+                }
+            }
         });
 
         this.addMouseMotionListener(new MouseMotionAdapter() {

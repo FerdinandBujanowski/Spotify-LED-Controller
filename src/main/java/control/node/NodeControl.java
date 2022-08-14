@@ -81,6 +81,7 @@ public class NodeControl implements NodeRequestAcceptor {
         return this.logicFunctions.get(this.logicFunctions.size() -1).getFunctionIndex() + 1;
     }
 
+    @Override
     public void addNode(int functionIndex, NodeType nodeType, Object[] extraParameters, Point position) {
         LogicNode newNode = null;
         int newNodeIndex = this.getNextFreeNodeIndex(functionIndex);
@@ -499,6 +500,7 @@ public class NodeControl implements NodeRequestAcceptor {
         );
     }
 
+    @Override
     public void makeNodeConnection(NodeConnection nodeConnection) throws JointConnectionFailedException {
         ThreeCoordinatePoint output = nodeConnection.getOutputCoordinates();
         ThreeCoordinatePoint input = nodeConnection.getInputCoordinates();

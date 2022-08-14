@@ -91,14 +91,22 @@ public class GraphicNode extends JPanel {
         for (int i = 0; i < graphicInputJoints.length; i++) {
             int currentNumber = i;
             this.graphicInputJoints[i] = new GraphicJoint(parentNodePanel.getJointTypeColor(true, this.indexes.y, currentNumber));
+            int finalI = i;
             this.graphicInputJoints[i].addMouseListener(new MouseAdapter() {
                 @Override
-                public void mousePressed(MouseEvent e) {
-                    if (e.getClickCount() >= 2) {
-                        try {
-                            parentNodePanel.onInputConnectionDelete(indexes.y, currentNumber);
-                        } catch (FunctionNodeInUseException ex) {
-                            JOptionPane.showMessageDialog(parentNodePanel, ex.getMessage(), "Connection delete failed!", JOptionPane.ERROR_MESSAGE);
+                public void mouseClicked(MouseEvent e) {
+                    switch(e.getButton()) {
+                        case MouseEvent.BUTTON1 -> {
+                            if (e.getClickCount() >= 2) {
+                                try {
+                                    parentNodePanel.onInputConnectionDelete(indexes.y, currentNumber);
+                                } catch (FunctionNodeInUseException ex) {
+                                    JOptionPane.showMessageDialog(parentNodePanel, ex.getMessage(), "Connection delete failed!", JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+                        }
+                        case MouseEvent.BUTTON3 -> {
+                            parentNodePanel.handleInputJointClicked(new Point(indexes.y, finalI));
                         }
                     }
                 }
@@ -111,7 +119,6 @@ public class GraphicNode extends JPanel {
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    //System.out.println("Input Joint " + currentNumber + " exited.");
                     parentNodePanel.onInputNodeHovered(-1, -1);
                     parentNodePanel.repaint();
                 }
@@ -126,7 +133,6 @@ public class GraphicNode extends JPanel {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    //System.out.println("Output Joint " + currentNumber + " released.");
                     try {
                         parentNodePanel.onOutputNodeReleased(indexes.y, currentNumber);
                     } catch (FunctionNodeInUseException | JointConnectionFailedException ex) {
@@ -208,7 +214,6 @@ public class GraphicNode extends JPanel {
     public MaskPanel getMaskPanel() {
         return this.maskPanel;
     }
-
 
     public void setLastClickedAt(Point lastClickedAt) {
         this.lastClickedAt = lastClickedAt;
@@ -342,6 +347,10 @@ public class GraphicNode extends JPanel {
                 this.setComponentZOrder(this.outputNameLabels[i], 0);
             }
         }
+    }
+
+    public void onJointClickedRequest() {
+
     }
 
     public GraphicJoint getOutputJoint(int jointIndex) {

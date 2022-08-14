@@ -1,6 +1,8 @@
 package gui;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.File;
 import java.text.NumberFormat;
 
@@ -66,5 +68,14 @@ public abstract class Dialogues {
                 super.approveSelection();
             }
         };
+    }
+
+    public static String getJsonChooserFile(Component parent, String message) {
+        JFileChooser fileOpenChooser = new JFileChooser(message);
+        FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
+        fileOpenChooser.setFileFilter(serializedFilter);
+        int returnValue = fileOpenChooser.showOpenDialog(parent);
+        if(returnValue == JFileChooser.APPROVE_OPTION) return fileOpenChooser.getSelectedFile().getPath();
+        else return "";
     }
 }

@@ -274,11 +274,7 @@ public class MainWindow extends JFrame {
                                 extraParameters[i] = AxisType.values()[selectedOption];
                             }
                             case JSON_INPUT -> {
-                                JFileChooser fileOpenChooser = new JFileChooser();
-                                FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
-                                fileOpenChooser.setFileFilter(serializedFilter);
-                                int returnValue = fileOpenChooser.showOpenDialog(getParent());
-                                extraParameters[i] = returnValue == JFileChooser.APPROVE_OPTION ? fileOpenChooser.getSelectedFile().getPath() : "";
+                                extraParameters[i] = Dialogues.getJsonChooserFile(getParent(), message);
                             }
                         }
                     }
