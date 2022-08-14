@@ -1,9 +1,6 @@
 package control.save;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import control.exceptions.JointConnectionFailedException;
 import control.led.LedControl;
 import control.node.NodeConnection;
@@ -29,6 +26,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public abstract class JsonWriter {
+
+    private final static String PROJECT_NAME = "project_name";
 
     private final static String TRACKS = "tracks";
     private final static String EVENTS = "events";
@@ -68,6 +67,13 @@ public abstract class JsonWriter {
     private final static String MASK = "mask";
     private final static String INTENSITY = "intensity";
 
+    public static void writeProjectFile(ProjectSaveUnit projectSaveUnit, String path) {
+        JsonObject projectObject = new JsonObject();
+        projectObject.addProperty(PROJECT_NAME, projectSaveUnit.getProjectName());
+
+        JsonWriter.write(projectObject, path);
+    }
+
     public static void writeTracksToFile(EventSaveUnit eventSaveUnit, String path) {
         JsonObject finalObject = new JsonObject();
 
@@ -82,14 +88,7 @@ public abstract class JsonWriter {
         }
         finalObject.add(TRACKS, trackArray);
 
-        try {
-            FileWriter file = new FileWriter(path);
-            file.write(finalObject.toString());
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("JSON file successfully created");
+        JsonWriter.write(finalObject, path);
     }
 
     private static JsonArray getEventsArray(LogicTrack logicTrack) {
@@ -157,28 +156,14 @@ public abstract class JsonWriter {
         }
         finalObject.add(FUNCTIONS, functionArray);
 
-        try {
-            FileWriter file = new FileWriter(path);
-            file.write(finalObject.toString());
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("JSON file successfully created");
+        JsonWriter.write(finalObject, path);
     }
 
     public static void writeFunctionToFile(NodeSaveUnit nodeSaveUnit, String path, int functionIndex, Point[] functionGraphicNodePositions) {
         LogicFunction logicFunction = nodeSaveUnit.getLogicFunctions().get(functionIndex);
         JsonObject functionObject = JsonWriter.getFunctionJsonObject(logicFunction, 0, functionGraphicNodePositions);
 
-        try {
-            FileWriter file = new FileWriter(path);
-            file.write(functionObject.toString());
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("JSON file successfully created");
+        JsonWriter.write(functionObject, path);
     }
 
     private static JsonObject getFunctionJsonObject(LogicFunction logicFunction, int functionIndex, Point[] functionGraphicNodePositions) {
@@ -400,14 +385,8 @@ public abstract class JsonWriter {
             pixelArray.add(pixelObject);
         }
         finalObject.add(PIXELS, pixelArray);
-        try {
-            FileWriter file = new FileWriter(path);
-            file.write(finalObject.toString());
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("JSON file successfully created");
+
+        JsonWriter.write(finalObject, path);
     }
 
     public static void addLedsFromFile(String path, LedControl ledControl) {
@@ -449,14 +428,8 @@ public abstract class JsonWriter {
             }
         }
         maskObject.add(MASK, pixelArray);
-        try {
-            FileWriter file = new FileWriter(path);
-            file.write(maskObject.toString());
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("JSON file successfully created");
+
+        JsonWriter.write(maskObject, path);
     }
 
     public static LogicMask getMaskFromFile(String path) {
@@ -480,5 +453,17 @@ public abstract class JsonWriter {
             logicMask.setIntensityAt(x, y, intensity);
         }
         return logicMask;
+    }
+
+    private static void write(JsonObject object, String path) {
+        try {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            FileWriter file = new FileWriter(path);
+            file.write(gson.toJson(object));
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("JSON file successfully created");
     }
 }

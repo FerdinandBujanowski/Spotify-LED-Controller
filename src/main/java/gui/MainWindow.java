@@ -45,6 +45,7 @@ public class MainWindow extends JFrame {
     private final JMenu createTrackNodeMenu;
 
     private boolean bProjectOpen;
+    private String projectPath;
 
     public MainWindow(Dimension dimension, String title, SongControl songControl, EventControl eventControl, NodeControl nodeControl, LedControl ledControl) {
         super(title);
@@ -515,7 +516,8 @@ public class MainWindow extends JFrame {
                         repaint();
                         bProjectOpen = true;
 
-                        setTitle(projectFile.getParentFile().getName());
+                        this.projectPath = projectFile.getParentFile().getPath();
+                        this.setTitle(projectFile.getParentFile().getName());
                     }
                 }
             }
@@ -529,6 +531,7 @@ public class MainWindow extends JFrame {
             if(returnValue == JFileChooser.APPROVE_OPTION) {
                 File projectFile = fileOpenChooser.getSelectedFile();
                 File directoryFile = projectFile.getParentFile();
+                this.projectPath = directoryFile.getPath();
                 if(projectFile.getName().equals("project.json")) {
                     setTitle(directoryFile.getName());
                     newProject(songControl, eventControl, nodeControl, ledControl, dimension);
@@ -538,17 +541,17 @@ public class MainWindow extends JFrame {
                     bProjectOpen = true;
                     enableTabs();
 
-                    File tracksFile = new File(directoryFile.getPath() + "\\data\\tracks.json");
+                    File tracksFile = new File(this.projectPath + "\\data\\tracks.json");
                     if(tracksFile.exists()) {
                         JsonWriter.addTracksFromFile(tracksFile.getPath(), eventControl);
                     }
 
-                    File nodesFile = new File(directoryFile.getPath() + "\\data\\nodes.json");
+                    File nodesFile = new File(this.projectPath + "\\data\\nodes.json");
                     if(nodesFile.exists()) {
                         JsonWriter.addNodesFromFile(nodesFile.getPath(), nodeControl, this);
                     }
 
-                    File ledsFile = new File(directoryFile.getPath() + "\\data\\leds.json");
+                    File ledsFile = new File(this.projectPath + "\\data\\leds.json");
                     if(ledsFile.exists()) {
                         JsonWriter.addLedsFromFile(ledsFile.getPath(), ledControl);
                     }
@@ -564,24 +567,19 @@ public class MainWindow extends JFrame {
         });
 
         saveProject.addActionListener(e -> {
-            Point[] nodeEditGraphicNodePositions = bakeGraphicNodePositions();
-            Point[][] functionEditGraphicNodePositions = bakeFunctionGraphicNodePositions();
-            DataStore dataStore = new DataStore(
-                    eventControl.createEventSaveUnit(),
-                    nodeControl.createNodeSaveUnit(),
-                    ledControl,
-                    nodeEditGraphicNodePositions,
-                    functionEditGraphicNodePositions
-            );
+            Point[] graphicNodePositions = bakeGraphicNodePositions();
+            Point[][] functionGraphicNodePositions = bakeFunctionGraphicNodePositions();
 
-            JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
-            FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("Spotify LED Control", "ledcontrol");
-            fileSaveChooser.setFileFilter(serializedFilter);
-            fileSaveChooser.setSelectedFile(new File("new_song.ledcontrol"));
-            int returnValue = fileSaveChooser.showSaveDialog(getParent());
-            if(returnValue == JFileChooser.APPROVE_OPTION) {
-                DataStore.writeToFile(fileSaveChooser.getSelectedFile().getPath(), dataStore);
-            }
+            if(this.projectPath == null) return;
+
+            File dataFolder = new File(this.projectPath + "\\data");
+            if(!dataFolder.exists()) dataFolder.mkdir();
+
+            JsonWriter.writeProjectFile(new ProjectSaveUnit(this.getTitle()), this.projectPath + "\\project.json");
+
+            JsonWriter.writeTracksToFile(eventControl.createEventSaveUnit(), dataFolder.getPath() + "\\tracks.json");
+            JsonWriter.writeNodesToFile(nodeControl.createNodeSaveUnit(), dataFolder.getPath() + "\\nodes.json", graphicNodePositions, functionGraphicNodePositions);
+            JsonWriter.writeLedsToFile(ledControl.getLedSaveUnit(), dataFolder.getPath() + "\\leds.json");
             });
 
         exportTracks.addActionListener(new ActionListener() {
