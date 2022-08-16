@@ -74,7 +74,7 @@ public abstract class JsonWriter {
         JsonWriter.write(projectObject, path);
     }
 
-    public static void writeTracksToFile(EventSaveUnit eventSaveUnit, String path) {
+    public static void writeTracksToFile(EventSaveUnit eventSaveUnit, String path, boolean exportTimeMeasures) {
         JsonObject finalObject = new JsonObject();
 
         JsonArray trackArray = new JsonArray();

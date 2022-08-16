@@ -17,6 +17,7 @@ import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 
 public class MainWindow extends JFrame {
 
+    public static final String PROGRAM_NAME = "LED Editor";
+    public static final String MAIN_PATH = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\" + PROGRAM_NAME;
     private SpotifyPlayerPanel spotifyPlayerPanel;
 
     private NodeEditWindow nodeEditWindow;
@@ -49,6 +52,27 @@ public class MainWindow extends JFrame {
 
     public MainWindow(Dimension dimension, String title, SongControl songControl, EventControl eventControl, NodeControl nodeControl, LedControl ledControl) {
         super(title);
+
+        File mainDir = new File(MAIN_PATH);
+        if(!mainDir.exists()) mainDir.mkdir();
+
+        File tracksDir = new File(MAIN_PATH + "\\tracks");
+        if(!tracksDir.exists()) tracksDir.mkdir();
+
+        File nodesDir = new File(MAIN_PATH + "\\nodes");
+        if(!nodesDir.exists()) nodesDir.mkdir();
+
+        File functionsDir = new File(MAIN_PATH + "\\functions");
+        if(!functionsDir.exists()) functionsDir.mkdir();
+
+        File ledsDir = new File(MAIN_PATH + "\\leds");
+        if(!ledsDir.exists()) ledsDir.mkdir();
+
+        File projectsDir = new File(MAIN_PATH + "\\projects");
+        if(!projectsDir.exists()) projectsDir.mkdir();
+
+        File masksDir = new File(MAIN_PATH + "\\masks");
+        if(!masksDir.exists()) masksDir.mkdir();
 
         this.setIconImage(new ImageIcon("images\\icon\\icon.png").getImage());
         this.bProjectOpen = false;
@@ -85,11 +109,10 @@ public class MainWindow extends JFrame {
         this.fileMenu = new JMenu("File");
         JMenuItem newProject = new JMenuItem("New Project");
         JMenuItem openProject = new JMenuItem("Open Project");
+        JMenu openRecentProject = new JMenu("Open Recent Project");
         JMenuItem saveProject = new JMenuItem("Save Project");
         JMenuItem exportTracks = new JMenuItem("Export Tracks");
         JMenuItem loadTracks = new JMenuItem("Import Tracks");
-        JMenuItem exportTimeMeasures = new JMenuItem("Export Time Measures");
-        JMenuItem loadTimeMeasures = new JMenuItem("Set Time Measures");
         JMenuItem exportNodes = new JMenuItem("Export Nodes");
         this.exportFunctionMenu = new JMenu("Export Function");
         JMenuItem importFunction = new JMenuItem("Import Function");
@@ -99,19 +122,18 @@ public class MainWindow extends JFrame {
         JMenuItem loadLeds = new JMenuItem("Import LEDs");
         JMenu importMenu = new JMenu("Import");
         importMenu.add(loadTracks);
-        importMenu.add(loadTimeMeasures);
         importMenu.add(loadNodes);
         importMenu.add(importFunction);
         importMenu.add(loadLeds);
         JMenu exportMenu = new JMenu("Export");
         exportMenu.add(exportTracks);
-        exportMenu.add(exportTimeMeasures);
         exportMenu.add(exportNodes);
         exportMenu.add(exportFunctionMenu);
         exportMenu.add(exportLeds);
         exportMenu.add(exportLedsAsMask);
         fileMenu.add(newProject);
         fileMenu.add(openProject);
+        fileMenu.add(openRecentProject);
         fileMenu.add(new JSeparator());
         fileMenu.add(saveProject);
         fileMenu.add(new JSeparator());
@@ -274,7 +296,7 @@ public class MainWindow extends JFrame {
                                 extraParameters[i] = AxisType.values()[selectedOption];
                             }
                             case JSON_INPUT -> {
-                                extraParameters[i] = Dialogues.getJsonChooserFile(getParent(), message);
+                                extraParameters[i] = Dialogues.getJsonChooserFile(getParent(), message, masksDir.getPath());
                             }
                         }
                     }
@@ -484,13 +506,13 @@ public class MainWindow extends JFrame {
 
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fileChooser.setCurrentDirectory(projectsDir);
             int returnValue = fileChooser.showOpenDialog(getParent());
             if(returnValue == JFileChooser.APPROVE_OPTION) {
                 String folderPath = fileChooser.getSelectedFile().getPath();
 
                 File projectFile = new File(folderPath + "\\project.json");
                 if(projectFile.exists()) {
-                    //TODO cannot create project
                     JOptionPane.showMessageDialog(
                             null,
                             "Unable to create already existing project",
@@ -521,46 +543,29 @@ public class MainWindow extends JFrame {
 
         openProject.addActionListener(e -> {
             JFileChooser fileOpenChooser = new JFileChooser("Please select project.json");
+            fileOpenChooser.setCurrentDirectory(projectsDir);
             FileNameExtensionFilter jsonFilter = new FileNameExtensionFilter("JSON", "json");
             fileOpenChooser.setFileFilter(jsonFilter);
             int returnValue = fileOpenChooser.showOpenDialog(getParent());
             if(returnValue == JFileChooser.APPROVE_OPTION) {
                 File projectFile = fileOpenChooser.getSelectedFile();
-                File directoryFile = projectFile.getParentFile();
-                this.projectPath = directoryFile.getPath();
-                if(projectFile.getName().equals("project.json")) {
-                    setTitle(directoryFile.getName());
-                    newProject(songControl, eventControl, nodeControl, ledControl, dimension);
-                    pack();
-                    setCorrectLocation();
-                    repaint();
-                    bProjectOpen = true;
-                    enableTabs();
-
-                    File tracksFile = new File(this.projectPath + "\\data\\tracks.json");
-                    if(tracksFile.exists()) {
-                        JsonWriter.addTracksFromFile(tracksFile.getPath(), eventControl);
-                    }
-
-                    File nodesFile = new File(this.projectPath + "\\data\\nodes.json");
-                    if(nodesFile.exists()) {
-                        JsonWriter.addNodesFromFile(nodesFile.getPath(), nodeControl, this);
-                    }
-
-                    File ledsFile = new File(this.projectPath + "\\data\\leds.json");
-                    if(ledsFile.exists()) {
-                        JsonWriter.addLedsFromFile(ledsFile.getPath(), ledControl);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Unable to open: Please select project.json",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-                }
+                this.openProject(projectFile, songControl, eventControl, nodeControl, ledControl, dimension);
             }
         });
+
+        File[] projectDirs = projectsDir.listFiles();
+        if(projectDirs != null) {
+            for(File currentProjectDir : projectDirs) {
+                File currentProjectFile = new File(currentProjectDir.getPath() + "\\project.json");
+                if(currentProjectFile.exists()) {
+                    JMenuItem currentProjectItem = new JMenuItem(currentProjectDir.getName());
+                    currentProjectItem.addActionListener(e -> {
+                        this.openProject(currentProjectFile, songControl, eventControl, nodeControl, ledControl, dimension);
+                    });
+                    openRecentProject.add(currentProjectItem);
+                }
+            }
+        }
 
         saveProject.addActionListener(e -> {
             Point[] graphicNodePositions = bakeGraphicNodePositions();
@@ -573,7 +578,7 @@ public class MainWindow extends JFrame {
 
             JsonWriter.writeProjectFile(new ProjectSaveUnit(this.getTitle()), this.projectPath + "\\project.json");
 
-            JsonWriter.writeTracksToFile(eventControl.createEventSaveUnit(), dataFolder.getPath() + "\\tracks.json");
+            JsonWriter.writeTracksToFile(eventControl.createEventSaveUnit(), dataFolder.getPath() + "\\tracks.json", true);
             JsonWriter.writeNodesToFile(nodeControl.createNodeSaveUnit(), dataFolder.getPath() + "\\nodes.json", graphicNodePositions, functionGraphicNodePositions);
             JsonWriter.writeLedsToFile(ledControl.getLedSaveUnit(), dataFolder.getPath() + "\\leds.json");
             });
@@ -583,13 +588,17 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 EventSaveUnit eventSaveUnit = eventControl.createEventSaveUnit();
 
+                int dialogResult = JOptionPane.showConfirmDialog(getParent(), "Export Time Measures?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                boolean exportTimeMeasures = (dialogResult == JOptionPane.YES_OPTION);
+
                 JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+                fileSaveChooser.setCurrentDirectory(tracksDir);
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
                 fileSaveChooser.setSelectedFile(new File("tracks.json"));
                 int returnValue = fileSaveChooser.showSaveDialog(getParent());
                 if(returnValue == JFileChooser.APPROVE_OPTION) {
-                    JsonWriter.writeTracksToFile(eventSaveUnit, fileSaveChooser.getSelectedFile().getPath());
+                    JsonWriter.writeTracksToFile(eventSaveUnit, fileSaveChooser.getSelectedFile().getPath(), exportTimeMeasures);
                 }
             }
         });
@@ -598,6 +607,7 @@ public class MainWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileOpenChooser = new JFileChooser();
+                fileOpenChooser.setCurrentDirectory(tracksDir);
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileOpenChooser.setFileFilter(serializedFilter);
                 int returnValue = fileOpenChooser.showOpenDialog(getParent());
@@ -615,6 +625,7 @@ public class MainWindow extends JFrame {
                 Point[][] functionGraphicNodePositions = bakeFunctionGraphicNodePositions();
 
                 JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+                fileSaveChooser.setCurrentDirectory(nodesDir);
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
                 fileSaveChooser.setSelectedFile(new File("nodes.json"));
@@ -630,6 +641,7 @@ public class MainWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileOpenChooser = new JFileChooser();
+                fileOpenChooser.setCurrentDirectory(nodesDir);
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileOpenChooser.setFileFilter(serializedFilter);
                 int returnValue = fileOpenChooser.showOpenDialog(getParent());
@@ -641,6 +653,7 @@ public class MainWindow extends JFrame {
 
         importFunction.addActionListener(e -> {
             JFileChooser fileOpenChooser = new JFileChooser();
+            fileOpenChooser.setCurrentDirectory(functionsDir);
             FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
             fileOpenChooser.setFileFilter(serializedFilter);
             int returnValue = fileOpenChooser.showOpenDialog(getParent());
@@ -655,6 +668,7 @@ public class MainWindow extends JFrame {
                 LedSaveUnit ledSaveUnit = ledControl.getLedSaveUnit();
 
                 JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+                fileSaveChooser.setCurrentDirectory(ledsDir);
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileSaveChooser.setFileFilter(serializedFilter);
                 fileSaveChooser.setSelectedFile(new File("leds.json"));
@@ -667,6 +681,7 @@ public class MainWindow extends JFrame {
 
         exportLedsAsMask.addActionListener(e -> {
             JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+            fileSaveChooser.setCurrentDirectory(ledsDir);
             FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
             fileSaveChooser.setFileFilter(serializedFilter);
             fileSaveChooser.setSelectedFile(new File("leds_mask.json"));
@@ -680,6 +695,7 @@ public class MainWindow extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileOpenChooser = new JFileChooser();
+                fileOpenChooser.setCurrentDirectory(ledsDir);
                 FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
                 fileOpenChooser.setFileFilter(serializedFilter);
                 int returnValue = fileOpenChooser.showOpenDialog(getParent());
@@ -733,6 +749,7 @@ public class MainWindow extends JFrame {
         exportNewFunctionItem.addActionListener(e -> {
             int currentFunctionIndex = functionItemList.indexOf(addNewFunctionItem);
             JFileChooser fileSaveChooser = Dialogues.getDefaultFileSaveChooser();
+            fileSaveChooser.setCurrentDirectory(new File(MainWindow.MAIN_PATH + "\\functions"));
             FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
             fileSaveChooser.setFileFilter(serializedFilter);
             fileSaveChooser.setSelectedFile(new File("function.json"));
@@ -779,6 +796,42 @@ public class MainWindow extends JFrame {
         this.nodeEditWindow.setPreferredSize(dimension);
 
         this.enableTabs();
+    }
+
+    private void openProject(File projectFile, SongControl songControl, EventControl eventControl, NodeControl nodeControl, LedControl ledControl, Dimension dimension) {
+        File directoryFile = projectFile.getParentFile();
+        this.projectPath = directoryFile.getPath();
+        if(projectFile.getName().equals("project.json")) {
+            setTitle(directoryFile.getName());
+            newProject(songControl, eventControl, nodeControl, ledControl, dimension);
+            pack();
+            setCorrectLocation();
+            repaint();
+            bProjectOpen = true;
+            enableTabs();
+
+            File tracksFile = new File(this.projectPath + "\\data\\tracks.json");
+            if(tracksFile.exists()) {
+                JsonWriter.addTracksFromFile(tracksFile.getPath(), eventControl);
+            }
+
+            File nodesFile = new File(this.projectPath + "\\data\\nodes.json");
+            if(nodesFile.exists()) {
+                JsonWriter.addNodesFromFile(nodesFile.getPath(), nodeControl, this);
+            }
+
+            File ledsFile = new File(this.projectPath + "\\data\\leds.json");
+            if(ledsFile.exists()) {
+                JsonWriter.addLedsFromFile(ledsFile.getPath(), ledControl);
+            }
+        } else {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Unable to open: Please select project.json",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     private JMenuItem createTrackToNodeItem(String trackName, int trackIndex, NodeControl nodeControl) {

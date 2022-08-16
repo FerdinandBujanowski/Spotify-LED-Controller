@@ -10,6 +10,7 @@ import control.type_enums.JointType;
 import control.type_enums.NodeType;
 import control.math_functions.MathFunctions;
 import gui.Dialogues;
+import gui.MainWindow;
 import gui.main_panels.node_panel.GraphicJoint;
 import gui.main_panels.node_panel.GraphicNode;
 import gui.main_panels.node_panel.MaskPanel;
@@ -472,7 +473,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
             }
             case MASK_TYPE -> {
                 nodeType = NodeType.CONSTANT_MASK_NODE;
-                extraParameters[0] = Dialogues.getJsonChooserFile(getParent(), InputDialogType.JSON_INPUT.getMessage());
+                extraParameters[0] = Dialogues.getJsonChooserFile(getParent(), InputDialogType.JSON_INPUT.getMessage(), MainWindow.MAIN_PATH + "\\masks");
             }
             case COLOR_TYPE -> {
                 nodeType = NodeType.CONSTANT_COLOR_NODE;

@@ -25,7 +25,6 @@ public class GraphicNode extends JPanel {
 
     private final JLabel topPicLabel, bottomPicLabel;
     private final JLabel[] centerPicLabels;
-    private BufferedImage[] nodeImages;
 
     private JLabel nameLabel;
     private JLabel[] inputNameLabels, outputNameLabels;
@@ -48,6 +47,7 @@ public class GraphicNode extends JPanel {
             e.printStackTrace();
         }
 
+        if(maskPanel != null) maxJoints += 3;
         this.centerPicLabels = new JLabel[maxJoints];
         for (int i = 0; i < maxJoints; i++) {
             try {
@@ -237,9 +237,9 @@ public class GraphicNode extends JPanel {
         if (this.maskPanel != null) {
             this.maskPanel.setBounds(
                     (int) Math.round(this.getX() + (0.25 * this.getWidth())),
-                    this.getY() + this.getHeight(),
-                    (int) Math.round(this.getWidth() / 2.0),
-                    (int) Math.round(this.getWidth() / 2.0)
+                    this.getY() + this.getHeight() - (int)(3.5 * NodeControl.NODE_CENTER_HEIGHT * zoomFactor),
+                    (int) Math.round(this.getWidth() / 2.2),
+                    (int) Math.round(this.getWidth() / 2.2)
             );
         }
 
@@ -270,12 +270,13 @@ public class GraphicNode extends JPanel {
 
     public void setTotalSize(double zoomFactor) {
         //OWN SIZE
+        int maxJoints = Math.max(this.numberInputJoints, this.numberOutputJoints);
+
         int height = NodeControl.NODE_TOP_HEIGHT
-                + Math.max(this.numberInputJoints, this.numberOutputJoints) * NodeControl.NODE_CENTER_HEIGHT
+                + (maxJoints + (this.maskPanel != null ? 3 : 0)) * NodeControl.NODE_CENTER_HEIGHT
                 + NodeControl.NODE_BOTTOM_HEIGHT;
         this.setSize(new Dimension((int) Math.round(200 * zoomFactor), (int) Math.round(height * zoomFactor)));
 
-        int maxJoints = Math.max(this.numberInputJoints, this.numberOutputJoints);
 
         //IMAGES
         try {
@@ -289,7 +290,7 @@ public class GraphicNode extends JPanel {
         );
         this.topPicLabel.setLocation(0, 0);
 
-        for (int i = 0; i < maxJoints; i++) {
+        for (int i = 0; i < this.centerPicLabels.length; i++) {
             try {
                 this.centerPicLabels[i].setIcon(new ImageIcon(this.zoomImage(ImageIO.read(new File("images\\node_center.png")), zoomFactor)));
             } catch (IOException e) {
@@ -299,9 +300,11 @@ public class GraphicNode extends JPanel {
                     (int) Math.round(200 * zoomFactor),
                     (int) Math.round(NodeControl.NODE_CENTER_HEIGHT * zoomFactor)
             );
-            this.centerPicLabels[i].setLocation(
-                    0, (int) Math.round((NodeControl.NODE_TOP_HEIGHT + i * NodeControl.NODE_CENTER_HEIGHT) * zoomFactor)
-            );
+            if(i == 0) {
+                this.centerPicLabels[i].setLocation(0, (int)Math.round((NodeControl.NODE_TOP_HEIGHT) * zoomFactor));
+            } else {
+                this.centerPicLabels[i].setLocation(0, (int)Math.round(centerPicLabels[i - 1].getY() + (zoomFactor * NodeControl.NODE_CENTER_HEIGHT)));
+            }
         }
         try {
             this.bottomPicLabel.setIcon(new ImageIcon(this.zoomImage(ImageIO.read(new File("images\\node_bottom.png")), zoomFactor)));
@@ -313,13 +316,13 @@ public class GraphicNode extends JPanel {
                 (int) Math.round(NodeControl.NODE_BOTTOM_HEIGHT * zoomFactor)
         );
         this.bottomPicLabel.setLocation(
-                0, (int) Math.round((NodeControl.NODE_TOP_HEIGHT + maxJoints * NodeControl.NODE_CENTER_HEIGHT) * zoomFactor)
+                0, (int) Math.round(this.centerPicLabels[this.centerPicLabels.length - 1].getY() + (zoomFactor * NodeControl.NODE_CENTER_HEIGHT))
         );
 
         //FONTS
         this.nameLabel.setFont(new Font("Times New Roman", Font.PLAIN, (int) Math.round(18.0 * zoomFactor)));
         this.nameLabel.setSize((int) Math.round(200.0 * zoomFactor), (int) Math.round(NodeControl.NODE_TOP_HEIGHT * zoomFactor));
-        this.nameLabel.setLocation((int) Math.round(15.0 * zoomFactor), 3);
+        this.nameLabel.setLocation((int)Math.round(15.0 * zoomFactor), (int)Math.round(3.0 * zoomFactor));
         this.setComponentZOrder(this.nameLabel, 0);
 
         if (this.graphicInputJoints.length > 0) {

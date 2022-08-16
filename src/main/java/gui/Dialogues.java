@@ -70,8 +70,9 @@ public abstract class Dialogues {
         };
     }
 
-    public static String getJsonChooserFile(Component parent, String message) {
+    public static String getJsonChooserFile(Component parent, String message, String directory) {
         JFileChooser fileOpenChooser = new JFileChooser(message);
+        fileOpenChooser.setCurrentDirectory(new File(directory));
         FileNameExtensionFilter serializedFilter = new FileNameExtensionFilter("JSON", "json");
         fileOpenChooser.setFileFilter(serializedFilter);
         int returnValue = fileOpenChooser.showOpenDialog(parent);
