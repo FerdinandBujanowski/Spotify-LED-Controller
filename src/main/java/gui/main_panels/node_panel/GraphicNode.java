@@ -317,9 +317,9 @@ public class GraphicNode extends JPanel {
         );
 
         //FONTS
-        this.nameLabel.setFont(new Font("Times New Roman", Font.PLAIN, (int) Math.round(20.0 * zoomFactor)));
+        this.nameLabel.setFont(new Font("Times New Roman", Font.PLAIN, (int) Math.round(18.0 * zoomFactor)));
         this.nameLabel.setSize((int) Math.round(200.0 * zoomFactor), (int) Math.round(NodeControl.NODE_TOP_HEIGHT * zoomFactor));
-        this.nameLabel.setLocation((int) Math.round(15.0 * zoomFactor), 2);
+        this.nameLabel.setLocation((int) Math.round(15.0 * zoomFactor), 3);
         this.setComponentZOrder(this.nameLabel, 0);
 
         if (this.graphicInputJoints.length > 0) {
