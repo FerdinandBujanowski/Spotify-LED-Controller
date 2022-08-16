@@ -1,6 +1,7 @@
 package control.save;
 
 import com.google.gson.*;
+import control.event.TimeMeasure;
 import control.exceptions.JointConnectionFailedException;
 import control.led.LedControl;
 import control.node.NodeConnection;
@@ -87,6 +88,19 @@ public abstract class JsonWriter {
             }
         }
         finalObject.add(TRACKS, trackArray);
+
+        if(exportTimeMeasures) {
+            JsonArray timeMeasureArray = new JsonArray();
+            for (TimeMeasure timeMeasure : eventSaveUnit.getTimeMeasures()) {
+                JsonObject timeMeasureObject = new JsonObject();
+                timeMeasureObject.addProperty(BEATS_BAR, timeMeasure.getBeatsPerBar());
+                timeMeasureObject.addProperty(BEATS_MINUTE, timeMeasure.getBeatsPerMinute());
+                timeMeasureObject.addProperty(START, timeMeasure.getMsStart());
+                timeMeasureObject.addProperty(DURATION, timeMeasure.getBarsDuration());
+                timeMeasureArray.add(timeMeasureObject);
+            }
+            finalObject.add(TIME_MEASURES, timeMeasureArray);
+        }
 
         JsonWriter.write(finalObject, path);
     }
