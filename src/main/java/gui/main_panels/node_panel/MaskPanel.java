@@ -76,13 +76,15 @@ public class MaskPanel extends JPanel {
                         (int)Math.round(step),
                         (int)Math.round(step)
                 );
-                g.setColor(Color.BLACK);
-                g.drawRect(
-                        (int)Math.round(step * i),
-                        (int)Math.round(step * j),
-                        (int)Math.round(step),
-                        (int)Math.round(step)
-                );
+                if((int)Math.round(step) > 3) {
+                    g.setColor(Color.BLACK);
+                    g.drawRect(
+                            (int)Math.round(step * i),
+                            (int)Math.round(step * j),
+                            (int)Math.round(step),
+                            (int)Math.round(step)
+                    );
+                }
             }
         }
     }
