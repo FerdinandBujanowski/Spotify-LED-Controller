@@ -31,5 +31,5 @@ public interface SongRequestAcceptor {
     void setCurrentSongMs(int newMs);
     void onSkipTo(int ms);
 
-    TimeMeasure generateTimeMeasure();
+    TimeMeasure[] generateTimeMeasures();
 }

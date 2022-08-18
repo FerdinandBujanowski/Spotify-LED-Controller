@@ -158,7 +158,8 @@ public class SpotifyPlayerPanel extends JPanel {
         this.exportTimeMeasureButton.setEnabled(false);
         this.exportTimeMeasureButton.addActionListener(e -> {
             //TODO abfragen ob WIRKLICH importieren (löscht die anderen TimeMeasures)
-            this.eventSongCommunication.importTimeMeasure(new TimeMeasure[] { this.songControl.generateTimeMeasure() });
+
+            this.eventSongCommunication.importTimeMeasure(this.songControl.generateTimeMeasures());
         });
         this.add(this.exportTimeMeasureButton);
 

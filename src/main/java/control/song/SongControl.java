@@ -324,13 +324,20 @@ public class SongControl implements SongRequestAcceptor, SongEventCommunication 
     }
 
     @Override
-    public TimeMeasure generateTimeMeasure() {
-        return new TimeMeasure(
+    public TimeMeasure[] generateTimeMeasures() {
+        int startMs = (int)(this.selectedSongAnalysis.getBeats()[0].getStart() * 1000);
+        TimeMeasure mainTimeMeasure = new TimeMeasure(
                 this.selectedSongFeatures.getTimeSignature(),
                 this.selectedSongFeatures.getTempo(),
-                (int)(this.selectedSongAnalysis.getBeats()[0].getStart() * 1000),
+                startMs,
                 this.selectedSongAnalysis.getBeats().length
         );
+        if(startMs != 0) {
+            float startBpm = 60000.f / startMs;
+            TimeMeasure startTimeMeasure = new TimeMeasure(1, startBpm, 0, 1);
+            return new TimeMeasure[] { startTimeMeasure, mainTimeMeasure };
+        }
+        return new TimeMeasure[] { mainTimeMeasure };
     }
 
     @Override
