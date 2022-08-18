@@ -224,12 +224,14 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
     }
 
     @Override
-    public void importTimeMeasure(TimeMeasure timeMeasure) {
+    public void importTimeMeasure(TimeMeasure[] timeMeasures) {
         while(!this.timeMeasures.isEmpty()) {
             this.eventWindow.removeTimeMeasure(this.timeMeasures.get(0).getMsStart());
             this.timeMeasures.remove(0);
         }
-        this.timeMeasures.add(timeMeasure);
-        this.eventWindow.addTimeMeasure(timeMeasure);
+        for(TimeMeasure timeMeasure : timeMeasures) {
+            this.timeMeasures.add(timeMeasure);
+            this.eventWindow.addTimeMeasure(timeMeasure);
+        }
     }
 }

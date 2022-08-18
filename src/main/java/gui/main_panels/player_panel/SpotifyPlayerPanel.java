@@ -3,6 +3,7 @@ package gui.main_panels.player_panel;
 import com.wrapper.spotify.exceptions.detailed.NotFoundException;
 import control.event.EventControl;
 import control.event.EventSongCommunication;
+import control.event.TimeMeasure;
 import control.song.SongControl;
 import control.song.SongRequestAcceptor;
 
@@ -157,7 +158,7 @@ public class SpotifyPlayerPanel extends JPanel {
         this.exportTimeMeasureButton.setEnabled(false);
         this.exportTimeMeasureButton.addActionListener(e -> {
             //TODO abfragen ob WIRKLICH importieren (löscht die anderen TimeMeasures)
-            this.eventSongCommunication.importTimeMeasure(this.songControl.generateTimeMeasure());
+            this.eventSongCommunication.importTimeMeasure(new TimeMeasure[] { this.songControl.generateTimeMeasure() });
         });
         this.add(this.exportTimeMeasureButton);
 

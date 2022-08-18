@@ -36,7 +36,7 @@ public abstract class JsonWriter {
     private final static String DURATION = "duration";
     private final static String CURVE_TYPE = "curve_type";
     private final static String USER_INPUT = "user_input";
-    //TODO : seperate export/import events and time measures
+
     private final static String TIME_MEASURES = "time_measures";
     private final static String BEATS_BAR = "beats_per_bar";
     private final static String BEATS_MINUTE = "beats_per_minute";
@@ -143,6 +143,21 @@ public abstract class JsonWriter {
                         eventObject.has(USER_INPUT) ? eventObject.get(USER_INPUT).getAsDouble() : 0
                 );
             }
+        }
+
+        if(tracksObject.has(TIME_MEASURES)) {
+            JsonArray timeMeasureArray = tracksObject.getAsJsonArray(TIME_MEASURES);
+            TimeMeasure[] timeMeasures = new TimeMeasure[timeMeasureArray.size()];
+            for(int i = 0; i < timeMeasureArray.size(); i++) {
+                JsonObject currentTimeMeasureObject = timeMeasureArray.get(i).getAsJsonObject();
+                timeMeasures[i] = new TimeMeasure(
+                        currentTimeMeasureObject.get(BEATS_BAR).getAsInt(),
+                        currentTimeMeasureObject.get(BEATS_MINUTE).getAsFloat(),
+                        currentTimeMeasureObject.get(START).getAsInt(),
+                        currentTimeMeasureObject.get(DURATION).getAsInt()
+                );
+            }
+            eventControl.importTimeMeasure(timeMeasures);
         }
     }
 

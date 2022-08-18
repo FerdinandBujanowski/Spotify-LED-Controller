@@ -206,7 +206,6 @@ public class GraphicNode extends JPanel {
         this.maskPanel = maskPanel;
         if (this.maskPanel != null) {
             parentNodePanel.add(this.maskPanel);
-            parentNodePanel.setComponentZOrder(this.maskPanel, 0);
             this.maskPanel.setBounds(50, 50, 100, 100);
         }
     }
@@ -235,11 +234,9 @@ public class GraphicNode extends JPanel {
         this.setLocation((int) Math.round(x * zoomFactor), (int) Math.round(y * zoomFactor));
 
         if (this.maskPanel != null) {
-            this.maskPanel.setBounds(
+            this.maskPanel.setLocation(
                     (int) Math.round(this.getX() + (0.25 * this.getWidth())),
-                    this.getY() + this.getHeight() - (int)(3.5 * NodeControl.NODE_CENTER_HEIGHT * zoomFactor),
-                    (int) Math.round(this.getWidth() / 2.2),
-                    (int) Math.round(this.getWidth() / 2.2)
+                    this.getY() + this.getHeight() - (int)(3.5 * NodeControl.NODE_CENTER_HEIGHT * zoomFactor)
             );
         }
 
@@ -349,6 +346,13 @@ public class GraphicNode extends JPanel {
                 );
                 this.setComponentZOrder(this.outputNameLabels[i], 0);
             }
+        }
+
+        if(this.maskPanel != null) {
+            this.maskPanel.setSize(
+                    (int) Math.round(this.getWidth() / 2.2),
+                    (int) Math.round(this.getWidth() / 2.2)
+            );
         }
     }
 
