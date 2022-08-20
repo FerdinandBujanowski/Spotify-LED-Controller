@@ -64,7 +64,7 @@ public abstract class ParentNodePanel extends JPanel implements Serializable, No
         this.zoomLabel.setSize(50, 50);
 
         this.setOpaque(true);
-        this.setBackground(Color.DARK_GRAY);
+        this.setBackground(new Color(25, 20, 20));
 
         this.addMouseListener(new MouseAdapter() {
             @Override

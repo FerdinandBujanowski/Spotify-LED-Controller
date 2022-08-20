@@ -1,0 +1,27 @@
+{
+    "nodes": [
+        {
+            "node_index": 0,
+            "node_type": "SUBTRACT_NODE"
+        },
+        {
+            "node_index": 1,
+            "node_type": "ADD_NODE"
+        }
+    ],
+    "node_connections": [
+        {
+            "input": {
+                "function_index": -1,
+                "node_index": 1,
+                "joint_index": 0
+            },
+            "output": {
+                "function_index": -1,
+                "node_index": 0,
+                "joint_index": 0
+            }
+        }
+    ],
+    "functions": []
+}

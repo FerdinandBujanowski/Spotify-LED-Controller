@@ -14,6 +14,8 @@ import java.awt.*;
 
 public class SimpleTextureNode extends LogicNode {
 
+    public LogicTexture logicTexture;
+
     public SimpleTextureNode(int nodeIndex) {
         super(
                 nodeIndex,
@@ -26,18 +28,27 @@ public class SimpleTextureNode extends LogicNode {
                 },
                 NodeType.SIMPLE_TEXTURE_NODE
         );
+        this.logicTexture = new LogicTexture();
     }
 
     public SimpleTextureNode(int nodeIndex, InputJoint[] inputJoints, OutputJoint[] outputJoints, NodeType nodeType, Object[] extraParameters) {
         super(nodeIndex, inputJoints, outputJoints, nodeType, extraParameters);
+        this.logicTexture = new LogicTexture();
     }
 
     @Override
     public TextureJointDataType[] function(InputJoint[] inputJoints) {
-        LogicMask mask = (LogicMask) inputJoints[0].getJointDataType().getData();
+        LogicMask logicMask = (LogicMask) inputJoints[0].getJointDataType().getData();
         Color color = (Color) inputJoints[1].getJointDataType().getData();
+        int degree = logicMask.getDegree();
+        for(int x = -degree; x <= degree; x++) {
+            for(int y = -degree; y <= degree; y++) {
+                this.logicTexture.setIntensityAt(x, y, logicMask.getIntensityAt(x, y), color);
+            }
+        }
+        logicTexture.getLogicMask().cleanUp();
         return new TextureJointDataType[] {
-                new TextureJointDataType(LogicTexture.multiplyMaskWithColor(mask, color))
+                new TextureJointDataType(this.logicTexture)
         };
     }
 

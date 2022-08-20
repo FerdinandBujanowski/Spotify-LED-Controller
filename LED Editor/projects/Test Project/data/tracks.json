@@ -1,0 +1,31 @@
+{
+  "tracks": [
+    {
+      "events": [
+        {
+          "start": 1000,
+          "duration": 1000,
+          "curve_type": "LINEAR"
+        },
+        {
+          "start": 4000,
+          "duration": 1000,
+          "curve_type": "CONSTANT"
+        },
+        {
+          "start": 6000,
+          "duration": 1000,
+          "curve_type": "CONSTANT"
+        }
+      ]
+    }
+  ],
+  "time_measures": [
+    {
+      "beats_per_bar": 5,
+      "beats_per_minute": 60.0,
+      "start": 0,
+      "duration": 16
+    }
+  ]
+}

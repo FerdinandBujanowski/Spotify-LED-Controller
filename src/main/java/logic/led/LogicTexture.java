@@ -32,6 +32,12 @@ public class LogicTexture {
         return this.logicMask;
     }
 
+    public void sweep() {
+        this.colors.removeAll(this.colors);
+        this.colorCoordinatePoints.removeAll(this.colorCoordinatePoints);
+        this.logicMask.sweep();
+    }
+
     public static int mixWithIntensity(int a, int b, double intensity) {
         int mix = (int)(Math.round(a * intensity)) + (int)(Math.round(b * (1.d - intensity)));
         if(mix > 255) return 255;

@@ -1,0 +1,116 @@
+{
+    "tracks": [
+        {
+            "events": [
+                {
+                    "start": 21680,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 22131,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 22582,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 23033,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 23484,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 24386,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 23935,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 24837,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 25288,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 25739,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 26190,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                },
+                {
+                    "start": 26641,
+                    "duration": 451,
+                    "curve_type": "LINEAR"
+                }
+            ]
+        },
+        {
+            "events": [
+                {
+                    "start": 21680,
+                    "duration": 5412,
+                    "curve_type": "LINEAR"
+                }
+            ]
+        },
+        {
+            "events": [
+                {
+                    "start": 21680,
+                    "duration": 451,
+                    "curve_type": "CONSTANT"
+                },
+                {
+                    "start": 22582,
+                    "duration": 451,
+                    "curve_type": "CONSTANT"
+                },
+                {
+                    "start": 23484,
+                    "duration": 451,
+                    "curve_type": "CONSTANT"
+                },
+                {
+                    "start": 24386,
+                    "duration": 451,
+                    "curve_type": "CONSTANT"
+                },
+                {
+                    "start": 25288,
+                    "duration": 451,
+                    "curve_type": "CONSTANT"
+                },
+                {
+                    "start": 26190,
+                    "duration": 451,
+                    "curve_type": "CONSTANT"
+                },
+                {
+                    "start": 27092,
+                    "duration": 451,
+                    "curve_type": "CONSTANT"
+                }
+            ]
+        }
+    ]
+}
