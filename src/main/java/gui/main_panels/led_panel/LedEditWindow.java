@@ -393,8 +393,14 @@ public class LedEditWindow extends JPanel implements LedGraphicUnit {
 
             Point from = new Point(lastOrderedPixel.getY(), lastOrderedPixel.getZ());
             Point to = new Point(lastPixel.getPixelX(), lastPixel.getPixelY());
-            for(int y = Math.min(from.y, to.y); y <= Math.max(from.y, to.y); y++) {
-                for(int x = Math.min(from.x, to.x); x <= Math.max(from.x, to.x); x++) {
+            int relativeX, relativeY;
+            if(to.x - from.x == 0) relativeX = 1;
+            else relativeX = (to.x - from.x) / Math.abs(to.x - from.x);
+            if(to.y - from.y == 0) relativeY = 1;
+            else relativeY = (to.y - from.y) / (Math.abs(to.y - from.y));
+            Point relativeMovement = new Point(relativeX, relativeY);
+            for(int y = from.y; (y - to.y) / relativeMovement.y <= 0; y += relativeMovement.y) {
+                for(int x = from.x; (x - to.x) / relativeMovement.x <= 0; x += relativeMovement.x) {
                     int pixelIndex = this.ledControl.getPixelIndex(x, y);
                     if(pixelIndex != -1) {
                         GraphicPixel currentGraphicPixel = this.graphicPixels.get(pixelIndex);

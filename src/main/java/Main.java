@@ -71,7 +71,7 @@ public class Main {
         Thread asyncThreadB = new Thread(() -> {
             while(true) {
                 try {
-                    Thread.sleep(40);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

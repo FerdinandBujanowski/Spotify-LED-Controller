@@ -40,15 +40,9 @@ public class SimpleTextureNode extends LogicNode {
     public TextureJointDataType[] function(InputJoint[] inputJoints) {
         LogicMask logicMask = (LogicMask) inputJoints[0].getJointDataType().getData();
         Color color = (Color) inputJoints[1].getJointDataType().getData();
-        int degree = logicMask.getDegree();
-        for(int x = -degree; x <= degree; x++) {
-            for(int y = -degree; y <= degree; y++) {
-                this.logicTexture.setIntensityAt(x, y, logicMask.getIntensityAt(x, y), color);
-            }
-        }
-        logicTexture.getLogicMask().cleanUp();
+
         return new TextureJointDataType[] {
-                new TextureJointDataType(this.logicTexture)
+                new TextureJointDataType(LogicTexture.multiplyMaskWithColor(logicMask, color))
         };
     }
 

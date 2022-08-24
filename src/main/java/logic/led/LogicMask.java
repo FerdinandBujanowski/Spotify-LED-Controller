@@ -6,6 +6,7 @@ import control.type_enums.AxisType;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class LogicMask implements Serializable {
 
@@ -16,9 +17,11 @@ public class LogicMask implements Serializable {
     }
 
     public void setIntensityAt(int x, int y, double intensity) {
-        for(LogicPixel pixel : this.pixels) {
-            if(pixel.x == x && pixel.y == y) {
-                pixel.setIntensity(intensity);
+        for(int i = 0; i < this.pixels.size(); i++) {
+            LogicPixel logicPixel = this.pixels.get(i);
+            if(logicPixel == null) return;
+            if(logicPixel.x == x && logicPixel.y == y) {
+                logicPixel.setIntensity(intensity);
                 return;
             }
         }
@@ -26,9 +29,11 @@ public class LogicMask implements Serializable {
     }
 
     public double getIntensityAt(int x, int y) {
-        for(LogicPixel pixel : this.pixels) {
-            if(pixel.x == x && pixel.y == y) {
-                return pixel.getIntensity();
+        for(int i = 0; i < this.pixels.size(); i++) {
+            LogicPixel logicPixel = this.pixels.get(i);
+            if(logicPixel == null) return 0;
+            if(logicPixel.x == x && logicPixel.y == y) {
+                return logicPixel.getIntensity();
             }
         }
         return 0;

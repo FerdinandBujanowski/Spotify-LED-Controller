@@ -25,6 +25,7 @@ public class LogicLayer implements Serializable {
         if(!this.isEnabled) {
             return(this.lowerLayer != null ? this.lowerLayer.getColorAt(x, y) : Color.BLACK);
         }
+        this.logicTexture.getLogicMask().cleanUp();
         double intensity = this.logicTexture.getLogicMask().getIntensityAt(x, y);
         Color lowerColor;
         if(this.lowerLayer == null) {
