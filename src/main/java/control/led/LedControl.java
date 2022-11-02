@@ -52,6 +52,17 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
         JsonWriter.writeMaskToFile(this.pixelMask.getValues(), path);
     }
 
+    public double[] calculateRelativeIntensities() {
+        double[] intensities = new double[this.pixels.size()];
+        for(int i = 0; i < this.pixels.size(); i++) {
+            Point currentPixel = this.pixels.get(i);
+            Color currentColor = this.getColorAt(currentPixel.x, currentPixel.y);
+            double currentIntensity = (currentColor.getRed() + currentColor.getGreen() + currentColor.getBlue()) / (3 * 256.d);
+            intensities[i] = currentIntensity;
+        }
+        return intensities;
+    }
+
     @Override
     public void setLedGraphicUnit(LedGraphicUnit ledGraphicUnit) {
         this.ledGraphicUnit = ledGraphicUnit;
@@ -177,6 +188,16 @@ public class LedControl implements Serializable, LedRequestAcceptor, LedNodeComm
             return this.logicLayers.get(this.logicLayers.size() - 1).getColorAt(x, y);
         } else return Color.BLACK;
      }
+
+    @Override
+    public double getUsedCapacity() {
+        double[] relativeIntensities = this.calculateRelativeIntensities();
+        double intensitiesSum = 0;
+        for(double intensity : relativeIntensities) {
+            intensitiesSum += intensity;
+        }
+        return intensitiesSum / relativeIntensities.length;
+    }
 
     @Override
     public String[] onGetPortsRequest() {

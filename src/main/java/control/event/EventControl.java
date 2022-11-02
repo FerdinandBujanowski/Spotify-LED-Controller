@@ -50,6 +50,14 @@ public class EventControl implements EventRequestAcceptor, EventSongCommunicatio
         this.songEventCommunication = songEventCommunication;
     }
 
+    public boolean isOverTheEdge(int currentMs) {
+        int totalMs = this.timeMeasures.get(0).getMsStart();
+        for(TimeMeasure timeMeasure : this.timeMeasures) {
+            totalMs += (timeMeasure.getLengthOneBar() * timeMeasure.getBarsDuration());
+        }
+        return currentMs > totalMs;
+    }
+
     @Override
     public void onSkipTo(int ms) {
         this.songEventCommunication.onSkipTo(ms);

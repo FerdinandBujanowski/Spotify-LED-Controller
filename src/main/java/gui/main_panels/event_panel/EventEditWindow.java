@@ -104,7 +104,7 @@ public class EventEditWindow extends JPanel implements EventGraphicUnit {
             }
         });
 
-        eventControl.onAddTimeMeasureRequest(4, 60, 0, 16);
+        eventControl.onAddTimeMeasureRequest(4, 60, 0, 4);
         eventControl.onAddTrackRequest();
     }
 

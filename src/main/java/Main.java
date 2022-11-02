@@ -81,6 +81,11 @@ public class Main {
                         msSince.set((int)(System.currentTimeMillis() - currentMs.get()));
 
                          correctMS = msSince.get() + songControl.getCurrentSongMs();
+                         if(eventControl.isOverTheEdge(correctMS)) {
+                             correctMS = 0;
+                             currentMs.set((int)System.currentTimeMillis());
+                             msSince.set(0);
+                         }
 
                         eventControl.tick(correctMS);
                         nodeControl.tick(correctMS, eventControl.getTrackIntensitiesAt(correctMS));

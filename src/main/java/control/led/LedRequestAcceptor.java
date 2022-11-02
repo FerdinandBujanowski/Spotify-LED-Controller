@@ -24,6 +24,7 @@ public interface LedRequestAcceptor {
     void onUpdatePixelRequest(int pixelIndex, int newX, int newY, boolean deleted);
     int getFinalDegree();
     Color getColorAt(int x, int y);
+    double getUsedCapacity();
 
     String[] onGetPortsRequest();
     void onOpenPortRequest(int index);
